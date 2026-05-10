@@ -1,8 +1,40 @@
 # Matters Community Watch
 
-Matters Community Watch is the implementation workspace for 「馬特市守望相助隊」.
+Matters Community Watch is the public-site and implementation workspace for 「馬特市守望相助隊」.
 
 The project goal is to let a small set of trusted citizens remove spam comments while keeping every action publicly auditable: who handled which comment, when, why, what appeal/review state it is in, and how Matters staff can recover or override the action.
+
+Production page:
+
+- https://community-watch.matters.town/
+
+## Public Page
+
+This repository now owns the standalone Astro static site for the public transparency page. The page was split out from `thematters/design-system` after the prototype became a real public property.
+
+Edit page copy, metrics, mock moderation records, appeal text, and AI-training notes here:
+
+```text
+src/content/page.ts
+```
+
+Main UI files:
+
+- `src/pages/index.astro`
+- `src/styles/global.css`
+- `src/styles/vendor/tokens.css`
+- `public/images/`
+
+Local development:
+
+```bash
+pnpm install
+pnpm dev
+pnpm build
+pnpm typecheck
+```
+
+Deployment notes live in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Scope
 
@@ -34,11 +66,11 @@ This repository is the planning and public-site home for Community Watch. Produc
 
 - `thematters/matters-server`: GraphQL API, DB migrations, permission checks, audit table, comment state updates.
 - `thematters/matters-web`: comment dropdown entry, removed-comment placeholder, public page integration if implemented in the main web app.
-- `thematters/design-system`: shared UI components and tokens for the public page.
+- `thematters/design-system`: shared UI components, tokens, and brand guidance consumed by this public page.
 
 ## Current Status
 
-Phase 0 is complete as repo-backed planning:
+Phase 0 is complete as repo-backed planning, and the standalone public page is now in this repository:
 
 - [docs/decisions.md](docs/decisions.md)
 - [docs/phase-0-repo-survey.md](docs/phase-0-repo-survey.md)
@@ -46,4 +78,4 @@ Phase 0 is complete as repo-backed planning:
 - [docs/staging-verification.md](docs/staging-verification.md)
 - [docs/status.md](docs/status.md)
 
-Next implementation target: Phase 1, admin assignment through a new `communityWatch` user feature flag.
+Next implementation target: connect the public page to the Community Watch audit API after the server-side action table and public query are available.

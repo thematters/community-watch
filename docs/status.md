@@ -9,6 +9,8 @@ Phase 1 is in implementation review.
 ## Completed
 
 - Created public project repository: `thematters/community-watch`.
+- Split the public transparency page out of `thematters/design-system` into this standalone repository.
+- Added the Astro public site for `community-watch.matters.town`.
 - Completed Phase 0 repo-backed survey and implementation plan.
 - Opened Phase 1 server PR:
   - Repository: `thematters/matters-server`
@@ -39,3 +41,4 @@ After Phase 1 review/CI:
 
 - Phase 2: add the Community Watch comment-removal API and DB audit table.
 - Phase 3: add the minimal existing-comment-dropdown entry and placeholder rendering.
+- Public page: replace mock audit records in `src/content/page.ts` with the public audit API when Phase 2 data is available.
