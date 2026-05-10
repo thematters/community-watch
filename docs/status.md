@@ -4,7 +4,7 @@ Last updated: 2026-05-10
 
 ## Current Phase
 
-Phase 2 is in implementation review as a stacked PR on Phase 1.
+Phase 3 is in implementation review as dependent server and web draft PRs.
 
 ## Completed
 
@@ -23,6 +23,16 @@ Phase 2 is in implementation review as a stacked PR on Phase 1.
   - Base branch while stacked: `codex/community-watch-phase1`
   - PR: https://github.com/thematters/matters-server/pull/4763
 - Fixed Phase 2 Codecov patch coverage by adding a GraphQL-level Community Watch mutation test in the CI upload batch.
+- Opened Phase 3 server PR:
+  - Repository: `thematters/matters-server`
+  - Branch: `codex/community-watch-phase3-server`
+  - Base branch while stacked: `codex/community-watch-phase1`
+  - PR: https://github.com/thematters/matters-server/pull/4764
+- Opened Phase 3 web PR:
+  - Repository: `thematters/matters-web`
+  - Branch: `codex/community-watch-phase3`
+  - Base branch: `develop`
+  - PR: https://github.com/thematters/matters-web/pull/5881
 
 ## Phase 1 PR Scope
 
@@ -47,6 +57,25 @@ Phase 2 is in implementation review as a stacked PR on Phase 1.
 - Writes audit evidence, triggers the existing `comment_banned` notification, and invalidates article/moment cache.
 - Covers migration rollback plus resolver success/error paths with focused tests.
 
+## Phase 3 PR Scope
+
+Server PR #4764:
+
+- Adds `Comment.communityWatchAction` to expose the active Community Watch audit record for a banned comment.
+- Returns the public audit `uuid`, reason, and created time so the web client can render a stable public record link.
+- Keeps this as a read-side resolver on the existing `community_watch_action` DB audit table instead of adding a parallel moderation state.
+- Covers the new field in the existing Community Watch mutation GraphQL test.
+
+Web PR #5881:
+
+- Adds viewer-side `isCommunityWatch` detection from the existing `oss.featureFlags` viewer fragment.
+- Adds two Community Watch-only comment menu actions: `色情廣告` and `濫發廣告`.
+- Adds the bottom warning label `所有處理都會公開留痕`; no extra confirmation dialog is added.
+- Replaces Community Watch removed comments with the placeholder `本則貼文已由守望相助隊檢舉`.
+- Links the placeholder to `https://community-watch.matters.town/records/{uuid}`.
+- Keeps Community Watch removed comments in article and moment comment lists so placeholders can render even though the stored comment state is `banned`.
+- Leaves circle comments untouched because circle is out of scope.
+
 ## Verification Notes
 
 - `npm run gen`: passed after rebuilding local `bcrypt` native dependency.
@@ -67,11 +96,22 @@ Phase 2 is in implementation review as a stacked PR on Phase 1.
   - GitHub `build / build`: passed on commit `5db47f5663987f0dbfd5aa24e82e5ba20f3d8b73`.
   - GitHub `codecov/patch`: passed; Codecov reports 81.91% patch coverage.
   - GitHub `codecov/project`: passed; Codecov reports 57.96% project coverage.
+- Phase 3 server local verification:
+  - `npm run build`: passed.
+  - `npm run lint`: passed.
+  - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchActionMigration.test.js build/common/utils/__test__/communityWatchRemoveComment.test.js --runInBand --forceExit`: passed, 12 tests.
+- Phase 3 web local verification:
+  - `npm run lint:ts`: passed.
+  - `npm run lint`: passed via pre-commit.
+  - `npm run test:unit -- src/common/utils/comment.test.ts src/components/Comment/Content/Content.test.tsx src/components/Comment/DropdownActions/DropdownActions.test.tsx`: passed, 15 tests.
+  - React tests still print existing `MemoryRouterProvider` act warnings and a react-spring deprecation warning; assertions pass.
+- Phase 3 web CI dependency:
+  - `thematters/matters-web` CI runs `npm run gen:type` against `server.matters.icu` and `server.matters.town`.
+  - Web PR #5881 is expected to remain draft/dependent until server PR #4764 is merged and the schema is deployed to the endpoints used by codegen.
 
 ## Next
 
-After Phase 1 and Phase 2 review/CI:
+After Phase 3 review/CI:
 
-- Phase 3: add the minimal existing-comment-dropdown entry and placeholder rendering.
 - Phase 4: replace mock audit records in `src/content/page.ts` with the public audit API.
 - Add a retention cleanup job or scheduled operation that clears `community_watch_action.original_content` after seven days.
