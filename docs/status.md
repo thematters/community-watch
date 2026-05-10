@@ -4,7 +4,7 @@ Last updated: 2026-05-10
 
 ## Current Phase
 
-Phase 3 is in implementation review as dependent server and web draft PRs. Phase 4-6 no-server-dependency work is continuing in this repository.
+Phase 4 is in implementation review as a stacked server PR. Phase 3 server/web PRs remain open underneath it.
 
 ## Completed
 
@@ -33,6 +33,11 @@ Phase 3 is in implementation review as dependent server and web draft PRs. Phase
   - Branch: `codex/community-watch-phase3`
   - Base branch: `develop`
   - PR: https://github.com/thematters/matters-web/pull/5881
+- Opened Phase 4 server PR:
+  - Repository: `thematters/matters-server`
+  - Branch: `codex/community-watch-phase4-server`
+  - Base branch while stacked: `codex/community-watch-phase3-server`
+  - PR: https://github.com/thematters/matters-server/pull/4765
 
 ## Phase 1 PR Scope
 
@@ -75,6 +80,28 @@ Web PR #5881:
 - Links the placeholder to `https://community-watch.matters.town/records/{uuid}`.
 - Keeps Community Watch removed comments in article and moment comment lists so placeholders can render even though the stored comment state is `banned`.
 - Leaves circle comments untouched because circle is out of scope.
+
+## Phase 4 PR Scope
+
+Server PR #4765:
+
+- Adds public root query `communityWatchActions(input:)` for recent audit records.
+- Adds public root query `communityWatchAction(input: { uuid })` for one audit record.
+- Expands `CommunityWatchAction` with fields needed by `community-watch.matters.town`:
+  - `commentId`;
+  - `sourceType`;
+  - `sourceTitle`;
+  - `sourceId`;
+  - `actorDisplayName`;
+  - `actionState`;
+  - `appealState`;
+  - `reviewState`;
+  - `originalContent`;
+  - `contentCleared`;
+  - `createdAt`.
+- Keeps actor identity public only as Matters display name; internal `actor_id` remains DB-only.
+- Maps internal numeric comment/source IDs to public GraphQL IDs.
+- Does not change the Phase 2 removal mutation.
 
 ## Verification Notes
 
@@ -127,11 +154,15 @@ Web PR #5881:
   - `pnpm typecheck`: passed.
   - `pnpm build`: passed and generated `/`, plus three `/records/cw-demo-*/` static pages.
   - Smoke-tested `http://127.0.0.1:4321/` and `http://127.0.0.1:4321/records/cw-demo-8f2a71/`: both returned 200.
+- Phase 4 server local verification:
+  - `npm run build`: passed.
+  - `npm run lint`: passed.
+  - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchPublicQueries.test.js --runInBand --forceExit`: passed, 3 tests.
 
 ## Next
 
-After Phase 3 review/CI:
+After Phase 4 review/CI:
 
-- Phase 4: replace sample audit records in `src/content/page.ts` with the public audit API.
+- Phase 4 web/site follow-up: replace sample audit records in `src/content/page.ts` with the public audit API.
 - Phase 5: add staff review and appeal status workflows.
 - Phase 6: configure `community-watch.matters.town`, staging validation, monitoring, and human production approval.
