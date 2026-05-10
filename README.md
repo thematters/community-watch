@@ -44,5 +44,6 @@ Phase 0 is complete as repo-backed planning:
 - [docs/phase-0-repo-survey.md](docs/phase-0-repo-survey.md)
 - [docs/implementation-plan.md](docs/implementation-plan.md)
 - [docs/staging-verification.md](docs/staging-verification.md)
+- [docs/status.md](docs/status.md)
 
 Next implementation target: Phase 1, admin assignment through a new `communityWatch` user feature flag.
