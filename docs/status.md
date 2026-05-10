@@ -4,7 +4,7 @@ Last updated: 2026-05-10
 
 ## Current Phase
 
-Phase 3 is in implementation review as dependent server and web draft PRs.
+Phase 3 is in implementation review as dependent server and web draft PRs. Phase 4-6 no-server-dependency work is continuing in this repository.
 
 ## Completed
 
@@ -113,10 +113,23 @@ Web PR #5881:
   - `thematters/matters-web` CI runs `npm run gen:type` against `server.matters.icu` and `server.matters.town`.
   - Web PR #5881 currently fails at `Generate Types (Develop)` because those endpoints do not yet expose `CommunityWatchRemoveCommentReason`, `communityWatchRemoveComment`, or `Comment.communityWatchAction`.
   - Web PR #5881 is expected to remain draft/dependent until server PR #4764 is merged and the schema is deployed to the endpoints used by codegen.
+- Retention decision update:
+  - Do not run automatic `original_content` cleanup in the current plan.
+  - Privacy/personal-data requests can still clear `original_content` directly while keeping non-personal audit metadata.
+- Phase 4-6 no-server-dependency work:
+  - Added `/records/{uuid}/` static public record detail pages using the current sample records.
+  - Added blurred-by-default original-content reveal behavior on the detail page.
+  - Labeled sample audit rows as demonstration data until the public API is connected.
+  - Added `docs/public-api-contract.md` for the future public list/detail query shape.
+  - Updated deployment and staging notes so they no longer require a seven-day cleanup job.
+  - `pnpm typecheck`: passed.
+  - `pnpm build`: passed and generated `/`, plus three `/records/cw-demo-*/` static pages.
+  - Smoke-tested `http://127.0.0.1:4321/` and `http://127.0.0.1:4321/records/cw-demo-8f2a71/`: both returned 200.
 
 ## Next
 
 After Phase 3 review/CI:
 
-- Phase 4: replace mock audit records in `src/content/page.ts` with the public audit API.
-- Add a retention cleanup job or scheduled operation that clears `community_watch_action.original_content` after seven days.
+- Phase 4: replace sample audit records in `src/content/page.ts` with the public audit API.
+- Phase 5: add staff review and appeal status workflows.
+- Phase 6: configure `community-watch.matters.town`, staging validation, monitoring, and human production approval.

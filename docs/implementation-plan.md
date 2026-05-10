@@ -112,7 +112,7 @@ Fields:
 - `reason`: enum `porn_ad` or `spam_ad`.
 - `actor_id`: Community Watch member user ID.
 - `comment_author_id`: original comment author user ID, nullable if privacy handling later requires removal.
-- `original_content`: comment content at removal time, nullable and cleared after 7 days.
+- `original_content`: comment content at removal time, nullable and manually clearable for privacy/personal-data requests.
 - `original_state`: previous comment state.
 - `action_state`: `active`, `restored`, `voided`.
 - `appeal_state`: `none`, `received`, `resolved`.
@@ -120,7 +120,7 @@ Fields:
 - `reviewer_id`: staff reviewer user ID, nullable.
 - `review_note`: staff note, nullable.
 - `reviewed_at`: timestamp, nullable.
-- `content_expires_at`: removal time plus 7 days.
+- `content_expires_at`: dormant compatibility field from the earlier seven-day retention plan; do not run automatic cleanup until a later product/legal decision re-enables timed retention.
 - `created_at`: removal time.
 - `updated_at`: update time.
 
@@ -131,13 +131,14 @@ Indexes:
 - Index `actor_id, created_at`.
 - Index `reason, created_at`.
 - Index `review_state, created_at`.
-- Index `content_expires_at` for scheduled clearing.
+- Index `content_expires_at` only if timed retention is re-enabled later.
 
 Retention:
 
-- Clear `original_content` when `content_expires_at <= now()`.
+- Do not automatically clear `original_content` in the current plan.
 - Preserve non-personal audit metadata unless a privacy/legal request requires additional deletion.
 - If personal data is found in `original_content`, clear `original_content` directly and keep the audit action metadata.
+- Revisit timed retention as a separate product/legal decision before enabling any cleanup job.
 
 ## Removed Comment State
 
@@ -202,7 +203,7 @@ Comment placeholder:
 Link target:
 
 ```text
-https://community-watch.matters.town/actions/{community_watch_action.uuid}
+https://community-watch.matters.town/records/{community_watch_action.uuid}
 ```
 
 The placeholder needs at least:
@@ -236,7 +237,7 @@ Public fields:
 - removal time
 - appeal status
 - staff review status
-- original content, if still within 7 days and not privacy-cleared
+- original content, unless manually privacy-cleared
 
 Caching:
 
@@ -256,6 +257,13 @@ Current recommendation:
 - Use `matters-web` if the team wants shared auth/session, existing i18n, and existing GraphQL client behavior.
 
 MVP can start with the API and link shape first, then decide the hosting option before Phase 4.
+
+Current no-server-dependency work:
+
+- Keep `thematters/community-watch` deployable as a static Astro site.
+- Provide sample public records in `src/content/page.ts` and label them as demonstration data.
+- Provide record detail routes at `/records/{uuid}/` with blurred content and appeal instructions.
+- Keep the API contract in `docs/public-api-contract.md` so the later server query can replace the static fallback without changing the public route shape.
 
 ## Appeals and Staff Review
 
@@ -305,7 +313,7 @@ False positives:
 
 Privacy:
 
-- Mitigation: 7-day `original_content` retention, direct content clearing on privacy requests, avoid storing unnecessary personal fields.
+- Mitigation: no automatic public spreading, blur-by-default, direct content clearing on privacy requests, avoid storing unnecessary personal fields.
 
 Secondary spread of spam:
 
@@ -313,7 +321,7 @@ Secondary spread of spam:
 
 Data retention:
 
-- Decision needed for non-content audit metadata lifetime.
+- Decision needed for `original_content` timed retention and non-content audit metadata lifetime.
 
 Model misuse:
 

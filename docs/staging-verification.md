@@ -24,8 +24,8 @@ Run this before production rollout.
 11. Confirm the account no longer sees the action and server mutation rejects stale calls.
 12. Restore a removed comment through staff tooling once Phase 5 exists.
 13. Confirm the public record shows the review/restoration state.
-14. Run the original-content cleanup job against expired test data.
-15. Confirm `original_content` is cleared after 7 days while audit metadata remains.
+14. Confirm no automatic original-content cleanup job is enabled in the current rollout.
+15. If a privacy/personal-data request is simulated, clear `original_content` directly and confirm audit metadata remains.
 
 ## Production Approval Gate
 
@@ -35,7 +35,7 @@ Approval should confirm:
 
 - Domain routing for `community-watch.matters.town`.
 - Rollback path for DB migrations.
-- Scheduled cleanup for `original_content`.
+- Current decision that no automatic `original_content` cleanup runs before a later retention decision.
 - Staff owner for `hi@matters.town` appeals.
 - Staff owner for member assignment/removal.
 - Monitoring for failed removals, duplicate removals, and permission errors.

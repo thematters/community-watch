@@ -66,6 +66,7 @@ const baseUrl = import.meta.env.BASE_URL;
           <p class="eyebrow">{page.log.eyebrow}</p>
           <h2 id="watch-log-title">{page.log.title}</h2>
           <p>{page.log.description}</p>
+          <span class="data-label">{page.log.dataLabel}</span>
         </div>
 
         <div class="case-list">
@@ -84,7 +85,7 @@ const baseUrl = import.meta.env.BASE_URL;
 
                 <div class="case-row__notice">
                   <span>{watchCase.publicNotice}</span>
-                  <a href={`#case-${watchCase.id}`}>#{watchCase.id}</a>
+                  <a href={`${baseUrl}records/${watchCase.id}/`}>#{watchCase.commentId}</a>
                 </div>
 
                 <div class="case-row__content">
@@ -115,6 +116,10 @@ const baseUrl = import.meta.env.BASE_URL;
                 <div>
                   <dt>申訴狀態</dt>
                   <dd>{watchCase.appealStatus}</dd>
+                </div>
+                <div>
+                  <dt>站方覆核</dt>
+                  <dd>{watchCase.reviewStatus}</dd>
                 </div>
               </dl>
             </article>
@@ -329,6 +334,19 @@ const baseUrl = import.meta.env.BASE_URL;
   .section-heading {
     max-width: 720px;
     margin-bottom: var(--space-sp32);
+  }
+
+  .data-label {
+    display: inline-flex;
+    margin-top: var(--space-sp12);
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp10);
+    color: var(--ink-muted);
+    background: var(--surface-muted);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
   }
 
   .section-heading h2,

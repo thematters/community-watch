@@ -11,14 +11,17 @@ export interface Metric {
 
 export interface WatchCase {
   id: string;
+  commentId: string;
   sourceType: "動態留言" | "文章留言";
   sourceTitle: string;
+  sourceId: string;
   reason: "色情廣告" | "濫發廣告";
   publicNotice: string;
   commentPreview: string;
   watcher: string;
   handledAt: string;
   appealStatus: string;
+  reviewStatus: string;
 }
 
 export interface Step {
@@ -46,6 +49,7 @@ export interface CommunityWatchContent {
     eyebrow: string;
     title: string;
     description: string;
+    dataLabel: string;
     cases: WatchCase[];
   };
   appeal: {
@@ -93,40 +97,50 @@ export const page: CommunityWatchContent = {
     eyebrow: "巡守紀錄",
     title: "最近被移除的留言",
     description:
-      "原留言預設以毛玻璃遮蔽，避免垃圾內容被二次散播；需要仲裁時，任何人仍可點開全文比對。",
+      "原留言預設以毛玻璃遮蔽，避免垃圾內容被二次散播；需要仲裁時，任何人仍可點開全文比對。正式 API 接上前，本頁先以示範資料展示公開紀錄格式。",
+    dataLabel: "示範資料",
     cases: [
       {
-        id: "cmt-8f2a71",
+        id: "cw-demo-8f2a71",
+        commentId: "cmt-8f2a71",
         sourceType: "動態留言",
         sourceTitle: "關於今天站內活動的討論",
+        sourceId: "moment-demo-01",
         reason: "濫發廣告",
         publicNotice: "本則貼文已由守望相助隊檢舉",
         commentPreview: "限時優惠，點擊連結領取投資教學名額，加客服可立即開通會員方案。",
         watcher: "巷口阿伯",
-        handledAt: "2026-05-09",
+        handledAt: "2026-05-09 18:22",
         appealStatus: "未申訴",
+        reviewStatus: "待覆核",
       },
       {
-        id: "cmt-3b91cd",
+        id: "cw-demo-3b91cd",
+        commentId: "cmt-3b91cd",
         sourceType: "文章留言",
         sourceTitle: "一篇長文底下的回覆串",
+        sourceId: "article-demo-01",
         reason: "色情廣告",
         publicNotice: "本則貼文已由守望相助隊檢舉",
         commentPreview: "成人交友廣告，附外站聯絡方式與多組重複關鍵字，和原文討論無關。",
         watcher: "公園大嬸",
-        handledAt: "2026-05-09",
+        handledAt: "2026-05-09 12:04",
         appealStatus: "站方覆核中",
+        reviewStatus: "覆核中",
       },
       {
-        id: "cmt-1d77e4",
+        id: "cw-demo-1d77e4",
+        commentId: "cmt-1d77e4",
         sourceType: "文章留言",
         sourceTitle: "新作者的第一篇文章",
+        sourceId: "article-demo-02",
         reason: "濫發廣告",
         publicNotice: "本則貼文已由守望相助隊檢舉",
         commentPreview: "多篇文章重複張貼相同購物折扣碼與外部短網址，未回應文章內容。",
         watcher: "樓下鄰長",
-        handledAt: "2026-05-08",
+        handledAt: "2026-05-08 22:38",
         appealStatus: "未申訴",
+        reviewStatus: "待覆核",
       },
     ],
   },

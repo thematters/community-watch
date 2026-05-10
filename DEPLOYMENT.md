@@ -30,10 +30,17 @@ pnpm preview
 
 ## Content Source
 
-Until the public API is connected, page copy, sample metrics, and mock audit rows live in:
+Until the public API is connected, page copy, sample metrics, and sample audit rows live in:
 
 ```text
 src/content/page.ts
 ```
 
-After API integration, keep the static content as fallback copy and move live audit records to the public API described in `docs/implementation-plan.md`.
+The sample rows are explicitly labeled as demonstration data on the page. After API integration, keep the static content as fallback copy and move live audit records to the public API described in `docs/public-api-contract.md`.
+
+## Public Routes
+
+- `/`: landing page, statistics, recent records, appeal copy.
+- `/records/{uuid}/`: public record detail page with blurred original content and appeal instructions.
+
+These routes can be built and deployed before the Matters server schema for Phase 3 is merged, because they currently use local sample data.

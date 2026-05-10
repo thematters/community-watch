@@ -8,7 +8,7 @@ This file records product and architecture decisions that should guide implement
 - Do not support circle comments in this project. Circle is being sunset.
 - Members appear publicly by their Matters display name. The audit table still stores internal `actor_id` for staff review and future audit integrity.
 - Do not add a warning confirmation before unblurring public content. Keep content blurred by default and add a warning note at the bottom of the public page.
-- Store `original_content` for 7 days only. After 7 days, clear it.
+- Do not run automatic `original_content` cleanup in the current plan. Keep content available for transparency review until the team makes a later retention decision; privacy/personal-data requests can still clear stored content directly.
 - Comments are not covered by anti-censorship preservation requirements for this feature.
 - Public display of removed spam content has secondary-spread risk, but transparency requires inspectability. Blur-by-default is the first mitigation.
 - GDPR/privacy requests should not require preserving personal data in `original_content`. If removed content contains personal data and a valid request is made, clear the stored content directly while preserving non-personal audit evidence.
@@ -19,7 +19,7 @@ This file records product and architecture decisions that should guide implement
 ## Needs Product Decision
 
 - Whether the public page is built inside `matters-web` with host-based routing or as a separate app in this repository.
-- Whether old audit rows remain forever after `original_content` is cleared, or whether metadata also gets a retention policy.
+- Whether `original_content` later gets a timed retention policy, and whether old audit metadata also gets a retention policy.
 - Whether staff review labels should be visible publicly in MVP or added in Phase 5.
 - Whether a restored comment should keep a visible history link in the original location.
 

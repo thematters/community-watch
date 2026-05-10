@@ -1,0 +1,300 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import { page, type WatchCase } from "../../content/page";
+
+export function getStaticPaths() {
+  return page.log.cases.map((watchCase) => ({
+    params: { uuid: watchCase.id },
+    props: { watchCase },
+  }));
+}
+
+interface Props {
+  watchCase: WatchCase;
+}
+
+const { watchCase } = Astro.props;
+const baseUrl = import.meta.env.BASE_URL;
+const title = `${watchCase.commentId}｜${page.hero.title}`;
+const mailSubject = encodeURIComponent(`守望相助隊申訴：${watchCase.commentId}`);
+---
+
+<PageLayout
+  title={title}
+  description={`守望相助隊公開紀錄：${watchCase.commentId}，處理理由為${watchCase.reason}。`}
+  lang={page.lang}
+>
+  <div class="page">
+    <header class="page__header">
+      <a class="page__brand" href="https://matters.town">
+        <img src={`${baseUrl}matters-lettering-black.svg`} alt="Matters" />
+        <span aria-hidden="true"></span>
+        <strong>守望相助隊</strong>
+      </a>
+      <nav class="page__nav" aria-label="主要導覽">
+        <a href={`${baseUrl}#watch-log`}>處理紀錄</a>
+        <a href={`${baseUrl}#appeal`}>申訴</a>
+        <a href="https://matters.town/billboard">Billboard</a>
+      </nav>
+    </header>
+
+    <main class="record-main">
+      <a class="back-link" href={`${baseUrl}#case-${watchCase.id}`}>回到處理紀錄</a>
+
+      <article class="record board">
+        <header class="record__header">
+          <div>
+            <p class="eyebrow">公開紀錄</p>
+            <h1>{watchCase.commentId}</h1>
+          </div>
+          <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
+            {watchCase.reason}
+          </span>
+        </header>
+
+        <p class="record__notice">{watchCase.publicNotice}</p>
+
+        <dl class="record-grid" aria-label="處理資訊">
+          <div>
+            <dt>公開紀錄 ID</dt>
+            <dd>{watchCase.id}</dd>
+          </div>
+          <div>
+            <dt>留言 ID</dt>
+            <dd>{watchCase.commentId}</dd>
+          </div>
+          <div>
+            <dt>來源類型</dt>
+            <dd>{watchCase.sourceType}</dd>
+          </div>
+          <div>
+            <dt>來源標題或 ID</dt>
+            <dd>{watchCase.sourceTitle}</dd>
+          </div>
+          <div>
+            <dt>來源 ID</dt>
+            <dd>{watchCase.sourceId}</dd>
+          </div>
+          <div>
+            <dt>處理人</dt>
+            <dd>{watchCase.watcher}</dd>
+          </div>
+          <div>
+            <dt>處理時間</dt>
+            <dd>{watchCase.handledAt}</dd>
+          </div>
+          <div>
+            <dt>申訴狀態</dt>
+            <dd>{watchCase.appealStatus}</dd>
+          </div>
+          <div>
+            <dt>站方覆核</dt>
+            <dd>{watchCase.reviewStatus}</dd>
+          </div>
+        </dl>
+
+        <section class="content-box" aria-labelledby="original-content">
+          <div class="content-box__header">
+            <h2 id="original-content">原留言內容</h2>
+            <button
+              class="content-box__toggle"
+              type="button"
+              data-watch-toggle
+              aria-expanded="false"
+            >
+              顯示全文
+            </button>
+          </div>
+          <p class="content-box__body is-blurred" data-watch-body>{watchCase.commentPreview}</p>
+          <p class="content-box__hint">
+            原文預設遮蔽，避免垃圾內容被二次散播；點開僅供申訴、覆核與社群稽核使用。
+          </p>
+        </section>
+      </article>
+
+      <aside class="appeal-box board" aria-labelledby="appeal-title">
+        <p class="eyebrow">申訴</p>
+        <h2 id="appeal-title">認為這則留言被誤判？</h2>
+        <p>
+          請把留言 ID <strong>{watchCase.commentId}</strong> 寄到
+          <a href={`mailto:${page.appeal.email}?subject=${mailSubject}`}>{page.appeal.email}</a>。
+          站方會依公開紀錄、處理理由與原文進行覆核。
+        </p>
+      </aside>
+    </main>
+
+    <footer class="page__footer">
+      <span>{page.footer.note}</span>
+    </footer>
+  </div>
+</PageLayout>
+
+<script>
+  document.querySelectorAll("[data-watch-toggle]").forEach((button) => {
+    button.addEventListener("click", () => {
+      const content = button.closest(".content-box")?.querySelector("[data-watch-body]");
+      const isExpanded = button.getAttribute("aria-expanded") === "true";
+
+      content?.classList.toggle("is-blurred", isExpanded);
+      button.setAttribute("aria-expanded", String(!isExpanded));
+      button.textContent = isExpanded ? "顯示全文" : "收起全文";
+    });
+  });
+</script>
+
+<style>
+  .record-main {
+    width: 100%;
+    max-width: var(--board-max);
+    margin: 0 auto;
+    padding: var(--space-watch-24) var(--board-pad-x) var(--space-watch-48);
+    display: grid;
+    gap: var(--space-sp16);
+  }
+
+  .back-link {
+    color: var(--ink-muted);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .back-link:hover {
+    color: var(--brand-purple);
+  }
+
+  .record__header {
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: var(--space-sp16);
+    border-bottom: 1px solid var(--line);
+    padding-bottom: var(--space-watch-20);
+  }
+
+  .record h1 {
+    margin: 0;
+    font-family: var(--font-reading);
+    font-size: clamp(32px, 5vw, 44px);
+    line-height: 1.2;
+  }
+
+  .record__notice {
+    margin: var(--space-watch-20) 0;
+    border-left: 4px solid var(--brand-lime);
+    padding-left: var(--space-sp12);
+    color: var(--ink);
+    font-weight: 800;
+  }
+
+  .record-grid {
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 0;
+    margin: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+  }
+
+  .record-grid div {
+    min-width: 0;
+    padding: var(--space-sp14);
+    border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
+    background: var(--board-bg);
+  }
+
+  .record-grid div:nth-child(3n) {
+    border-right: 0;
+  }
+
+  .record-grid dt {
+    color: var(--ink-muted);
+    font-size: 13px;
+    font-weight: 700;
+  }
+
+  .record-grid dd {
+    margin: var(--space-sp4) 0 0;
+    color: var(--ink);
+    font-weight: 700;
+    overflow-wrap: anywhere;
+  }
+
+  .content-box {
+    margin-top: var(--space-watch-24);
+  }
+
+  .content-box__header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sp12);
+  }
+
+  .content-box h2,
+  .appeal-box h2 {
+    margin: 0;
+    font-family: var(--font-reading);
+    font-size: 24px;
+    line-height: 1.35;
+  }
+
+  .content-box__body {
+    min-height: 112px;
+    margin: var(--space-sp12) 0 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    background: var(--surface-muted);
+    padding: var(--space-sp16);
+    transition: filter 0.16s ease, opacity 0.16s ease;
+  }
+
+  .content-box__body.is-blurred {
+    filter: blur(7px);
+    opacity: 0.56;
+    user-select: none;
+  }
+
+  .content-box__toggle {
+    min-width: 88px;
+    min-height: 36px;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    background: var(--board-bg);
+    color: var(--ink);
+    cursor: pointer;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .content-box__toggle:hover {
+    border-color: var(--brand-purple);
+    color: var(--brand-purple);
+  }
+
+  .content-box__hint,
+  .appeal-box p {
+    color: var(--ink-muted);
+  }
+
+  .appeal-box a {
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  @media (max-width: 760px) {
+    .record__header {
+      display: grid;
+    }
+
+    .record-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .record-grid div,
+    .record-grid div:nth-child(3n) {
+      border-right: 0;
+    }
+  }
+</style>

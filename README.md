@@ -48,7 +48,7 @@ MVP scope:
 - Removed comments are replaced in-place with: `本則貼文已由守望相助隊檢舉`.
 - The replacement links to a public audit record on `community-watch.matters.town`.
 - Original removed content is blurred by default on the public page.
-- `original_content` is retained for 7 days, then cleared.
+- `original_content` is not automatically cleared in the current plan; privacy/personal-data requests can still clear stored content directly.
 - Appeals go through `hi@matters.town` with the removed comment ID.
 - AI is not allowed to remove comments in the first version. It can only provide future candidate detection or hints.
 
@@ -75,7 +75,8 @@ Phase 0 is complete as repo-backed planning, and the standalone public page is n
 - [docs/decisions.md](docs/decisions.md)
 - [docs/phase-0-repo-survey.md](docs/phase-0-repo-survey.md)
 - [docs/implementation-plan.md](docs/implementation-plan.md)
+- [docs/public-api-contract.md](docs/public-api-contract.md)
 - [docs/staging-verification.md](docs/staging-verification.md)
 - [docs/status.md](docs/status.md)
 
-Next implementation target: connect the public page to the Community Watch audit API after the server-side action table and public query are available.
+Next implementation target: replace the static public-record fallback with the Community Watch audit API after the server-side public query is available.
