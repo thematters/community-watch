@@ -16,6 +16,7 @@ Phase 1 is in implementation review.
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase1`
   - PR: https://github.com/thematters/matters-server/pull/4762
+- Added a migration unit test after Codecov reported missing rollback coverage for the Phase 1 migration.
 
 ## Phase 1 PR Scope
 
@@ -32,6 +33,7 @@ Phase 1 is in implementation review.
 
 - `npm run gen`: passed after rebuilding local `bcrypt` native dependency.
 - `npm run build`: passed.
+- `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchFeatureFlagMigration.test.js --runInBand --forceExit`: passed.
 - Focused Jest command reached the test suite but failed before assertions because local test connections failed with `AggregateError`; this appears to be an environment/test dependency issue, not a Community Watch assertion failure.
 - `npm ci` is currently blocked locally because the repo lockfile is missing several optional dependency entries. Local verification used `npm install --ignore-scripts --no-save` and `npm rebuild bcrypt` without changing `package-lock.json`.
 
