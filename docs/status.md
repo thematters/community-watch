@@ -100,6 +100,10 @@ Web PR #5881:
   - `npm run build`: passed.
   - `npm run lint`: passed.
   - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchActionMigration.test.js build/common/utils/__test__/communityWatchRemoveComment.test.js --runInBand --forceExit`: passed, 12 tests.
+- Phase 3 server CI:
+  - GitHub `build / build`: passed on commit `032d829abd05e60232cf0772b06953196f54397a`.
+  - GitHub `codecov/patch`: passed; Codecov reports 100.00% patch coverage.
+  - GitHub `codecov/project`: passed; Codecov reports 57.97% project coverage.
 - Phase 3 web local verification:
   - `npm run lint:ts`: passed.
   - `npm run lint`: passed via pre-commit.
@@ -107,6 +111,7 @@ Web PR #5881:
   - React tests still print existing `MemoryRouterProvider` act warnings and a react-spring deprecation warning; assertions pass.
 - Phase 3 web CI dependency:
   - `thematters/matters-web` CI runs `npm run gen:type` against `server.matters.icu` and `server.matters.town`.
+  - Web PR #5881 currently fails at `Generate Types (Develop)` because those endpoints do not yet expose `CommunityWatchRemoveCommentReason`, `communityWatchRemoveComment`, or `Comment.communityWatchAction`.
   - Web PR #5881 is expected to remain draft/dependent until server PR #4764 is merged and the schema is deployed to the endpoints used by codegen.
 
 ## Next
