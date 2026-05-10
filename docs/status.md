@@ -22,6 +22,7 @@ Phase 2 is in implementation review as a stacked PR on Phase 1.
   - Branch: `codex/community-watch-phase2`
   - Base branch while stacked: `codex/community-watch-phase1`
   - PR: https://github.com/thematters/matters-server/pull/4763
+- Fixed Phase 2 Codecov patch coverage by adding a GraphQL-level Community Watch mutation test in the CI upload batch.
 
 ## Phase 1 PR Scope
 
@@ -62,6 +63,10 @@ Phase 2 is in implementation review as a stacked PR on Phase 1.
   - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchActionMigration.test.js build/common/utils/__test__/communityWatchRemoveComment.test.js --runInBand --forceExit`: passed, 12 tests.
   - Coverage for `src/mutations/comment/communityWatchRemoveComment.ts`: 100% lines, 90% branches.
   - `npm run test:utils` is still blocked locally by the repo script's `--no-experimental-fetch` flag under Node 24; the equivalent targeted Jest command without that flag passes.
+- Phase 2 CI after coverage fix:
+  - GitHub `build / build`: passed on commit `5db47f5663987f0dbfd5aa24e82e5ba20f3d8b73`.
+  - GitHub `codecov/patch`: passed; Codecov reports 81.91% patch coverage.
+  - GitHub `codecov/project`: passed; Codecov reports 57.96% project coverage.
 
 ## Next
 
