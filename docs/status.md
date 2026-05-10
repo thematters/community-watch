@@ -111,8 +111,10 @@ Web PR #5881:
   - React tests still print existing `MemoryRouterProvider` act warnings and a react-spring deprecation warning; assertions pass.
 - Phase 3 web CI dependency:
   - `thematters/matters-web` CI runs `npm run gen:type` against `server.matters.icu` and `server.matters.town`.
-  - Web PR #5881 currently fails at `Generate Types (Develop)` because those endpoints do not yet expose `CommunityWatchRemoveCommentReason`, `communityWatchRemoveComment`, or `Comment.communityWatchAction`.
-  - Web PR #5881 is expected to remain draft/dependent until server PR #4764 is merged and the schema is deployed to the endpoints used by codegen.
+  - Web PR #5881 originally failed at `Generate Types (Develop)` because those endpoints do not yet expose `CommunityWatchRemoveCommentReason`, `communityWatchRemoveComment`, or `Comment.communityWatchAction`.
+  - Web PR #5881 now includes a temporary local codegen schema extension in `src/common/utils/types/index.ts` to unblock CI before #4764 is deployed.
+  - Runtime still depends on server PR #4764 or equivalent API support; remove the temporary schema extension after the deployed schemas include these fields.
+  - After the bypass: `npm run gen:type`, `npm run gen:type:prod`, `npm run lint:ts`, and targeted unit tests passed locally.
 - Retention decision update:
   - Do not run automatic `original_content` cleanup in the current plan.
   - Privacy/personal-data requests can still clear `original_content` directly while keeping non-personal audit metadata.

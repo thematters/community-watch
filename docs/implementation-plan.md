@@ -261,6 +261,7 @@ MVP can start with the API and link shape first, then decide the hosting option 
 Current no-server-dependency work:
 
 - Keep `thematters/community-watch` deployable as a static Astro site.
+- Public URL remains `https://community-watch.matters.town/`.
 - Provide sample public records in `src/content/page.ts` and label them as demonstration data.
 - Provide record detail routes at `/records/{uuid}/` with blurred content and appeal instructions.
 - Keep the API contract in `docs/public-api-contract.md` so the later server query can replace the static fallback without changing the public route shape.
