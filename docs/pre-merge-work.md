@@ -1,6 +1,14 @@
-# Pre-Merge Work
+# Merge Boundary Work
 
-This list tracks work that can proceed before `thematters/matters-server` #4762 is merged.
+This list tracks what was safe before `thematters/matters-server` #4762 merged and what became available after merge.
+
+## Merge Status
+
+#4762 was merged into `thematters/matters-server:develop` on 2026-05-11.
+
+- Merge commit: `82235f10d`
+- Branch: `codex/community-watch-phase1`
+- Base: `develop`
 
 ## Safe Before Merge
 
@@ -13,14 +21,10 @@ This list tracks work that can proceed before `thematters/matters-server` #4762 
 - Prepare Phase 5 staff-review API and data-model specs.
 - Prepare privacy handling for `original_content` clearing.
 
-## Wait Until #4762 Merge / Deploy
+## Available After Merge / Deploy
 
 - Enable live production `COMMUNITY_WATCH_API_URL`.
 - Validate live public records from real DB rows.
 - Remove temporary schema bypasses from Matters web, if the deployed GraphQL schemas make them unnecessary.
 - Start full staging flow with real member assignment and real comment removal.
 - Open Phase 5 server implementation PRs against `develop`.
-
-## Current Merge Gate
-
-As of 2026-05-11, #4762 is mergeable and all visible checks pass. The remaining blocker is GitHub review state: `CHANGES_REQUESTED`.

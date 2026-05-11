@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Only Phase 1 server PR #4762 remains open. It is mergeable after resolving the latest `develop` conflict, and all visible checks now pass; GitHub still shows `CHANGES_REQUESTED` until the CTO review state is cleared. Phase 2 server, Phase 3 server/web, and Phase 4 server PRs have been merged.
+Phase 1 through Phase 4 code PRs are merged. The project is now at the deployment and staging-validation gate: confirm schema publication, deploy or configure the public site, set staging `COMMUNITY_WATCH_API_URL`, and run the real end-to-end staging flow.
 
 ## Completed
 
@@ -27,6 +27,10 @@ Only Phase 1 server PR #4762 remains open. It is mergeable after resolving the l
   - Commit: `5e3684ebe`
   - Conflict was only in `src/connectors/medium/index.ts`; kept the MIME-type guard and develop's `Invalid content-type.` error text.
   - Push build and pull_request build both passed after rerunning the transient `channel/feedback.test.js` failure.
+- Merged Phase 1 server PR #4762 on 2026-05-11:
+  - Merge commit: `82235f10d`
+  - This completes the server-side `communityWatch` feature flag assignment foundation on `develop`.
+  - Merge-time `Push Schema to Apollo` workflow completed successfully for the develop schema.
 - Opened Phase 2 server PR:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase2`
@@ -199,20 +203,15 @@ Server PR #4765:
   - GitHub `build / build`: passed on commit `e7f2e49a4`.
   - GitHub `codecov/patch`: passed.
   - GitHub `codecov/project`: passed.
-- Current open PR:
-  - `thematters/matters-server` #4762 remains open against `develop`.
-  - #4762 is no longer draft.
-  - #4762 GitHub `build / build` passed on commit `b3543d34f` after the connector refactor.
-  - #4762 GitHub `codecov/patch` and `codecov/project` passed after the connector refactor.
-  - #4762 is mergeable after merging `origin/develop`; push build passed on merge commit `5e3684ebe`.
-  - The pull_request build on `5e3684ebe` initially failed in develop's `channel/feedback.test.js` setup (`createTopicChannel` undefined), but the rerun passed.
-  - #4762 still shows `CHANGES_REQUESTED`; the remaining blocker is review-state cleanup, not merge conflict or CI.
-  - `thematters/matters-server` #4763, #4764, #4765 and `thematters/matters-web` #5881 are merged.
+- PR merge status:
+  - `thematters/matters-server` #4762, #4763, #4764, and #4765 are merged.
+  - `thematters/matters-web` #5881 is merged.
+  - #4762 merge commit on `develop`: `82235f10d`.
 
 ## Next
 
-After Phase 1 server PR #4762 is merged and the public query is deployed:
-
-- Set `COMMUNITY_WATCH_API_URL` for the public site and verify live audit records render on `/` and `/records/{uuid}/`.
+- Deploy or configure the public site on Cloudflare Pages.
+- Set staging `COMMUNITY_WATCH_API_URL` and verify live audit records render on `/` and `/records/{uuid}/`.
+- Run the staging flow in `docs/staging-verification.md`.
 - Phase 5: add staff review and appeal status workflows.
 - Phase 6: configure `community-watch.matters.town`, staging validation, monitoring, and human production approval.
