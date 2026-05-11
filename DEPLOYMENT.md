@@ -9,6 +9,46 @@
 - Build command: `pnpm build`
 - Build output directory: `dist`
 - Production branch: `main`
+- Node.js: use the Cloudflare Pages default supported LTS runtime unless the dashboard already pins a compatible version.
+- Package manager: keep `pnpm-lock.yaml` committed and use pnpm install in CI/Pages.
+
+## Pre-Merge Setup
+
+These tasks can be completed before `thematters/matters-server` #4762 is merged because the site falls back to sample records when the API is unavailable.
+
+1. Create or confirm the Cloudflare Pages project `community-watch`.
+2. Connect the `thematters/community-watch` repository.
+3. Set the production branch to `main`.
+4. Set the build command to `pnpm build`.
+5. Set the build output directory to `dist`.
+6. Add `community-watch.matters.town` as the production custom domain.
+7. Leave `COMMUNITY_WATCH_API_URL` unset until the server public query is deployed, or point it at staging only for staging builds.
+8. Deploy once with fallback sample records and confirm `/` plus `/records/cw-demo-8f2a71/` return 200.
+
+## Environment Variables
+
+| Name | Required | When | Value |
+| --- | --- | --- | --- |
+| `COMMUNITY_WATCH_API_URL` | No | After server public query is deployed | `https://server.matters.town/graphql` for production, staging endpoint for staging |
+| `COMMUNITY_WATCH_API_FIRST` | No | Optional record count tuning | Defaults to 50 |
+
+Do not put admin tokens or private API secrets in this site. The public page must use only public GraphQL queries.
+
+## Rollout Order
+
+1. Deploy the static site with sample-data fallback.
+2. Merge and deploy the server public audit schema.
+3. Set `COMMUNITY_WATCH_API_URL` in staging.
+4. Verify live audit records on staging.
+5. Set `COMMUNITY_WATCH_API_URL` in production only after human approval.
+6. Keep the fallback behavior enabled so static builds do not fail during temporary API outages.
+
+## Rollback
+
+- Static page issue: roll back the Cloudflare Pages deployment to the previous successful build.
+- Bad live data source: remove or change `COMMUNITY_WATCH_API_URL`; the next build falls back to sample records.
+- Server/API issue: roll back the Matters server deployment separately. The public site should remain readable with stale static content or sample fallback.
+- Domain issue: remove the custom domain mapping or point DNS back to the previous target.
 
 ## Manual Deploy
 
@@ -57,3 +97,15 @@ COMMUNITY_WATCH_API_FIRST=50
 - `/records/{uuid}/`: public record detail page with blurred original content and appeal instructions.
 
 These routes can be built and deployed before the Matters server public audit schema is deployed, because they fall back to local sample data.
+
+## Production Gate
+
+Before enabling live records on `community-watch.matters.town`, confirm:
+
+- #4762 and dependent server PRs are deployed to the target environment.
+- A real Community Watch removal produces a public `uuid`.
+- The placeholder link from Matters web opens the matching `/records/{uuid}/` page.
+- The page shows actor display name only, not internal user ID.
+- `originalContent` is blurred by default.
+- `hi@matters.town` appeal ownership is assigned.
+- Production rollout has explicit human approval.

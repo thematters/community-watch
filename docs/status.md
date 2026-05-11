@@ -55,6 +55,14 @@ Only Phase 1 server PR #4762 remains open. It is mergeable after resolving the l
 - Pushed a Phase 4 server coverage fix after Codecov reported only 18.18% patch coverage:
   - Commit: `e7f2e49a4`
   - Adds GraphQL-level public audit query coverage to `src/types/__test__/2/comment.test.ts`.
+- Advanced pre-merge Phase 4-6 work in this repo:
+  - Expanded `DEPLOYMENT.md` with Cloudflare Pages setup, environment variables, rollout order, rollback, and production gate.
+  - Expanded `docs/staging-verification.md` into a role-based staging checklist with expected results and failure handling.
+  - Added `docs/pre-merge-work.md` to separate safe pre-merge work from items that need #4762 merge/deploy.
+  - Added `docs/phase-5-staff-review.md` for admin review, restore, appeal state, reason adjustment, and content clearing API planning.
+  - Added `docs/privacy-original-content.md` for manual and future structured clearing of `original_content`.
+  - Added a bottom-page warning label to the public site without adding a reveal confirmation dialog.
+  - Verified the updated public site with `pnpm typecheck`, `pnpm build`, API-failure fallback build, and in-app browser checks for `/` and `/records/cw-demo-8f2a71/`.
 
 ## Phase 1 PR Scope
 
@@ -172,6 +180,12 @@ Server PR #4765:
   - Updated docs so Cloudflare Pages can enable live public audit records by setting `COMMUNITY_WATCH_API_URL` after the server public query is deployed.
   - `pnpm typecheck`: passed.
   - `pnpm build`: passed and generated `/`, plus three `/records/cw-demo-*/` static pages.
+  - Latest pre-merge public site verification after docs/UI updates:
+    - `pnpm typecheck`: passed.
+    - `pnpm build`: passed.
+    - `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9/graphql pnpm build`: passed and fell back to sample records.
+    - In-app browser check for `http://127.0.0.1:4321/`: hero, recent records, record links, reveal buttons, and bottom warning were present.
+    - In-app browser check for `http://127.0.0.1:4321/records/cw-demo-8f2a71/`: comment ID, appeal email, bottom warning, and reveal/collapse interaction worked; console had no errors or warnings.
   - Smoke-tested `http://127.0.0.1:4321/` and `http://127.0.0.1:4321/records/cw-demo-8f2a71/`: both returned 200.
   - `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9/graphql pnpm build`: passed and fell back to sample records.
   - Mock GraphQL build verification: `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9876/graphql pnpm build` generated `/records/cw-live-test/` and rendered API-sourced record content.

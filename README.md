@@ -84,6 +84,9 @@ Phase 0 is complete as repo-backed planning, and the standalone public page is n
 - [docs/phase-0-repo-survey.md](docs/phase-0-repo-survey.md)
 - [docs/implementation-plan.md](docs/implementation-plan.md)
 - [docs/public-api-contract.md](docs/public-api-contract.md)
+- [docs/pre-merge-work.md](docs/pre-merge-work.md)
+- [docs/phase-5-staff-review.md](docs/phase-5-staff-review.md)
+- [docs/privacy-original-content.md](docs/privacy-original-content.md)
 - [docs/staging-verification.md](docs/staging-verification.md)
 - [docs/status.md](docs/status.md)
 

@@ -161,7 +161,10 @@ const { page } = await getCommunityWatchPageData();
     </main>
 
     <footer class="page__footer">
-      <span>{page.footer.note}</span>
+      <div class="page__footer-copy">
+        <span>{page.footer.note}</span>
+        <strong>{page.footer.warning}</strong>
+      </div>
       {
         page.footer.links && page.footer.links.length > 0 && (
           <nav aria-label="footer">

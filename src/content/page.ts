@@ -67,6 +67,7 @@ export interface CommunityWatchContent {
   };
   footer: {
     note: string;
+    warning: string;
     links?: CTA[];
   };
 }
@@ -176,6 +177,7 @@ export const page: CommunityWatchContent = {
   },
   footer: {
     note: "© Matters Lab · community-watch.matters.town",
+    warning: "公開原文僅供申訴、覆核與社群稽核使用；請勿轉貼垃圾連結、色情廣告或詐騙內容。",
     links: [
       { label: "申訴信箱", href: "mailto:hi@matters.town" },
       { label: "Matters 首頁", href: "https://matters.town" },

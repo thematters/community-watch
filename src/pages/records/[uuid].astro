@@ -126,7 +126,10 @@ const mailSubject = encodeURIComponent(`守望相助隊申訴：${watchCase.comm
     </main>
 
     <footer class="page__footer">
-      <span>{page.footer.note}</span>
+      <div class="page__footer-copy">
+        <span>{page.footer.note}</span>
+        <strong>{page.footer.warning}</strong>
+      </div>
     </footer>
   </div>
 </PageLayout>

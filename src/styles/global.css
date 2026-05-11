@@ -169,6 +169,17 @@ img {
   gap: var(--space-sp8);
 }
 
+.page__footer-copy {
+  display: grid;
+  gap: var(--space-sp4);
+}
+
+.page__footer-copy strong {
+  color: var(--ink);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
 @media (min-width: 720px) {
   .page__footer {
     flex-direction: row;
