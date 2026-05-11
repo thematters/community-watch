@@ -23,6 +23,9 @@ Only Phase 1 server PR #4762 remains open, and it now passes build, Codecov, and
 - Addressed #4762 CTO review feedback that knex queries should live under `src/connectors`:
   - Commit: `b3543d34f`
   - Moved the `Comment.communityWatchAction` active audit lookup from the resolver to `CommentService.findActiveCommunityWatchAction`.
+- Resolved #4762 merge conflict with updated `origin/develop`:
+  - Commit: `5e3684ebe`
+  - Conflict was only in `src/connectors/medium/index.ts`; kept the MIME-type guard and develop's `Invalid content-type.` error text.
 - Opened Phase 2 server PR:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase2`
@@ -186,6 +189,8 @@ Server PR #4765:
   - #4762 is no longer draft.
   - #4762 GitHub `build / build` passed on commit `b3543d34f` after the connector refactor.
   - #4762 GitHub `codecov/patch` and `codecov/project` passed after the connector refactor.
+  - #4762 is mergeable after merging `origin/develop`; push build passed on merge commit `5e3684ebe`.
+  - The pull_request build on `5e3684ebe` failed in develop's `channel/feedback.test.js` setup (`createTopicChannel` undefined); the failed pull_request run was rerun.
   - `thematters/matters-server` #4763, #4764, #4765 and `thematters/matters-web` #5881 are merged.
 
 ## Next
