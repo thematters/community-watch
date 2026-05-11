@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Only Phase 1 server PR #4762 remains open. Phase 2 server, Phase 3 server/web, and Phase 4 server PRs have been merged.
+Only Phase 1 server PR #4762 remains open, and it now passes build, Codecov, and WIP after a TypeScript upload MIME-type fix. Phase 2 server, Phase 3 server/web, and Phase 4 server PRs have been merged.
 
 ## Completed
 
@@ -17,6 +17,9 @@ Only Phase 1 server PR #4762 remains open. Phase 2 server, Phase 3 server/web, a
   - Branch: `codex/community-watch-phase1`
   - PR: https://github.com/thematters/matters-server/pull/4762
 - Added a migration unit test after Codecov reported missing rollback coverage for the Phase 1 migration.
+- Fixed #4762 TypeScript build failure from fetched upload MIME-type inference:
+  - Commit: `81693d7ed`
+  - Normalizes remote `content-type` headers to strings before MIME allow-list checks and upload payload construction.
 - Opened Phase 2 server PR:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase2`
@@ -173,7 +176,9 @@ Server PR #4765:
   - GitHub `codecov/project`: passed.
 - Current open PR:
   - `thematters/matters-server` #4762 remains open against `develop`.
-  - #4762 is no longer draft, but one rerun of `build / build` failed while another `build / build` rerun is still in progress as of the latest check.
+  - #4762 is no longer draft.
+  - #4762 GitHub `build / build` passed for both pull request and push runs on commit `81693d7ed`.
+  - #4762 GitHub `codecov/patch`, `codecov/project`, and `WIP` passed.
   - `thematters/matters-server` #4763, #4764, #4765 and `thematters/matters-web` #5881 are merged.
 
 ## Next
