@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Phase 1 through Phase 4 are on `develop`. The Phase 4 public audit query is deployed on staging (`server.matters.icu`) and returns live API data; production (`server.matters.town`) has not been rolled out yet. The project is now at the public-site configuration, staging end-to-end validation, and Phase 5 staff-review implementation gate.
+Phase 1 through Phase 4 are on `develop`. The Phase 4 public audit query is deployed on staging (`server.matters.icu`) and returns live API data; production (`server.matters.town`) has not been rolled out yet. Phase 5 server PR #4771 is open as a draft for staff review, restore, appeal state, reason adjustment, and original-content clearing.
 
 ## Completed
 
@@ -73,6 +73,16 @@ Phase 1 through Phase 4 are on `develop`. The Phase 4 public audit query is depl
   - Develop deploy workflow completed successfully after rerun: migration, EB deploy, Lambda deploys, and notification all passed.
   - `https://server.matters.icu/graphql` accepts `communityWatchActions(input:)` and currently returns `totalCount: 0`.
   - `https://server.matters.town/graphql` does not expose `communityWatchActions` yet; production rollout is still pending human approval.
+- Opened Phase 5 server PR:
+  - Repository: `thematters/matters-server`
+  - Branch: `codex/community-watch-phase5`
+  - Base branch: `develop`
+  - PR: https://github.com/thematters/matters-server/pull/4771
+  - Adds append-only `community_watch_review_event` records for staff actions.
+  - Adds admin-only mutations: `updateCommunityWatchActionState`, `restoreCommunityWatchComment`, and `clearCommunityWatchOriginalContent`.
+  - Keeps Community Watch member disablement on the existing admin `putUserFeatureFlags` path.
+  - Rejects setting `reviewState: reversed` through the generic update mutation; staff must use `restoreCommunityWatchComment` so the comment state and audit state stay consistent.
+  - Local verification: `npm run gen`, `npm run build`, `npm run lint`, and focused Jest for review-event migration plus staff-review service/mutations passed.
 - Advanced pre-merge Phase 4-6 work in this repo:
   - Expanded `DEPLOYMENT.md` with Cloudflare Pages setup, environment variables, rollout order, rollback, and production gate.
   - Expanded `docs/staging-verification.md` into a role-based staging checklist with expected results and failure handling.
@@ -145,6 +155,19 @@ Server PR #4765:
 - Keeps actor identity public only as Matters display name; internal `actor_id` remains DB-only.
 - Maps internal numeric comment/source IDs to public GraphQL IDs.
 - Does not change the Phase 2 removal mutation.
+
+## Phase 5 PR Scope
+
+Server PR #4771:
+
+- Adds `community_watch_review_event` as an append-only staff action log.
+- Adds staff-only GraphQL mutations:
+  - `updateCommunityWatchActionState(input:)` for appeal state, review state, and reason updates.
+  - `restoreCommunityWatchComment(input:)` for restoring a Community Watch removed comment and marking the audit row reversed.
+  - `clearCommunityWatchOriginalContent(input:)` for privacy or personal-data clearing while keeping non-content audit metadata.
+- Reuses the existing `community_watch_action` public read model; public records remain visible after restore or content clearing.
+- Reuses the existing `putUserFeatureFlags` admin path to disable Community Watch members.
+- Keeps knex-backed review and restore writes under `src/connectors/commentService.ts`.
 
 ## Verification Notes
 
@@ -219,8 +242,14 @@ Server PR #4765:
   - GitHub `build / build`: passed on commit `e7f2e49a4`.
   - GitHub `codecov/patch`: passed.
   - GitHub `codecov/project`: passed.
+- Phase 5 server local verification:
+  - `npm run gen`: passed.
+  - `npm run build`: passed.
+  - `npm run lint`: passed.
+  - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchReviewEventMigration.test.js build/common/utils/__test__/communityWatchStaffReview.test.js --runInBand --forceExit`: passed, 9 tests.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, and #4769 are merged.
+  - `thematters/matters-server` #4771 is open as a draft.
   - `thematters/matters-web` #5881 is merged.
   - #4762 merge commit on `develop`: `82235f10d`.
   - #4769 merge commit on `develop`: `fc0789792`.
@@ -230,5 +259,6 @@ Server PR #4765:
 - Deploy or configure the public site on Cloudflare Pages.
 - Set staging `COMMUNITY_WATCH_API_URL` and verify live audit records render on `/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.
-- Phase 5: add staff review and appeal status workflows.
+- Wait for #4771 CI and review, then merge and deploy Phase 5 staff-review API to staging.
+- After #4771 staging deploy, run staff restore / reason adjustment / content clearing against real Community Watch audit rows.
 - Phase 6: configure `community-watch.matters.town`, staging validation, monitoring, and human production approval.
