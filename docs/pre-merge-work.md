@@ -4,12 +4,14 @@ This list tracks what was safe before `thematters/matters-server` #4762 merged a
 
 ## Merge Status
 
-#4762 was merged into `thematters/matters-server:develop` on 2026-05-11.
+#4762 and the Phase 4 follow-up #4769 were merged into `thematters/matters-server:develop` on 2026-05-11.
 
 - Merge commit: `82235f10d`
 - Branch: `codex/community-watch-phase1`
 - Base: `develop`
-- Follow-up: #4769 is open to land Phase 4 public audit queries on `develop`, because #4765 merged into the stacked Phase 3 branch rather than `develop`.
+- Phase 4 follow-up merge commit: `fc0789792`
+- The Phase 4 public audit query is deployed on staging and available from `https://server.matters.icu/graphql`.
+- Production `https://server.matters.town/graphql` does not expose the public audit query yet; production rollout still needs human approval.
 
 ## Safe Before Merge
 

@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Phase 1 through Phase 3 are on `develop`. Phase 4's public audit query was merged only into an intermediate stacked branch, so a follow-up server PR #4769 is open to land it on `develop`. The project is at the deployment and staging-validation gate after #4769 merges: configure the public site, set staging `COMMUNITY_WATCH_API_URL`, and run the real end-to-end staging flow.
+Phase 1 through Phase 4 are on `develop`. The Phase 4 public audit query is deployed on staging (`server.matters.icu`) and returns live API data; production (`server.matters.town`) has not been rolled out yet. The project is now at the public-site configuration, staging end-to-end validation, and Phase 5 staff-review implementation gate.
 
 ## Completed
 
@@ -59,7 +59,7 @@ Phase 1 through Phase 3 are on `develop`. Phase 4's public audit query was merge
 - Pushed a Phase 4 server coverage fix after Codecov reported only 18.18% patch coverage:
   - Commit: `e7f2e49a4`
   - Adds GraphQL-level public audit query coverage to `src/types/__test__/2/comment.test.ts`.
-- Opened Phase 4 server follow-up PR #4769 against `develop`:
+- Opened and merged Phase 4 server follow-up PR #4769 against `develop`:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase4-develop`
   - PR: https://github.com/thematters/matters-server/pull/4769
@@ -67,6 +67,12 @@ Phase 1 through Phase 3 are on `develop`. Phase 4's public audit query was merge
   - Cherry-picked the Phase 4 public query commits and moved the knex-backed public audit reads into `CommentService` to follow the existing connector pattern.
   - Local verification: `npm run build`, `npm run lint`, and `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchPublicQueries.test.js --runInBand --forceExit` passed.
   - GitHub checks: push build, pull_request build, `codecov/patch`, `codecov/project`, and WIP passed.
+  - Merged on 2026-05-11 with merge commit `fc0789792`.
+- Verified post-merge server deployment:
+  - `Push Schema (develop)` completed successfully.
+  - Develop deploy workflow completed successfully after rerun: migration, EB deploy, Lambda deploys, and notification all passed.
+  - `https://server.matters.icu/graphql` accepts `communityWatchActions(input:)` and currently returns `totalCount: 0`.
+  - `https://server.matters.town/graphql` does not expose `communityWatchActions` yet; production rollout is still pending human approval.
 - Advanced pre-merge Phase 4-6 work in this repo:
   - Expanded `DEPLOYMENT.md` with Cloudflare Pages setup, environment variables, rollout order, rollback, and production gate.
   - Expanded `docs/staging-verification.md` into a role-based staging checklist with expected results and failure handling.
@@ -201,6 +207,8 @@ Server PR #4765:
   - Smoke-tested `http://127.0.0.1:4321/` and `http://127.0.0.1:4321/records/cw-demo-8f2a71/`: both returned 200.
   - `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9/graphql pnpm build`: passed and fell back to sample records.
   - Mock GraphQL build verification: `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9876/graphql pnpm build` generated `/records/cw-live-test/` and rendered API-sourced record content.
+  - Staging GraphQL build verification: `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql pnpm build` passed. Because staging currently has zero Community Watch audit rows, the build generated the index page only.
+  - API-failure fallback build verification: `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9/graphql pnpm build` passed and fell back to sample records.
 - Phase 4 server local verification:
   - `npm run build`: passed.
   - `npm run lint`: passed.
@@ -212,14 +220,13 @@ Server PR #4765:
   - GitHub `codecov/patch`: passed.
   - GitHub `codecov/project`: passed.
 - PR merge status:
-  - `thematters/matters-server` #4762, #4763, #4764, and #4765 are merged, but #4765 landed on the stacked Phase 3 branch rather than `develop`.
+  - `thematters/matters-server` #4762, #4763, #4764, #4765, and #4769 are merged.
   - `thematters/matters-web` #5881 is merged.
   - #4762 merge commit on `develop`: `82235f10d`.
-  - `thematters/matters-server` #4769 is open and all visible checks pass; remaining blocker is review approval.
+  - #4769 merge commit on `develop`: `fc0789792`.
 
 ## Next
 
-- Wait for #4769 CI and merge so the public audit schema exists on `develop`.
 - Deploy or configure the public site on Cloudflare Pages.
 - Set staging `COMMUNITY_WATCH_API_URL` and verify live audit records render on `/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.

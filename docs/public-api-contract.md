@@ -14,8 +14,8 @@ The public site can ship with static sample data before the Matters server publi
 GraphQL shape used by the site:
 
 ```graphql
-query CommunityWatchActions($first: Int = 50) {
-  communityWatchActions(input: { first: $first }) {
+query CommunityWatchActions($input: CommunityWatchActionsInput!) {
+  communityWatchActions(input: $input) {
     edges {
       cursor
       node {
@@ -40,6 +40,12 @@ query CommunityWatchActions($first: Int = 50) {
     }
   }
 }
+```
+
+Example variables:
+
+```json
+{ "input": { "first": 50 } }
 ```
 
 Required behavior:

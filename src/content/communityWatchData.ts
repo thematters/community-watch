@@ -51,8 +51,8 @@ let apiUnavailable = false;
 let cachedPageData: Promise<CommunityWatchPageData> | undefined;
 
 const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
-  query CommunityWatchActions($first: Int!) {
-    communityWatchActions(input: { first: $first }) {
+  query CommunityWatchActions($input: CommunityWatchActionsInput!) {
+    communityWatchActions(input: $input) {
       edges {
         node {
           uuid
@@ -217,15 +217,19 @@ const requestGraphQL = async <T>(
 const getLiveCases = async () => {
   const data = await requestGraphQL<CommunityWatchActionsResponse>(
     COMMUNITY_WATCH_ACTIONS_QUERY,
-    { first: getFirst() }
+    { input: { first: getFirst() } }
   );
+  if (!data) {
+    return null;
+  }
+
   const nodes = data?.communityWatchActions.edges.map(({ node }) => node) ?? [];
   return nodes.map(mapAction);
 };
 
 const loadCommunityWatchPageData = async (): Promise<CommunityWatchPageData> => {
   const liveCases = await getLiveCases();
-  if (liveCases.length > 0) {
+  if (liveCases) {
     return { page: buildPage(liveCases, "api"), source: "api" };
   }
 
