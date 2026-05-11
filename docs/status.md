@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Phase 4 is in implementation review as a stacked server PR. A Codecov patch-coverage fix has been pushed to the Phase 4 server PR; Phase 3 server/web PRs remain open underneath it.
+Phase 4 is in implementation review as a stacked server PR. The Phase 4 server PR now passes build and Codecov after a GraphQL coverage fix; Phase 3 server/web PRs remain open underneath it.
 
 ## Completed
 
@@ -163,6 +163,10 @@ Server PR #4765:
   - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchPublicQueries.test.js --runInBand --forceExit`: passed, 3 tests.
   - Added DB-backed GraphQL coverage for `communityWatchActions` and `communityWatchAction` in `src/types/__test__/2/comment.test.ts`.
   - Local `build/types/__test__/2/comment.test.js` still fails before assertions with the existing test database `AggregateError`; CI should verify this suite in the GitHub Actions environment.
+- Phase 4 server CI after coverage fix:
+  - GitHub `build / build`: passed on commit `e7f2e49a4`.
+  - GitHub `codecov/patch`: passed.
+  - GitHub `codecov/project`: passed.
 
 ## Next
 
