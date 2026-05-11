@@ -66,6 +66,7 @@ Phase 1 through Phase 3 are on `develop`. Phase 4's public audit query was merge
   - Reason: #4765 was merged into the stacked base `codex/community-watch-phase3-server`; its public root queries were not present on `origin/develop` after #4762 merged.
   - Cherry-picked the Phase 4 public query commits and moved the knex-backed public audit reads into `CommentService` to follow the existing connector pattern.
   - Local verification: `npm run build`, `npm run lint`, and `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchPublicQueries.test.js --runInBand --forceExit` passed.
+  - GitHub checks: push build, pull_request build, `codecov/patch`, `codecov/project`, and WIP passed.
 - Advanced pre-merge Phase 4-6 work in this repo:
   - Expanded `DEPLOYMENT.md` with Cloudflare Pages setup, environment variables, rollout order, rollback, and production gate.
   - Expanded `docs/staging-verification.md` into a role-based staging checklist with expected results and failure handling.
@@ -214,7 +215,7 @@ Server PR #4765:
   - `thematters/matters-server` #4762, #4763, #4764, and #4765 are merged, but #4765 landed on the stacked Phase 3 branch rather than `develop`.
   - `thematters/matters-web` #5881 is merged.
   - #4762 merge commit on `develop`: `82235f10d`.
-  - `thematters/matters-server` #4769 is open to land the Phase 4 public query on `develop`.
+  - `thematters/matters-server` #4769 is open and all visible checks pass; remaining blocker is review approval.
 
 ## Next
 
