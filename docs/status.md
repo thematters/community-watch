@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Only Phase 1 server PR #4762 remains open, and it now passes build, Codecov, and WIP after a TypeScript upload MIME-type fix. Phase 2 server, Phase 3 server/web, and Phase 4 server PRs have been merged.
+Only Phase 1 server PR #4762 remains open. It is mergeable after resolving the latest `develop` conflict, and all visible checks now pass; GitHub still shows `CHANGES_REQUESTED` until the CTO review state is cleared. Phase 2 server, Phase 3 server/web, and Phase 4 server PRs have been merged.
 
 ## Completed
 
@@ -26,6 +26,7 @@ Only Phase 1 server PR #4762 remains open, and it now passes build, Codecov, and
 - Resolved #4762 merge conflict with updated `origin/develop`:
   - Commit: `5e3684ebe`
   - Conflict was only in `src/connectors/medium/index.ts`; kept the MIME-type guard and develop's `Invalid content-type.` error text.
+  - Push build and pull_request build both passed after rerunning the transient `channel/feedback.test.js` failure.
 - Opened Phase 2 server PR:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase2`
@@ -190,7 +191,8 @@ Server PR #4765:
   - #4762 GitHub `build / build` passed on commit `b3543d34f` after the connector refactor.
   - #4762 GitHub `codecov/patch` and `codecov/project` passed after the connector refactor.
   - #4762 is mergeable after merging `origin/develop`; push build passed on merge commit `5e3684ebe`.
-  - The pull_request build on `5e3684ebe` failed in develop's `channel/feedback.test.js` setup (`createTopicChannel` undefined); the failed pull_request run was rerun.
+  - The pull_request build on `5e3684ebe` initially failed in develop's `channel/feedback.test.js` setup (`createTopicChannel` undefined), but the rerun passed.
+  - #4762 still shows `CHANGES_REQUESTED`; the remaining blocker is review-state cleanup, not merge conflict or CI.
   - `thematters/matters-server` #4763, #4764, #4765 and `thematters/matters-web` #5881 are merged.
 
 ## Next
