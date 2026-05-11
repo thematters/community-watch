@@ -305,6 +305,9 @@ Server PR #4771:
     - removed records appear on the Community Watch public page/API;
     - admin/staff can review removed content and run restore, reason adjustment, appeal state update, and original-content clearing.
   - After the `matters.icu` flow passes, #4772 can be marked ready and merged to `master`.
+- Staging verification checklist:
+  - Expanded `docs/staging-verification.md` into an executable `matters.icu` acceptance checklist.
+  - The checklist now includes environment URLs, test-account table, test-content table, preflight checks, step-by-step pass/fail evidence fields, public record checks, stop conditions, failure handling, and the release decision sequence for #4772.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.
@@ -315,6 +318,7 @@ Server PR #4771:
 ## Next
 
 - Run the full stable-flow verification on `matters.icu`.
+- Use `docs/staging-verification.md` as the source checklist for evidence and pass/fail status.
 - After the `matters.icu` flow passes, mark `thematters/matters-server` #4772 ready for review/merge and run production rollout.
 - After production server rollout, verify live audit records render on `https://community-watch.matters.town/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.

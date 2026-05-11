@@ -1,82 +1,142 @@
 # Staging Verification
 
-Run this before production rollout.
+Run this full checklist on `matters.icu` before marking `thematters/matters-server` #4772 ready for production.
 
-## Preconditions
+Production release rule:
 
-- Server migrations are applied on staging.
-- Matters web points to the staging GraphQL endpoint that includes Community Watch mutations and public audit queries.
-- `community-watch` staging build has `COMMUNITY_WATCH_API_URL` set to the staging GraphQL endpoint.
-- Test accounts are prepared:
-  - one admin/staff account;
-  - one Community Watch member candidate;
-  - one normal user;
-  - one author/commenter account for creating test comments.
-- Test content exists:
-  - one article with at least two comments;
-  - one moment with at least two comments;
-  - one circle comment only if staging still has circle surfaces available, to confirm it is rejected.
-- `hi@matters.town` appeal owner is identified for the rollout test.
+- Keep #4772 as draft until every required item below passes.
+- Do not merge #4772 to `master` from CI success alone.
+- If any stop condition is hit, pause production rollout and fix the issue on `develop` first.
+
+## Environments
+
+| Surface | URL | Expected State |
+| --- | --- | --- |
+| Matters staging web | `https://matters.icu` | Includes `thematters/matters-web` #5881 Community Watch UI. |
+| Matters staging GraphQL | `https://server.matters.icu/graphql` | Exposes Community Watch public queries and member/staff mutations. |
+| Community Watch public page | `https://community-watch.matters.town` or a staging Pages deployment | Can show audit records from the target GraphQL endpoint. |
+| Production release PR | https://github.com/thematters/matters-server/pull/4772 | Must remain draft until this checklist passes. |
+
+If the public page is being tested against staging data, use a staging Pages deployment or local Cloudflare preview with:
+
+```bash
+COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql pnpm preview
+```
+
+Do not point the production custom domain at staging data.
+
+## Test Accounts
+
+Fill this before starting.
+
+| Role | Matters Account | Email/Login Owner | Notes |
+| --- | --- | --- | --- |
+| Admin/staff |  |  | Can assign feature flags and run staff review actions. |
+| Community Watch candidate |  |  | Will receive and later lose `communityWatch`. |
+| Normal user |  |  | Must never see Community Watch actions. |
+| Article author/commenter |  |  | Creates article comments to remove. |
+| Moment author/commenter |  |  | Creates moment comments to remove. |
+
+## Test Content
+
+Create fresh staging content so the audit records are easy to identify.
+
+| Content | URL | Source ID | Comment ID | Comment Text Summary |
+| --- | --- | --- | --- | --- |
+| Article comment for `色情廣告` |  |  |  |  |
+| Article comment for `濫發廣告` |  |  |  |  |
+| Moment comment for `色情廣告` |  |  |  |  |
+| Moment comment for `濫發廣告` |  |  |  |  |
+| Circle comment, only if still available |  |  |  |  |
+
+Use obvious test spam text, but avoid real malicious links, real personal data, or real adult content.
+
+## Preflight
+
+| Check | Expected Result | Pass/Fail | Evidence |
+| --- | --- | --- | --- |
+| Staging server schema | `server.matters.icu` exposes `communityWatchActions`, `communityWatchAction`, `communityWatchRemoveComment`, `updateCommunityWatchActionState`, `restoreCommunityWatchComment`, and `clearCommunityWatchOriginalContent`. |  |  |
+| Staging web deployment | `matters.icu` includes Community Watch comment-menu UI from #5881. |  |  |
+| Public page data source | The test public page points at `server.matters.icu` when verifying staging records. |  |  |
+| Appeal owner | `hi@matters.town` owner knows this test is happening. |  |  |
+| Release PR state | #4772 is draft before staging verification starts. |  |  |
 
 ## Required Flow
 
-| Step | Actor | Expected Result | Evidence |
-| --- | --- | --- | --- |
-| 1 | Admin | Assign the candidate account the `communityWatch` feature flag. | Admin action time and target user. |
-| 2 | Candidate | Reload Matters web and confirm article/moment comment menus show Community Watch actions. | Screenshot of menu. |
-| 3 | Normal user | Confirm a normal account does not see the Community Watch actions. | Screenshot of menu. |
-| 4 | Candidate | Remove an article comment with reason `色情廣告`. | Removed comment ID and public record link. |
-| 5 | Everyone | Original article comment renders as `本則貼文已由守望相助隊檢舉`. | Screenshot of placeholder. |
-| 6 | Everyone | Placeholder link opens the matching public record. | URL and screenshot. |
-| 7 | Candidate | Remove a moment comment with reason `濫發廣告`. | Removed comment ID and public record link. |
-| 8 | Everyone | Original moment comment renders the same placeholder and public record link. | Screenshot of placeholder. |
-| 9 | Candidate | Attempt to remove a circle comment if available. | Server rejects it; no audit record is created. |
-| 10 | Candidate | Confirm no UI/API path allows article deletion, moment body deletion, account suspension, or site-wide ban. | Notes from menu/API checks. |
-| 11 | Admin | Remove the candidate account's `communityWatch` flag. | Admin action time. |
-| 12 | Candidate | Reload and confirm actions disappear; stale mutation calls are rejected. | Screenshot plus API error. |
-| 13 | Staff | Restore a removed comment through staff tooling once Phase 5 exists. | Review action record. |
-| 14 | Everyone | Public record shows restoration/review state once Phase 5 exists. | Screenshot. |
-| 15 | Staff | Confirm no automatic `original_content` cleanup job is enabled in the current rollout. | Job/config check. |
-| 16 | Staff | Simulate a privacy/personal-data request by clearing `original_content` directly while preserving audit metadata. | Record before/after. |
+| Step | Actor | Action | Expected Result | Evidence | Pass/Fail |
+| --- | --- | --- | --- | --- | --- |
+| 1 | Admin | Assign candidate the `communityWatch` feature flag. | Candidate has Community Watch permission after reload. | Admin action time, target account, screenshot or API result. |  |
+| 2 | Candidate | Open article comment menu. | `色情廣告` and `濫發廣告` actions are visible. | Screenshot. |  |
+| 3 | Candidate | Open moment comment menu. | `色情廣告` and `濫發廣告` actions are visible. | Screenshot. |  |
+| 4 | Normal user | Open the same article and moment comment menus. | Community Watch actions are not visible. | Screenshot. |  |
+| 5 | Candidate | Remove article comment with `色情廣告`. | Comment is removed; audit row is created. | Comment ID, audit UUID, mutation result or screenshot. |  |
+| 6 | Everyone | Reload original article. | Removed comment renders `本則貼文已由守望相助隊檢舉`. | Screenshot of placeholder. |  |
+| 7 | Everyone | Open placeholder link. | Public record opens for the same audit UUID. | Public record URL and screenshot. |  |
+| 8 | Candidate | Remove moment comment with `濫發廣告`. | Comment is removed; audit row is created. | Comment ID, audit UUID, mutation result or screenshot. |  |
+| 9 | Everyone | Reload original moment. | Removed comment renders the same placeholder and links to its public record. | Screenshot. |  |
+| 10 | Candidate | Try circle comment if the surface still exists. | Removal is rejected; no audit row is created. | Error result or screenshot. |  |
+| 11 | Candidate | Check available UI actions. | No path allows article deletion, moment body deletion, account suspension, or site-wide ban. | Notes and screenshots. |  |
+| 12 | Admin | Remove candidate's `communityWatch` feature flag. | Candidate loses permission after reload. | Admin action time and target account. |  |
+| 13 | Candidate | Retry comment menu and stale mutation after permission removal. | UI actions disappear; stale mutation is rejected. | Screenshot plus API error. |  |
+| 14 | Staff | Restore one removed comment. | Comment state is restored and audit review state becomes reversed. | Audit UUID, screenshot/API result. |  |
+| 15 | Staff | Adjust reason on one record. | Public record shows updated reason/review state. | Before/after screenshot. |  |
+| 16 | Staff | Mark appeal state on one record. | Public record shows appeal status change. | Before/after screenshot. |  |
+| 17 | Staff | Clear `originalContent` on one record. | Public record preserves metadata and shows cleared-content text. | Before/after screenshot. |  |
 
 ## Public Record Checks
 
-For every public record opened during staging, confirm it shows:
+Run these for every audit UUID created during the test.
 
-- comment ID;
-- source type and source title or ID;
-- reason;
-- member display name;
-- removal time;
-- appeal instruction with `hi@matters.town`;
-- original content blurred by default.
+| Field/Behavior | Expected Result | Pass/Fail | Evidence |
+| --- | --- | --- | --- |
+| Public record URL | URL is `/records/{uuid}/` and matches the placeholder link. |  |  |
+| Comment ID | Shows the removed comment ID. |  |  |
+| Source | Shows article/moment source type and source title or ID. |  |  |
+| Reason | Shows only `色情廣告` or `濫發廣告`. |  |  |
+| Actor | Shows the Community Watch member's Matters display name, not internal user ID. |  |  |
+| Time | Shows removal time. |  |  |
+| Appeal | Shows `hi@matters.town` appeal instruction. |  |  |
+| Review state | Shows pending/upheld/reversed/reason-adjusted as staff actions change it. |  |  |
+| Original content default | Content is blurred by default. |  |  |
+| Reveal interaction | Clicking `顯示全文` reveals text and changes button to `收起全文`. |  |  |
+| No dialog | No extra warning confirmation appears before reveal. |  |  |
+| Footer warning | Bottom warning text remains visible on the page. |  |  |
+| Cleared content | After staff clearing, original content is not displayed, but audit metadata remains. |  |  |
 
-Then click `顯示全文` and confirm:
+## Stop Conditions
 
-- content becomes readable only after the click;
-- button text changes to `收起全文`;
-- no extra confirmation dialog appears;
-- bottom warning text remains visible somewhere near the page footer.
+Stop and do not mark #4772 ready if any of these happen:
+
+- A non-member can see or call Community Watch removal.
+- A member can affect anything other than article or moment comments.
+- Circle comments can be removed.
+- Removed comments disappear entirely instead of showing the placeholder.
+- Placeholder links do not resolve to a matching public record.
+- Public records expose internal user IDs, emails, IP addresses, staff notes, or hidden account data.
+- Staff restore does not restore the comment while marking the audit state consistently.
+- Clearing `originalContent` deletes the whole audit record instead of preserving metadata.
+- The public page turns into a spam-content display wall without blur by default.
 
 ## Failure Handling
 
-- If assignment does not take effect after reload, check the `user_feature_flag` row and GraphQL viewer feature flags.
-- If removal succeeds but no public record appears, check `community_watch_action` insert and public query response.
-- If the placeholder does not render, check whether banned comments are still included with enough `communityWatchAction` data for the UI.
-- If a non-member can call the mutation, stop rollout.
-- If a member can affect anything other than article/moment comments, stop rollout.
-- If `originalContent` exposes internal user IDs or hidden account data, stop rollout and clear the affected content.
+| Symptom | First Check |
+| --- | --- |
+| Feature flag assignment does not take effect | Check `user_feature_flag` row and viewer `oss.featureFlags`. |
+| Candidate sees no menu actions | Confirm `matters.icu` web deployment includes #5881 and viewer feature flags are fresh after reload. |
+| Removal mutation fails for candidate | Check viewer permission and target comment source type. |
+| Removal succeeds but no public record appears | Check `community_watch_action` insert and public `communityWatchAction` query. |
+| Placeholder does not render | Check whether banned comments are included with `Comment.communityWatchAction` data. |
+| Public page has sample records only | Confirm the test page is using `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` and staging has at least one audit row. |
+| Restore/reason/appeal changes do not show | Check `community_watch_review_event` insert and public record query response. |
 
-## Production Approval Gate
+## Release Decision
 
-Production rollout needs explicit human approval after staging passes.
+When every required item passes:
 
-Approval should confirm:
-
-- Domain routing for `community-watch.matters.town`.
-- Rollback path for DB migrations.
-- Current decision that no automatic `original_content` cleanup runs before a later retention decision.
-- Staff owner for `hi@matters.town` appeals.
-- Staff owner for member assignment/removal.
-- Monitoring for failed removals, duplicate removals, and permission errors.
-- Public copy reviewed for privacy and appeal clarity.
+1. Save the evidence links/screenshots in the project tracker or rollout notes.
+2. Add a comment on #4772 summarizing the passed `matters.icu` verification.
+3. Mark #4772 ready for review.
+4. After approval, merge #4772 to `master`.
+5. Watch production `Push Schema to Apollo` and `Deploy` workflows.
+6. Verify `server.matters.town/graphql` exposes Community Watch queries/mutations.
+7. Verify `community-watch.matters.town` reads live production audit records once a production record exists.
