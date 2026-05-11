@@ -83,6 +83,7 @@ Phase 1 through Phase 4 are on `develop`. The Phase 4 public audit query is depl
   - Keeps Community Watch member disablement on the existing admin `putUserFeatureFlags` path.
   - Rejects setting `reviewState: reversed` through the generic update mutation; staff must use `restoreCommunityWatchComment` so the comment state and audit state stay consistent.
   - Local verification: `npm run gen`, `npm run build`, `npm run lint`, and focused Jest for review-event migration plus staff-review service/mutations passed.
+  - GitHub checks: push build, pull_request build, `codecov/patch`, and `codecov/project` passed; WIP remains tied to draft state.
 - Advanced pre-merge Phase 4-6 work in this repo:
   - Expanded `DEPLOYMENT.md` with Cloudflare Pages setup, environment variables, rollout order, rollback, and production gate.
   - Expanded `docs/staging-verification.md` into a role-based staging checklist with expected results and failure handling.
@@ -247,6 +248,12 @@ Server PR #4771:
   - `npm run build`: passed.
   - `npm run lint`: passed.
   - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchReviewEventMigration.test.js build/common/utils/__test__/communityWatchStaffReview.test.js --runInBand --forceExit`: passed, 9 tests.
+- Phase 5 server CI:
+  - GitHub push `build / build`: passed.
+  - GitHub pull_request `build / build`: passed.
+  - GitHub `codecov/patch`: passed.
+  - GitHub `codecov/project`: passed.
+  - WIP remains in progress while the PR is draft.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, and #4769 are merged.
   - `thematters/matters-server` #4771 is open as a draft.
