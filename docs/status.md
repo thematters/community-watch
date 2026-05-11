@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Phase 4 is in implementation review as a stacked server PR. The Phase 4 server PR now passes build and Codecov after a GraphQL coverage fix; Phase 3 server/web PRs remain open underneath it.
+Only Phase 1 server PR #4762 remains open. Phase 2 server, Phase 3 server/web, and Phase 4 server PRs have been merged.
 
 ## Completed
 
@@ -22,22 +22,26 @@ Phase 4 is in implementation review as a stacked server PR. The Phase 4 server P
   - Branch: `codex/community-watch-phase2`
   - Base branch while stacked: `codex/community-watch-phase1`
   - PR: https://github.com/thematters/matters-server/pull/4763
+- Merged Phase 2 server PR #4763 on 2026-05-10.
 - Fixed Phase 2 Codecov patch coverage by adding a GraphQL-level Community Watch mutation test in the CI upload batch.
 - Opened Phase 3 server PR:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase3-server`
   - Base branch while stacked: `codex/community-watch-phase1`
   - PR: https://github.com/thematters/matters-server/pull/4764
+- Merged Phase 3 server PR #4764 on 2026-05-11.
 - Opened Phase 3 web PR:
   - Repository: `thematters/matters-web`
   - Branch: `codex/community-watch-phase3`
   - Base branch: `develop`
   - PR: https://github.com/thematters/matters-web/pull/5881
+- Merged Phase 3 web PR #5881 on 2026-05-11.
 - Opened Phase 4 server PR:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase4-server`
   - Base branch while stacked: `codex/community-watch-phase3-server`
   - PR: https://github.com/thematters/matters-server/pull/4765
+- Merged Phase 4 server PR #4765 on 2026-05-11.
 - Pushed a Phase 4 server coverage fix after Codecov reported only 18.18% patch coverage:
   - Commit: `e7f2e49a4`
   - Adds GraphQL-level public audit query coverage to `src/types/__test__/2/comment.test.ts`.
@@ -167,10 +171,14 @@ Server PR #4765:
   - GitHub `build / build`: passed on commit `e7f2e49a4`.
   - GitHub `codecov/patch`: passed.
   - GitHub `codecov/project`: passed.
+- Current open PR:
+  - `thematters/matters-server` #4762 remains open against `develop`.
+  - #4762 is no longer draft, but one rerun of `build / build` failed while another `build / build` rerun is still in progress as of the latest check.
+  - `thematters/matters-server` #4763, #4764, #4765 and `thematters/matters-web` #5881 are merged.
 
 ## Next
 
-After Phase 4 review/CI:
+After Phase 1 server PR #4762 is merged:
 
 - Phase 4 web/site follow-up: replace sample audit records in `src/content/page.ts` with the public audit API.
 - Phase 5: add staff review and appeal status workflows.
