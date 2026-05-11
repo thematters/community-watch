@@ -290,6 +290,15 @@ Server PR #4771:
   - Verified `https://community-watch.matters.town/records/cw-demo-8f2a71/` returns 200 with the same cache header.
   - In-app browser check on the production domain passed for the homepage, sample record detail page, appeal email, and blurred-content reveal interaction.
   - Production Matters server does not expose the public Community Watch query yet, so the production public site currently falls back to sample records. It will read production audit records after the server production rollout exposes `communityWatchActions` and `communityWatchAction`.
+- Production server release PR:
+  - Opened `thematters/matters-server` #4772: `Release Community Watch to production`.
+  - PR URL: https://github.com/thematters/matters-server/pull/4772
+  - Base: `master`; head: `develop`.
+  - Release PR is mergeable.
+  - Checks passed: `build / build`, `WIP`, `codecov/patch`, and `codecov/project`.
+  - Direct merge is blocked by `master` branch policy because review is required.
+  - Auto-merge is disabled for the repository, so #4772 needs a human approval and manual merge.
+  - Added a PR comment with production rollout verification targets.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.
@@ -300,6 +309,7 @@ Server PR #4771:
 ## Next
 
 - Run production Matters server rollout when approved so `server.matters.town` exposes the public Community Watch queries.
+- Review and merge `thematters/matters-server` #4772.
 - After production server rollout, verify live audit records render on `https://community-watch.matters.town/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.
 - Run staff restore / reason adjustment / content clearing against real Community Watch audit rows on staging.
