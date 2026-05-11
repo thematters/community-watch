@@ -1,10 +1,10 @@
 # Status
 
-Last updated: 2026-05-10
+Last updated: 2026-05-11
 
 ## Current Phase
 
-Phase 4 is in implementation review as a stacked server PR. Phase 3 server/web PRs remain open underneath it.
+Phase 4 is in implementation review as a stacked server PR. A Codecov patch-coverage fix has been pushed to the Phase 4 server PR; Phase 3 server/web PRs remain open underneath it.
 
 ## Completed
 
@@ -38,6 +38,9 @@ Phase 4 is in implementation review as a stacked server PR. Phase 3 server/web P
   - Branch: `codex/community-watch-phase4-server`
   - Base branch while stacked: `codex/community-watch-phase3-server`
   - PR: https://github.com/thematters/matters-server/pull/4765
+- Pushed a Phase 4 server coverage fix after Codecov reported only 18.18% patch coverage:
+  - Commit: `e7f2e49a4`
+  - Adds GraphQL-level public audit query coverage to `src/types/__test__/2/comment.test.ts`.
 
 ## Phase 1 PR Scope
 
@@ -158,6 +161,8 @@ Server PR #4765:
   - `npm run build`: passed.
   - `npm run lint`: passed.
   - `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchPublicQueries.test.js --runInBand --forceExit`: passed, 3 tests.
+  - Added DB-backed GraphQL coverage for `communityWatchActions` and `communityWatchAction` in `src/types/__test__/2/comment.test.ts`.
+  - Local `build/types/__test__/2/comment.test.js` still fails before assertions with the existing test database `AggregateError`; CI should verify this suite in the GitHub Actions environment.
 
 ## Next
 
