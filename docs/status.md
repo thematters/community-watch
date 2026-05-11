@@ -294,11 +294,17 @@ Server PR #4771:
   - Opened `thematters/matters-server` #4772: `Release Community Watch to production`.
   - PR URL: https://github.com/thematters/matters-server/pull/4772
   - Base: `master`; head: `develop`.
-  - Release PR is mergeable.
+  - Release PR is mergeable but intentionally kept as draft.
   - Checks passed: `build / build`, `WIP`, `codecov/patch`, and `codecov/project`.
-  - Direct merge is blocked by `master` branch policy because review is required.
-  - Auto-merge is disabled for the repository, so #4772 needs a human approval and manual merge.
-  - Added a PR comment with production rollout verification targets.
+  - Production/master rollout is gated on full stable-flow verification on `matters.icu`.
+  - Required staging flow before master:
+    - admin assigns a Community Watch member;
+    - the member sees the remove UI in article and moment comment menus;
+    - the member removes comments with `色情廣告` and `濫發廣告`;
+    - removed comments render the placeholder in the original UI;
+    - removed records appear on the Community Watch public page/API;
+    - admin/staff can review removed content and run restore, reason adjustment, appeal state update, and original-content clearing.
+  - After the `matters.icu` flow passes, #4772 can be marked ready and merged to `master`.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.
@@ -308,8 +314,8 @@ Server PR #4771:
 
 ## Next
 
-- Run production Matters server rollout when approved so `server.matters.town` exposes the public Community Watch queries.
-- Review and merge `thematters/matters-server` #4772.
+- Run the full stable-flow verification on `matters.icu`.
+- After the `matters.icu` flow passes, mark `thematters/matters-server` #4772 ready for review/merge and run production rollout.
 - After production server rollout, verify live audit records render on `https://community-watch.matters.town/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.
 - Run staff restore / reason adjustment / content clearing against real Community Watch audit rows on staging.
