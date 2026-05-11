@@ -185,7 +185,7 @@ Server PR #4765:
   - `thematters/matters-server` #4762 remains open against `develop`.
   - #4762 is no longer draft.
   - #4762 GitHub `build / build` passed on commit `b3543d34f` after the connector refactor.
-  - Earlier #4762 `codecov/patch`, `codecov/project`, and `WIP` passed on commit `81693d7ed`; new Codecov contexts were not yet reported immediately after `b3543d34f`.
+  - #4762 GitHub `codecov/patch` and `codecov/project` passed after the connector refactor.
   - `thematters/matters-server` #4763, #4764, #4765 and `thematters/matters-web` #5881 are merged.
 
 ## Next
