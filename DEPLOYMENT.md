@@ -30,17 +30,30 @@ pnpm preview
 
 ## Content Source
 
-Until the public API is connected, page copy, sample metrics, and sample audit rows live in:
+Page copy and fallback sample audit rows live in:
 
 ```text
 src/content/page.ts
 ```
 
-The sample rows are explicitly labeled as demonstration data on the page. After API integration, keep the static content as fallback copy and move live audit records to the public API described in `docs/public-api-contract.md`.
+Build-time API integration lives in:
+
+```text
+src/content/communityWatchData.ts
+```
+
+The sample rows are explicitly labeled as demonstration data on the page. Set `COMMUNITY_WATCH_API_URL` to fetch live public audit records at build time; if the API is unavailable, the build falls back to the sample rows.
+
+Optional build-time environment:
+
+```bash
+COMMUNITY_WATCH_API_URL=https://server.matters.town/graphql
+COMMUNITY_WATCH_API_FIRST=50
+```
 
 ## Public Routes
 
 - `/`: landing page, statistics, recent records, appeal copy.
 - `/records/{uuid}/`: public record detail page with blurred original content and appeal instructions.
 
-These routes can be built and deployed before the Matters server schema for Phase 3 is merged, because they currently use local sample data.
+These routes can be built and deployed before the Matters server public audit schema is deployed, because they fall back to local sample data.

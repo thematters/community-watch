@@ -161,9 +161,13 @@ Server PR #4765:
   - Labeled sample audit rows as demonstration data until the public API is connected.
   - Added `docs/public-api-contract.md` for the future public list/detail query shape.
   - Updated deployment and staging notes so they no longer require a seven-day cleanup job.
+  - Added build-time API data-source wiring behind `COMMUNITY_WATCH_API_URL`, with sample-record fallback when the server API is not deployed or unavailable.
+  - Updated docs so Cloudflare Pages can enable live public audit records by setting `COMMUNITY_WATCH_API_URL` after the server public query is deployed.
   - `pnpm typecheck`: passed.
   - `pnpm build`: passed and generated `/`, plus three `/records/cw-demo-*/` static pages.
   - Smoke-tested `http://127.0.0.1:4321/` and `http://127.0.0.1:4321/records/cw-demo-8f2a71/`: both returned 200.
+  - `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9/graphql pnpm build`: passed and fell back to sample records.
+  - Mock GraphQL build verification: `COMMUNITY_WATCH_API_URL=http://127.0.0.1:9876/graphql pnpm build` generated `/records/cw-live-test/` and rendered API-sourced record content.
 - Phase 4 server local verification:
   - `npm run build`: passed.
   - `npm run lint`: passed.
@@ -183,8 +187,8 @@ Server PR #4765:
 
 ## Next
 
-After Phase 1 server PR #4762 is merged:
+After Phase 1 server PR #4762 is merged and the public query is deployed:
 
-- Phase 4 web/site follow-up: replace sample audit records in `src/content/page.ts` with the public audit API.
+- Set `COMMUNITY_WATCH_API_URL` for the public site and verify live audit records render on `/` and `/records/{uuid}/`.
 - Phase 5: add staff review and appeal status workflows.
 - Phase 6: configure `community-watch.matters.town`, staging validation, monitoring, and human production approval.

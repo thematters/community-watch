@@ -1,9 +1,11 @@
 ---
 import PageLayout from "../../layouts/PageLayout.astro";
 import { page, type WatchCase } from "../../content/page";
+import { getCommunityWatchPageData } from "../../content/communityWatchData";
 
-export function getStaticPaths() {
-  return page.log.cases.map((watchCase) => ({
+export async function getStaticPaths() {
+  const pageData = await getCommunityWatchPageData();
+  return pageData.page.log.cases.map((watchCase) => ({
     params: { uuid: watchCase.id },
     props: { watchCase },
   }));

@@ -12,11 +12,19 @@ Production page:
 
 This repository now owns the standalone Astro static site for the public transparency page. The page was split out from `thematters/design-system` after the prototype became a real public property.
 
-Edit page copy, metrics, mock moderation records, appeal text, and AI-training notes here:
+Edit page copy, fallback moderation records, appeal text, and AI-training notes here:
 
 ```text
 src/content/page.ts
 ```
+
+Build-time API integration lives here:
+
+```text
+src/content/communityWatchData.ts
+```
+
+Set `COMMUNITY_WATCH_API_URL` to use the Matters server public GraphQL audit queries. When it is unset or unavailable, the page keeps using the local fallback records.
 
 Main UI files:
 
@@ -79,4 +87,4 @@ Phase 0 is complete as repo-backed planning, and the standalone public page is n
 - [docs/staging-verification.md](docs/staging-verification.md)
 - [docs/status.md](docs/status.md)
 
-Next implementation target: replace the static public-record fallback with the Community Watch audit API after the server-side public query is available.
+Next implementation target: after the server-side public query is deployed, set `COMMUNITY_WATCH_API_URL` in the Pages environment and verify the public page against real audit records.

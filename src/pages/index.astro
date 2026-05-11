@@ -1,8 +1,9 @@
 ---
 import PageLayout from "../layouts/PageLayout.astro";
-import { page } from "../content/page";
+import { getCommunityWatchPageData } from "../content/communityWatchData";
 
 const baseUrl = import.meta.env.BASE_URL;
+const { page } = await getCommunityWatchPageData();
 ---
 
 <PageLayout

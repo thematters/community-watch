@@ -11,11 +11,11 @@ The public site can ship with static sample data before the Matters server publi
 
 ## Minimum List Query
 
-GraphQL shape:
+GraphQL shape used by the site:
 
 ```graphql
-query CommunityWatchActions($first: Int = 20, $after: String, $reason: CommunityWatchReason) {
-  communityWatchActions(input: { first: $first, after: $after, reason: $reason }) {
+query CommunityWatchActions($first: Int = 50) {
+  communityWatchActions(input: { first: $first }) {
     edges {
       cursor
       node {
@@ -27,8 +27,11 @@ query CommunityWatchActions($first: Int = 20, $after: String, $reason: Community
         reason
         actorDisplayName
         createdAt
+        actionState
         appealState
         reviewState
+        originalContent
+        contentCleared
       }
     }
     pageInfo {
@@ -45,6 +48,7 @@ Required behavior:
 - Include active, restored, and voided records once Phase 5 review exists.
 - Do not include unrelated generic banned comments.
 - Do not require login.
+- The current static site build uses `originalContent` in the list query so recent records can render without one detail request per row. Detail pages still support the single-record query below.
 
 ## Minimum Detail Query
 
@@ -101,6 +105,12 @@ Review state:
 - Recent list: public cache for about 60 seconds.
 - Detail page: public cache for about 60 seconds.
 - Staff review changes can rely on short TTL at MVP; explicit invalidation can be added later.
+
+## Site Environment
+
+- `COMMUNITY_WATCH_API_URL`: GraphQL endpoint used at build time, for example `https://server.matters.town/graphql`.
+- `COMMUNITY_WATCH_API_FIRST`: optional build-time list size, default `50`, capped at `100`.
+- If `COMMUNITY_WATCH_API_URL` is unset or unavailable, the Astro site falls back to local sample records in `src/content/page.ts`.
 
 ## Privacy
 
