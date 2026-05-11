@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Phase 1 through Phase 4 code PRs are merged. The project is now at the deployment and staging-validation gate: confirm schema publication, deploy or configure the public site, set staging `COMMUNITY_WATCH_API_URL`, and run the real end-to-end staging flow.
+Phase 1 through Phase 3 are on `develop`. Phase 4's public audit query was merged only into an intermediate stacked branch, so a follow-up server PR #4769 is open to land it on `develop`. The project is at the deployment and staging-validation gate after #4769 merges: configure the public site, set staging `COMMUNITY_WATCH_API_URL`, and run the real end-to-end staging flow.
 
 ## Completed
 
@@ -59,6 +59,13 @@ Phase 1 through Phase 4 code PRs are merged. The project is now at the deploymen
 - Pushed a Phase 4 server coverage fix after Codecov reported only 18.18% patch coverage:
   - Commit: `e7f2e49a4`
   - Adds GraphQL-level public audit query coverage to `src/types/__test__/2/comment.test.ts`.
+- Opened Phase 4 server follow-up PR #4769 against `develop`:
+  - Repository: `thematters/matters-server`
+  - Branch: `codex/community-watch-phase4-develop`
+  - PR: https://github.com/thematters/matters-server/pull/4769
+  - Reason: #4765 was merged into the stacked base `codex/community-watch-phase3-server`; its public root queries were not present on `origin/develop` after #4762 merged.
+  - Cherry-picked the Phase 4 public query commits and moved the knex-backed public audit reads into `CommentService` to follow the existing connector pattern.
+  - Local verification: `npm run build`, `npm run lint`, and `MATTERS_ENV=test node --experimental-vm-modules node_modules/.bin/jest build/common/utils/__test__/communityWatchPublicQueries.test.js --runInBand --forceExit` passed.
 - Advanced pre-merge Phase 4-6 work in this repo:
   - Expanded `DEPLOYMENT.md` with Cloudflare Pages setup, environment variables, rollout order, rollback, and production gate.
   - Expanded `docs/staging-verification.md` into a role-based staging checklist with expected results and failure handling.
@@ -204,12 +211,14 @@ Server PR #4765:
   - GitHub `codecov/patch`: passed.
   - GitHub `codecov/project`: passed.
 - PR merge status:
-  - `thematters/matters-server` #4762, #4763, #4764, and #4765 are merged.
+  - `thematters/matters-server` #4762, #4763, #4764, and #4765 are merged, but #4765 landed on the stacked Phase 3 branch rather than `develop`.
   - `thematters/matters-web` #5881 is merged.
   - #4762 merge commit on `develop`: `82235f10d`.
+  - `thematters/matters-server` #4769 is open to land the Phase 4 public query on `develop`.
 
 ## Next
 
+- Wait for #4769 CI and merge so the public audit schema exists on `develop`.
 - Deploy or configure the public site on Cloudflare Pages.
 - Set staging `COMMUNITY_WATCH_API_URL` and verify live audit records render on `/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.

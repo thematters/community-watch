@@ -9,6 +9,7 @@ This list tracks what was safe before `thematters/matters-server` #4762 merged a
 - Merge commit: `82235f10d`
 - Branch: `codex/community-watch-phase1`
 - Base: `develop`
+- Follow-up: #4769 is open to land Phase 4 public audit queries on `develop`, because #4765 merged into the stacked Phase 3 branch rather than `develop`.
 
 ## Safe Before Merge
 
