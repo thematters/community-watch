@@ -279,6 +279,17 @@ Server PR #4771:
   - Header check: `/` and `/records/cw-demo-8f2a71/` both return `Cache-Control: public, max-age=60, s-maxage=60`.
   - Staging API binding check with `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql`: the index rendered `公開 API`; staging still has zero live Community Watch rows.
   - Detail fallback check: non-UUID demo IDs stay on sample data, while a UUID-shaped missing record renders the local "找不到這筆公開紀錄" message.
+- Phase 6 Cloudflare Pages deployment:
+  - Confirmed the `community-watch` Pages project exists under the Matters Lab Cloudflare account.
+  - Confirmed custom domain `community-watch.matters.town` is attached to the Pages project.
+  - Set production Pages runtime secret `COMMUNITY_WATCH_API_URL` to `https://server.matters.town/graphql`.
+  - Deployed commit `4c87990` to production Pages:
+    - Deployment ID: `fea8f282-ec58-40b5-8c59-5f926f4c2ca8`.
+    - Deployment URL: `https://fea8f282.community-watch.pages.dev`.
+  - Verified `https://community-watch.matters.town/` returns 200 with `Cache-Control: public, max-age=60, s-maxage=60`.
+  - Verified `https://community-watch.matters.town/records/cw-demo-8f2a71/` returns 200 with the same cache header.
+  - In-app browser check on the production domain passed for the homepage, sample record detail page, appeal email, and blurred-content reveal interaction.
+  - Production Matters server does not expose the public Community Watch query yet, so the production public site currently falls back to sample records. It will read production audit records after the server production rollout exposes `communityWatchActions` and `communityWatchAction`.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.
@@ -288,8 +299,8 @@ Server PR #4771:
 
 ## Next
 
-- Deploy or configure the public site on Cloudflare Pages.
-- Set staging `COMMUNITY_WATCH_API_URL` and verify live audit records render on `/` and `/records/{uuid}/`.
+- Run production Matters server rollout when approved so `server.matters.town` exposes the public Community Watch queries.
+- After production server rollout, verify live audit records render on `https://community-watch.matters.town/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.
 - Run staff restore / reason adjustment / content clearing against real Community Watch audit rows on staging.
-- Phase 6: configure `community-watch.matters.town`, staging validation, monitoring, and human production approval.
+- Add monitoring/operational checks for failed removals, duplicate removals, permission errors, and public-page API failures.
