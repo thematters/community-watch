@@ -3,7 +3,11 @@ import PageLayout from "../layouts/PageLayout.astro";
 import { getCommunityWatchPageData } from "../content/communityWatchData";
 
 const baseUrl = import.meta.env.BASE_URL;
-const { page } = await getCommunityWatchPageData();
+const runtimeEnv = (Astro.locals as { runtime?: { env?: Record<string, string | undefined> } })
+  .runtime?.env;
+const { page } = await getCommunityWatchPageData(runtimeEnv);
+
+Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
 ---
 
 <PageLayout

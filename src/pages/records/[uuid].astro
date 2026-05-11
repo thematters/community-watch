@@ -1,29 +1,29 @@
 ---
 import PageLayout from "../../layouts/PageLayout.astro";
-import { page, type WatchCase } from "../../content/page";
-import { getCommunityWatchPageData } from "../../content/communityWatchData";
+import { page } from "../../content/page";
+import { getCommunityWatchActionData } from "../../content/communityWatchData";
 
-export async function getStaticPaths() {
-  const pageData = await getCommunityWatchPageData();
-  return pageData.page.log.cases.map((watchCase) => ({
-    params: { uuid: watchCase.id },
-    props: { watchCase },
-  }));
-}
-
-interface Props {
-  watchCase: WatchCase;
-}
-
-const { watchCase } = Astro.props;
+const runtimeEnv = (Astro.locals as { runtime?: { env?: Record<string, string | undefined> } })
+  .runtime?.env;
+const uuid = Astro.params.uuid ?? "";
+const watchCase = await getCommunityWatchActionData(uuid, runtimeEnv);
 const baseUrl = import.meta.env.BASE_URL;
-const title = `${watchCase.commentId}｜${page.hero.title}`;
-const mailSubject = encodeURIComponent(`守望相助隊申訴：${watchCase.commentId}`);
+const title = watchCase
+  ? `${watchCase.commentId}｜${page.hero.title}`
+  : `公開紀錄不存在｜${page.hero.title}`;
+const description = watchCase
+  ? `守望相助隊公開紀錄：${watchCase.commentId}，處理理由為${watchCase.reason}。`
+  : "守望相助隊公開紀錄頁。這筆紀錄目前無法在公開 API 中找到。";
+const mailSubject = encodeURIComponent(
+  `守望相助隊申訴：${watchCase?.commentId ?? uuid}`
+);
+
+Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
 ---
 
 <PageLayout
   title={title}
-  description={`守望相助隊公開紀錄：${watchCase.commentId}，處理理由為${watchCase.reason}。`}
+  description={description}
   lang={page.lang}
 >
   <div class="page">
@@ -41,84 +41,102 @@ const mailSubject = encodeURIComponent(`守望相助隊申訴：${watchCase.comm
     </header>
 
     <main class="record-main">
-      <a class="back-link" href={`${baseUrl}#case-${watchCase.id}`}>回到處理紀錄</a>
+      <a class="back-link" href={watchCase ? `${baseUrl}#case-${watchCase.id}` : baseUrl}>
+        回到處理紀錄
+      </a>
 
-      <article class="record board">
-        <header class="record__header">
-          <div>
-            <p class="eyebrow">公開紀錄</p>
-            <h1>{watchCase.commentId}</h1>
-          </div>
-          <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
-            {watchCase.reason}
-          </span>
-        </header>
+      {
+        watchCase ? (
+          <article class="record board">
+            <header class="record__header">
+              <div>
+                <p class="eyebrow">公開紀錄</p>
+                <h1>{watchCase.commentId}</h1>
+              </div>
+              <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
+                {watchCase.reason}
+              </span>
+            </header>
 
-        <p class="record__notice">{watchCase.publicNotice}</p>
+            <p class="record__notice">{watchCase.publicNotice}</p>
 
-        <dl class="record-grid" aria-label="處理資訊">
-          <div>
-            <dt>公開紀錄 ID</dt>
-            <dd>{watchCase.id}</dd>
-          </div>
-          <div>
-            <dt>留言 ID</dt>
-            <dd>{watchCase.commentId}</dd>
-          </div>
-          <div>
-            <dt>來源類型</dt>
-            <dd>{watchCase.sourceType}</dd>
-          </div>
-          <div>
-            <dt>來源標題或 ID</dt>
-            <dd>{watchCase.sourceTitle}</dd>
-          </div>
-          <div>
-            <dt>來源 ID</dt>
-            <dd>{watchCase.sourceId}</dd>
-          </div>
-          <div>
-            <dt>處理人</dt>
-            <dd>{watchCase.watcher}</dd>
-          </div>
-          <div>
-            <dt>處理時間</dt>
-            <dd>{watchCase.handledAt}</dd>
-          </div>
-          <div>
-            <dt>申訴狀態</dt>
-            <dd>{watchCase.appealStatus}</dd>
-          </div>
-          <div>
-            <dt>站方覆核</dt>
-            <dd>{watchCase.reviewStatus}</dd>
-          </div>
-        </dl>
+            <dl class="record-grid" aria-label="處理資訊">
+              <div>
+                <dt>公開紀錄 ID</dt>
+                <dd>{watchCase.id}</dd>
+              </div>
+              <div>
+                <dt>留言 ID</dt>
+                <dd>{watchCase.commentId}</dd>
+              </div>
+              <div>
+                <dt>來源類型</dt>
+                <dd>{watchCase.sourceType}</dd>
+              </div>
+              <div>
+                <dt>來源標題或 ID</dt>
+                <dd>{watchCase.sourceTitle}</dd>
+              </div>
+              <div>
+                <dt>來源 ID</dt>
+                <dd>{watchCase.sourceId}</dd>
+              </div>
+              <div>
+                <dt>處理人</dt>
+                <dd>{watchCase.watcher}</dd>
+              </div>
+              <div>
+                <dt>處理時間</dt>
+                <dd>{watchCase.handledAt}</dd>
+              </div>
+              <div>
+                <dt>申訴狀態</dt>
+                <dd>{watchCase.appealStatus}</dd>
+              </div>
+              <div>
+                <dt>站方覆核</dt>
+                <dd>{watchCase.reviewStatus}</dd>
+              </div>
+            </dl>
 
-        <section class="content-box" aria-labelledby="original-content">
-          <div class="content-box__header">
-            <h2 id="original-content">原留言內容</h2>
-            <button
-              class="content-box__toggle"
-              type="button"
-              data-watch-toggle
-              aria-expanded="false"
-            >
-              顯示全文
-            </button>
-          </div>
-          <p class="content-box__body is-blurred" data-watch-body>{watchCase.commentPreview}</p>
-          <p class="content-box__hint">
-            原文預設遮蔽，避免垃圾內容被二次散播；點開僅供申訴、覆核與社群稽核使用。
-          </p>
-        </section>
-      </article>
+            <section class="content-box" aria-labelledby="original-content">
+              <div class="content-box__header">
+                <h2 id="original-content">原留言內容</h2>
+                <button
+                  class="content-box__toggle"
+                  type="button"
+                  data-watch-toggle
+                  aria-expanded="false"
+                >
+                  顯示全文
+                </button>
+              </div>
+              <p class="content-box__body is-blurred" data-watch-body>{watchCase.commentPreview}</p>
+              <p class="content-box__hint">
+                原文預設遮蔽，避免垃圾內容被二次散播；點開僅供申訴、覆核與社群稽核使用。
+              </p>
+            </section>
+          </article>
+        ) : (
+          <article class="record board">
+            <header class="record__header">
+              <div>
+                <p class="eyebrow">公開紀錄</p>
+                <h1>找不到這筆公開紀錄</h1>
+              </div>
+            </header>
+            <p class="record__notice">
+              這筆紀錄可能尚未同步到公開 API，或已不是有效的守望相助隊處理紀錄。
+            </p>
+          </article>
+        )
+      }
 
       <aside class="appeal-box board" aria-labelledby="appeal-title">
         <p class="eyebrow">申訴</p>
         <h2 id="appeal-title">認為這則留言被誤判？</h2>
         <p>
-          請把留言 ID <strong>{watchCase.commentId}</strong> 寄到
+          請把留言 ID <strong>{watchCase?.commentId ?? uuid}</strong> 寄到
           <a href={`mailto:${page.appeal.email}?subject=${mailSubject}`}>{page.appeal.email}</a>。
           站方會依公開紀錄、處理理由與原文進行覆核。
         </p>

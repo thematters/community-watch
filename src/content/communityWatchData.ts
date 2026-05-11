@@ -34,6 +34,10 @@ interface CommunityWatchActionsResponse {
   };
 }
 
+interface CommunityWatchActionResponse {
+  communityWatchAction: CommunityWatchActionNode | null;
+}
+
 interface GraphQLResponse<T> {
   data?: T;
   errors?: Array<{ message?: string }>;
@@ -44,11 +48,13 @@ export interface CommunityWatchPageData {
   source: "api" | "sample";
 }
 
+type CommunityWatchEnv = Record<string, string | undefined>;
+
 const PUBLIC_NOTICE = "本則貼文已由守望相助隊檢舉";
 const CLEARED_CONTENT_TEXT = "原留言內容已因隱私或個資請求清空。";
 const DEFAULT_FIRST = 50;
-let apiUnavailable = false;
-let cachedPageData: Promise<CommunityWatchPageData> | undefined;
+const UUID_PATTERN =
+  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
 const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
   query CommunityWatchActions($input: CommunityWatchActionsInput!) {
@@ -74,15 +80,44 @@ const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
   }
 `;
 
+const COMMUNITY_WATCH_ACTION_QUERY = /* GraphQL */ `
+  query CommunityWatchAction($uuid: ID!) {
+    communityWatchAction(input: { uuid: $uuid }) {
+      uuid
+      commentId
+      sourceType
+      sourceTitle
+      sourceId
+      reason
+      actorDisplayName
+      actionState
+      appealState
+      reviewState
+      originalContent
+      contentCleared
+      createdAt
+    }
+  }
+`;
+
 const getBuildEnv = () =>
   (globalThis as typeof globalThis & {
     process?: { env?: Record<string, string | undefined> };
   }).process?.env ?? {};
 
-const getApiUrl = () => getBuildEnv().COMMUNITY_WATCH_API_URL?.trim();
+const getRuntimeEnv = (runtimeEnv?: CommunityWatchEnv) => ({
+  ...getBuildEnv(),
+  ...runtimeEnv,
+});
 
-const getFirst = () => {
-  const raw = Number.parseInt(getBuildEnv().COMMUNITY_WATCH_API_FIRST ?? "", 10);
+const getApiUrl = (runtimeEnv?: CommunityWatchEnv) =>
+  getRuntimeEnv(runtimeEnv).COMMUNITY_WATCH_API_URL?.trim();
+
+const getFirst = (runtimeEnv?: CommunityWatchEnv) => {
+  const raw = Number.parseInt(
+    getRuntimeEnv(runtimeEnv).COMMUNITY_WATCH_API_FIRST ?? "",
+    10
+  );
   if (Number.isFinite(raw) && raw > 0) {
     return Math.min(raw, 100);
   }
@@ -183,10 +218,11 @@ const buildPage = (
 
 const requestGraphQL = async <T>(
   query: string,
-  variables: Record<string, unknown>
+  variables: Record<string, unknown>,
+  runtimeEnv?: CommunityWatchEnv
 ): Promise<T | null> => {
-  const apiUrl = getApiUrl();
-  if (!apiUrl || apiUnavailable) {
+  const apiUrl = getApiUrl(runtimeEnv);
+  if (!apiUrl) {
     return null;
   }
 
@@ -208,16 +244,16 @@ const requestGraphQL = async <T>(
 
     return result.data ?? null;
   } catch (error) {
-    apiUnavailable = true;
     console.warn(`Community Watch API unavailable, using sample data: ${error}`);
     return null;
   }
 };
 
-const getLiveCases = async () => {
+const getLiveCases = async (runtimeEnv?: CommunityWatchEnv) => {
   const data = await requestGraphQL<CommunityWatchActionsResponse>(
     COMMUNITY_WATCH_ACTIONS_QUERY,
-    { input: { first: getFirst() } }
+    { input: { first: getFirst(runtimeEnv) } },
+    runtimeEnv
   );
   if (!data) {
     return null;
@@ -227,8 +263,27 @@ const getLiveCases = async () => {
   return nodes.map(mapAction);
 };
 
-const loadCommunityWatchPageData = async (): Promise<CommunityWatchPageData> => {
-  const liveCases = await getLiveCases();
+const getLiveCase = async (uuid: string, runtimeEnv?: CommunityWatchEnv) => {
+  const data = await requestGraphQL<CommunityWatchActionResponse>(
+    COMMUNITY_WATCH_ACTION_QUERY,
+    { uuid },
+    runtimeEnv
+  );
+
+  if (!data) {
+    return null;
+  }
+
+  return data.communityWatchAction ? mapAction(data.communityWatchAction) : undefined;
+};
+
+const findSampleCase = (uuid: string) =>
+  page.log.cases.find((watchCase) => watchCase.id === uuid);
+
+const loadCommunityWatchPageData = async (
+  runtimeEnv?: CommunityWatchEnv
+): Promise<CommunityWatchPageData> => {
+  const liveCases = await getLiveCases(runtimeEnv);
   if (liveCases) {
     return { page: buildPage(liveCases, "api"), source: "api" };
   }
@@ -236,7 +291,22 @@ const loadCommunityWatchPageData = async (): Promise<CommunityWatchPageData> => 
   return { page: buildPage(page.log.cases, "sample"), source: "sample" };
 };
 
-export const getCommunityWatchPageData = async (): Promise<CommunityWatchPageData> => {
-  cachedPageData = cachedPageData ?? loadCommunityWatchPageData();
-  return cachedPageData;
+export const getCommunityWatchPageData = async (
+  runtimeEnv?: CommunityWatchEnv
+): Promise<CommunityWatchPageData> => loadCommunityWatchPageData(runtimeEnv);
+
+export const getCommunityWatchActionData = async (
+  uuid: string,
+  runtimeEnv?: CommunityWatchEnv
+) => {
+  if (!UUID_PATTERN.test(uuid)) {
+    return findSampleCase(uuid) ?? null;
+  }
+
+  const liveCase = await getLiveCase(uuid, runtimeEnv);
+  if (liveCase !== null) {
+    return liveCase;
+  }
+
+  return findSampleCase(uuid) ?? null;
 };

@@ -1,4 +1,5 @@
 import { defineConfig } from "astro/config";
+import cloudflare from "@astrojs/cloudflare";
 
 // Set SITE_URL / BASE_PATH at build time when deploying to a subpath
 // (e.g. GitHub Pages user/repo). Default = root.
@@ -9,7 +10,8 @@ const base = rawBase === "/" ? "/" : `/${rawBase.replace(/^\/+|\/+$/g, "")}`;
 export default defineConfig({
   site,
   base,
-  output: "static",
+  output: "server",
+  adapter: cloudflare({ imageService: "passthrough" }),
   trailingSlash: "always",
   build: { format: "directory" },
 });

@@ -98,6 +98,12 @@ Phase 1 through Phase 5 are on `develop`. The Phase 5 staff review API is deploy
   - Added `docs/privacy-original-content.md` for manual and future structured clearing of `original_content`.
   - Added a bottom-page warning label to the public site without adding a reveal confirmation dialog.
   - Verified the updated public site with `pnpm typecheck`, `pnpm build`, API-failure fallback build, and in-app browser checks for `/` and `/records/cw-demo-8f2a71/`.
+- Advanced Phase 6 public-site reliability work after #4771 merged:
+  - Converted the public site from static-only Astro output to Cloudflare server rendering with `@astrojs/cloudflare`.
+  - Kept the existing visual page and sample fallback, but changed `/records/{uuid}/` to resolve records on demand through the public GraphQL detail query.
+  - Added 60-second public cache headers on the landing page and record detail pages.
+  - Updated local preview to use `wrangler pages dev` because Astro 4's Cloudflare adapter does not support `astro preview`.
+  - Updated deployment docs to describe runtime API reads and Cloudflare Pages Functions output.
 
 ## Phase 1 PR Scope
 
@@ -264,6 +270,15 @@ Server PR #4771:
   - Develop deploy workflow: passed.
   - Staging GraphQL exposes `communityWatchRemoveComment`, `updateCommunityWatchActionState`, `restoreCommunityWatchComment`, and `clearCommunityWatchOriginalContent`.
   - Production GraphQL does not expose the Community Watch mutations yet; production rollout remains gated on human approval.
+- Phase 6 public site runtime verification:
+  - `pnpm typecheck`: passed.
+  - `pnpm build`: passed with Cloudflare server output.
+  - `wrangler pages dev dist --compatibility-date=2026-05-07 --port 4321`: started successfully.
+  - In-app browser check for `http://localhost:4321/`: passed with sample fallback records.
+  - In-app browser check for `http://localhost:4321/records/cw-demo-8f2a71/`: passed; blurred content reveal toggled from `顯示全文` to `收起全文`.
+  - Header check: `/` and `/records/cw-demo-8f2a71/` both return `Cache-Control: public, max-age=60, s-maxage=60`.
+  - Staging API binding check with `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql`: the index rendered `公開 API`; staging still has zero live Community Watch rows.
+  - Detail fallback check: non-UUID demo IDs stay on sample data, while a UUID-shaped missing record renders the local "找不到這筆公開紀錄" message.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.

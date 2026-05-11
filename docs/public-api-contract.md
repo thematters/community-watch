@@ -54,7 +54,7 @@ Required behavior:
 - Include active, restored, and voided records once Phase 5 review exists.
 - Do not include unrelated generic banned comments.
 - Do not require login.
-- The current static site build uses `originalContent` in the list query so recent records can render without one detail request per row. Detail pages still support the single-record query below.
+- The public site uses `originalContent` in the list query so recent records can render without one detail request per row. Detail pages use the single-record query below so new `/records/{uuid}/` links can resolve on demand.
 
 ## Minimum Detail Query
 
@@ -71,6 +71,7 @@ query CommunityWatchAction($uuid: ID!) {
     reason
     actorDisplayName
     createdAt
+    actionState
     appealState
     reviewState
     originalContent
@@ -114,8 +115,8 @@ Review state:
 
 ## Site Environment
 
-- `COMMUNITY_WATCH_API_URL`: GraphQL endpoint used at build time, for example `https://server.matters.town/graphql`.
-- `COMMUNITY_WATCH_API_FIRST`: optional build-time list size, default `50`, capped at `100`.
+- `COMMUNITY_WATCH_API_URL`: GraphQL endpoint used by the Cloudflare runtime, for example `https://server.matters.town/graphql`.
+- `COMMUNITY_WATCH_API_FIRST`: optional list size, default `50`, capped at `100`.
 - If `COMMUNITY_WATCH_API_URL` is unset or unavailable, the Astro site falls back to local sample records in `src/content/page.ts`.
 
 ## Privacy

@@ -10,7 +10,7 @@ Production page:
 
 ## Public Page
 
-This repository now owns the standalone Astro static site for the public transparency page. The page was split out from `thematters/design-system` after the prototype became a real public property.
+This repository now owns the standalone Astro site for the public transparency page. The page was split out from `thematters/design-system` after the prototype became a real public property.
 
 Edit page copy, fallback moderation records, appeal text, and AI-training notes here:
 
@@ -24,7 +24,7 @@ Build-time API integration lives here:
 src/content/communityWatchData.ts
 ```
 
-Set `COMMUNITY_WATCH_API_URL` to use the Matters server public GraphQL audit queries. When it is unset or unavailable, the page keeps using the local fallback records.
+Set `COMMUNITY_WATCH_API_URL` to use the Matters server public GraphQL audit queries. When it is unset or unavailable, the page keeps using the local fallback records. The Cloudflare deployment uses server rendering so `/records/{uuid}/` can fetch a public audit record on demand.
 
 Main UI files:
 
@@ -40,6 +40,7 @@ pnpm install
 pnpm dev
 pnpm build
 pnpm typecheck
+pnpm preview
 ```
 
 Deployment notes live in [DEPLOYMENT.md](DEPLOYMENT.md).

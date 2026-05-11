@@ -1,0 +1,3 @@
+name = "community-watch"
+compatibility_date = "2026-05-07"
+pages_build_output_dir = "dist"
