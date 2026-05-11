@@ -20,6 +20,9 @@ Only Phase 1 server PR #4762 remains open, and it now passes build, Codecov, and
 - Fixed #4762 TypeScript build failure from fetched upload MIME-type inference:
   - Commit: `81693d7ed`
   - Normalizes remote `content-type` headers to strings before MIME allow-list checks and upload payload construction.
+- Addressed #4762 CTO review feedback that knex queries should live under `src/connectors`:
+  - Commit: `b3543d34f`
+  - Moved the `Comment.communityWatchAction` active audit lookup from the resolver to `CommentService.findActiveCommunityWatchAction`.
 - Opened Phase 2 server PR:
   - Repository: `thematters/matters-server`
   - Branch: `codex/community-watch-phase2`
@@ -181,8 +184,8 @@ Server PR #4765:
 - Current open PR:
   - `thematters/matters-server` #4762 remains open against `develop`.
   - #4762 is no longer draft.
-  - #4762 GitHub `build / build` passed for both pull request and push runs on commit `81693d7ed`.
-  - #4762 GitHub `codecov/patch`, `codecov/project`, and `WIP` passed.
+  - #4762 GitHub `build / build` passed on commit `b3543d34f` after the connector refactor.
+  - Earlier #4762 `codecov/patch`, `codecov/project`, and `WIP` passed on commit `81693d7ed`; new Codecov contexts were not yet reported immediately after `b3543d34f`.
   - `thematters/matters-server` #4763, #4764, #4765 and `thematters/matters-web` #5881 are merged.
 
 ## Next
