@@ -308,6 +308,9 @@ Server PR #4771:
 - Staging verification checklist:
   - Expanded `docs/staging-verification.md` into an executable `matters.icu` acceptance checklist.
   - The checklist now includes environment URLs, test-account table, test-content table, preflight checks, step-by-step pass/fail evidence fields, public record checks, stop conditions, failure handling, and the release decision sequence for #4772.
+- Governance rules:
+  - Added `docs/community-watch-rules.md` as the v0.1 trial rules for Community Watch membership.
+  - Covers joining, exit, trial period, term length, qualification maintenance, suspension, handling scope, conflicts of interest, public audit records, appeal/review, privacy, and AI boundaries.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.

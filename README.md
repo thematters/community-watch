@@ -82,6 +82,7 @@ This repository is the planning and public-site home for Community Watch. Produc
 Phase 0 is complete as repo-backed planning, and the standalone public page is now in this repository:
 
 - [docs/decisions.md](docs/decisions.md)
+- [docs/community-watch-rules.md](docs/community-watch-rules.md)
 - [docs/phase-0-repo-survey.md](docs/phase-0-repo-survey.md)
 - [docs/implementation-plan.md](docs/implementation-plan.md)
 - [docs/public-api-contract.md](docs/public-api-contract.md)
