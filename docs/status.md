@@ -4,7 +4,7 @@ Last updated: 2026-05-11
 
 ## Current Phase
 
-Phase 1 through Phase 4 are on `develop`. The Phase 4 public audit query is deployed on staging (`server.matters.icu`) and returns live API data; production (`server.matters.town`) has not been rolled out yet. Phase 5 server PR #4771 is open as a draft for staff review, restore, appeal state, reason adjustment, and original-content clearing.
+Phase 1 through Phase 5 are on `develop`. The Phase 5 staff review API is deployed on staging (`server.matters.icu`) and exposes the Community Watch remove, review update, restore, and original-content clearing mutations. Production (`server.matters.town`) has not been rolled out yet.
 
 ## Completed
 
@@ -83,7 +83,13 @@ Phase 1 through Phase 4 are on `develop`. The Phase 4 public audit query is depl
   - Keeps Community Watch member disablement on the existing admin `putUserFeatureFlags` path.
   - Rejects setting `reviewState: reversed` through the generic update mutation; staff must use `restoreCommunityWatchComment` so the comment state and audit state stay consistent.
   - Local verification: `npm run gen`, `npm run build`, `npm run lint`, and focused Jest for review-event migration plus staff-review service/mutations passed.
-  - GitHub checks: push build, pull_request build, `codecov/patch`, and `codecov/project` passed; WIP remains tied to draft state.
+  - GitHub checks: push build, pull_request build, `codecov/patch`, and `codecov/project` passed before merge.
+- Merged Phase 5 server PR #4771 on 2026-05-11:
+  - Merge commit: `1207bc23e`.
+  - `Push Schema (develop)` completed successfully; production schema push was skipped.
+  - Develop deploy workflow completed successfully: build, DB migration, EB deploy, Lambda deploys, and notification all passed.
+  - `https://server.matters.icu/graphql` exposes `communityWatchRemoveComment`, `updateCommunityWatchActionState`, `restoreCommunityWatchComment`, and `clearCommunityWatchOriginalContent`.
+  - `https://server.matters.town/graphql` does not expose the Community Watch mutations yet; production rollout still needs human approval.
 - Advanced pre-merge Phase 4-6 work in this repo:
   - Expanded `DEPLOYMENT.md` with Cloudflare Pages setup, environment variables, rollout order, rollback, and production gate.
   - Expanded `docs/staging-verification.md` into a role-based staging checklist with expected results and failure handling.
@@ -253,19 +259,22 @@ Server PR #4771:
   - GitHub pull_request `build / build`: passed.
   - GitHub `codecov/patch`: passed.
   - GitHub `codecov/project`: passed.
-  - WIP remains in progress while the PR is draft.
+- Phase 5 post-merge deploy:
+  - `Push Schema (develop)`: passed.
+  - Develop deploy workflow: passed.
+  - Staging GraphQL exposes `communityWatchRemoveComment`, `updateCommunityWatchActionState`, `restoreCommunityWatchComment`, and `clearCommunityWatchOriginalContent`.
+  - Production GraphQL does not expose the Community Watch mutations yet; production rollout remains gated on human approval.
 - PR merge status:
-  - `thematters/matters-server` #4762, #4763, #4764, #4765, and #4769 are merged.
-  - `thematters/matters-server` #4771 is open as a draft.
+  - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.
   - #4762 merge commit on `develop`: `82235f10d`.
   - #4769 merge commit on `develop`: `fc0789792`.
+  - #4771 merge commit on `develop`: `1207bc23e`.
 
 ## Next
 
 - Deploy or configure the public site on Cloudflare Pages.
 - Set staging `COMMUNITY_WATCH_API_URL` and verify live audit records render on `/` and `/records/{uuid}/`.
 - Run the staging flow in `docs/staging-verification.md`.
-- Wait for #4771 CI and review, then merge and deploy Phase 5 staff-review API to staging.
-- After #4771 staging deploy, run staff restore / reason adjustment / content clearing against real Community Watch audit rows.
+- Run staff restore / reason adjustment / content clearing against real Community Watch audit rows on staging.
 - Phase 6: configure `community-watch.matters.town`, staging validation, monitoring, and human production approval.
