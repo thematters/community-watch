@@ -1,6 +1,6 @@
 # Status
 
-Last updated: 2026-05-13
+Last updated: 2026-05-14
 
 ## Current Phase
 
@@ -128,6 +128,13 @@ Phase 1 through Phase 5 are on `develop`. The Phase 5 staff review API is deploy
   - Public API now returns the prior E2E record `957ebd2b-ac4a-4fa6-ba62-0e9c3d79e748` as `actionState: restored` and `reviewState: reversed`.
   - Local Cloudflare preview with `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` shows data source `公開 API`, the record detail page, comment ID `Q29tbWVudDozNjkzMg`, actor display name `mashbean`, and review status `已恢復`.
   - `community-watch.matters.town` still uses production/sample data, so staging public-page validation should use a staging preview or local preview until production rollout is approved.
+- Temporarily configured Cloudflare Pages production binding for staging validation:
+  - Project: `community-watch`.
+  - Binding: `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql`.
+  - Manual deployment completed at `https://cad3cd32.community-watch.pages.dev`.
+  - `https://community-watch.matters.town` now reads staging public records for `matters.icu` validation.
+  - Verified both `/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce` and `/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce/` return 200 and show the restored staging audit record.
+  - Before production rollout, switch this binding to `https://server.matters.town/graphql` after server production deploy, or remove it to return to sample fallback.
 
 ## Phase 1 PR Scope
 
