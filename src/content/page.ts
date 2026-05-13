@@ -29,6 +29,12 @@ export interface Step {
   body: string;
 }
 
+export interface FlowItem {
+  label: string;
+  title: string;
+  body: string;
+}
+
 export interface CommunityWatchContent {
   pageTitle: string;
   pageDescription: string;
@@ -45,6 +51,13 @@ export interface CommunityWatchContent {
     imageAlt: string;
   };
   metrics: Metric[];
+  flow: {
+    eyebrow: string;
+    title: string;
+    description: string;
+    items: FlowItem[];
+    note: string;
+  };
   log: {
     eyebrow: string;
     title: string;
@@ -94,6 +107,35 @@ export const page: CommunityWatchContent = {
     { label: "濫發廣告", value: "42", note: "本月已移除" },
     { label: "申訴受理", value: "5", note: "站方評估中" },
   ],
+  flow: {
+    eyebrow: "處理流程",
+    title: "從廣告留言到申訴覆核",
+    description:
+      "守望相助隊只處理明確的垃圾廣告留言；每次移除都會留下公開紀錄，讓被處理者、站方與社群都能回頭查核。",
+    items: [
+      {
+        label: "廣告留言",
+        title: "色情廣告或濫發廣告出現",
+        body: "垃圾留言干擾文章與動態討論，符合明確類別時才進入守望相助流程。",
+      },
+      {
+        label: "守望相助隊",
+        title: "受託市民協助判斷",
+        body: "守望相助隊僅能針對留言處理，並需選擇色情廣告或濫發廣告作為理由。",
+      },
+      {
+        label: "刪除行為",
+        title: "留言替換並公開留痕",
+        body: "原留言會改為處理提示，公開紀錄保留留言 ID、處理人、日期與處理理由。",
+      },
+      {
+        label: "申訴行為",
+        title: "留言者可要求站方覆核",
+        body: "若認為遭誤判，可用留言 ID 寄信申訴；站方保留恢復留言與調整權限的最終決定權。",
+      },
+    ],
+    note: "透明紀錄的目的不是擴大懲罰，而是讓刪除、申訴與覆核之間形成可查核的社群自治循環。",
+  },
   log: {
     eyebrow: "公開紀錄",
     title: "近期處理紀錄",

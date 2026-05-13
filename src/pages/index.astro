@@ -66,6 +66,27 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
         ))}
       </section>
 
+      <section class="board process-flow" aria-labelledby="process-flow-title">
+        <div class="process-flow__heading">
+          <p class="eyebrow">{page.flow.eyebrow}</p>
+          <h2 id="process-flow-title">{page.flow.title}</h2>
+          <p>{page.flow.description}</p>
+        </div>
+
+        <div class="process-flow__track" aria-label="廣告留言、守望相助隊、刪除行為與申訴行為關係">
+          {page.flow.items.map((item, index) => (
+            <article class="process-flow__item">
+              <span class="process-flow__index">{index + 1}</span>
+              <span class="process-flow__label">{item.label}</span>
+              <h3>{item.title}</h3>
+              <p>{item.body}</p>
+            </article>
+          ))}
+        </div>
+
+        <p class="process-flow__note">{page.flow.note}</p>
+      </section>
+
       <section class="board watch-log" id="watch-log" aria-labelledby="watch-log-title">
         <div class="section-heading">
           <p class="eyebrow">{page.log.eyebrow}</p>
@@ -337,6 +358,121 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
   .metric small {
     color: var(--ink-muted);
     font-size: 14px;
+  }
+
+  .process-flow {
+    position: relative;
+    overflow: hidden;
+    background:
+      linear-gradient(135deg, rgba(195, 244, 50, 0.2) 0%, rgba(195, 244, 50, 0) 34%),
+      linear-gradient(315deg, rgba(114, 88, 255, 0.12) 0%, rgba(114, 88, 255, 0) 36%),
+      var(--board-bg);
+  }
+
+  .process-flow__heading {
+    max-width: 760px;
+  }
+
+  .process-flow__heading h2 {
+    font-family: var(--font-reading);
+    font-size: clamp(28px, 4vw, 36px);
+    line-height: 1.34;
+    font-weight: 700;
+    margin: 0;
+  }
+
+  .process-flow__heading p:not(.eyebrow) {
+    color: var(--ink-muted);
+    margin: var(--space-sp12) 0 0;
+  }
+
+  .process-flow__track {
+    position: relative;
+    display: grid;
+    grid-template-columns: repeat(4, minmax(0, 1fr));
+    gap: var(--space-sp12);
+    margin-top: var(--space-sp32);
+  }
+
+  .process-flow__track::before {
+    content: "";
+    position: absolute;
+    top: 20px;
+    left: 10%;
+    right: 10%;
+    height: 2px;
+    background: linear-gradient(90deg, var(--brand-lime), var(--brand-purple));
+    opacity: 0.7;
+  }
+
+  .process-flow__item {
+    position: relative;
+    z-index: 1;
+    min-width: 0;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: 52px var(--space-sp16) var(--space-sp16);
+    background: rgba(255, 255, 255, 0.88);
+  }
+
+  .process-flow__item:not(:last-child)::after {
+    content: "";
+    position: absolute;
+    top: 15px;
+    right: calc(var(--space-sp12) * -1);
+    width: 12px;
+    height: 12px;
+    border-top: 2px solid var(--brand-purple);
+    border-right: 2px solid var(--brand-purple);
+    transform: translateX(50%) rotate(45deg);
+    background: var(--board-bg);
+  }
+
+  .process-flow__index {
+    position: absolute;
+    top: var(--space-sp12);
+    left: var(--space-sp16);
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    background: var(--brand-lime);
+    color: var(--color-grey-black);
+    font-size: 14px;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .process-flow__label {
+    display: inline-flex;
+    color: var(--brand-purple);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
+  .process-flow__item h3 {
+    margin: var(--space-sp6) 0 0;
+    color: var(--ink);
+    font-size: 18px;
+    line-height: 1.42;
+  }
+
+  .process-flow__item p {
+    margin: var(--space-sp10) 0 0;
+    color: var(--ink-muted);
+    font-size: 15px;
+    line-height: 1.65;
+  }
+
+  .process-flow__note {
+    margin: var(--space-sp20) 0 0;
+    border-left: 4px solid var(--brand-lime);
+    padding-left: var(--space-sp12);
+    color: var(--ink);
+    font-weight: 700;
   }
 
   .section-heading {
@@ -619,6 +755,34 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
   @media (max-width: 880px) {
     .info-grid {
       grid-template-columns: 1fr;
+    }
+
+    .process-flow__track {
+      grid-template-columns: 1fr;
+      gap: var(--space-sp16);
+    }
+
+    .process-flow__track::before {
+      top: 16px;
+      bottom: 16px;
+      left: 16px;
+      right: auto;
+      width: 2px;
+      height: auto;
+      background: linear-gradient(180deg, var(--brand-lime), var(--brand-purple));
+    }
+
+    .process-flow__item {
+      padding: var(--space-sp12) var(--space-sp16) var(--space-sp16) 56px;
+    }
+
+    .process-flow__item:not(:last-child)::after {
+      display: none;
+    }
+
+    .process-flow__index {
+      top: var(--space-sp14);
+      left: 0;
     }
 
     .hero {
