@@ -133,6 +133,21 @@ MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
 | Public record content    | Pass                   | 公開紀錄顯示留言 `Q29tbWVudDozNjkzNA`、處理者 `mashbean`、來源 `Fediverse staging 測試文章 2026-05-12`、理由 `色情廣告`、覆核狀態 `已恢復`，且原留言預設仍有 `is-blurred` 遮蔽。                                             |
 | Production switch        | Required before master | 正式 rollout 前，需將 `COMMUNITY_WATCH_API_URL` 改為 `https://server.matters.town/graphql`，或移除該 binding 回到 sample fallback；切換後需重新驗證 root、record route、placeholder link 與 staff restore 後的公開紀錄狀態。 |
 
+## 2026-05-14 完整 UI E2E 驗收紀錄
+
+| 檢查項目                    | 結果 | 證據 / 備註                                                                                                                                                                                                                 |
+| --------------------------- | ---- | --------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Web viewer flag deployment  | Pass | `thematters/matters-web` #5889 已 merge 到 `develop`；`matters.icu` live build `W_M6ay-BSxG-9U-_6hpgW` 已包含 viewer OSS feature flags，隊員留言選單可顯示「色情廣告」與「濫發廣告」。                                     |
+| Test article                | Pass | 驗收文章：`https://matters.icu/a/ckl5le599uwc`，標題 `Fediverse staging 測試文章 2026-05-12`。                                                                                                                              |
+| Comment creation            | Pass | 新增測試留言 `Q29tbWVudDozNjkzNQ`，內容為明確測試標記，不含真實廣告連結、成人內容或個資。                                                                                                                                  |
+| Community Watch removal     | Pass | 隊員 `mashbean` 於留言選單選擇「色情廣告」後，產生公開紀錄 `7ac9cd2d-abc9-4afb-bdce-ddecb4c5ca51`，reason 為 `porn_ad`。                                                                                                   |
+| Placeholder link            | Pass | 原留言位置顯示 `本則貼文已由守望相助隊檢舉`，連至 `https://community-watch.matters.town/records/7ac9cd2d-abc9-4afb-bdce-ddecb4c5ca51/`。                                                                                    |
+| Public record detail        | Pass | 公開紀錄頁顯示留言 ID `Q29tbWVudDozNjkzNQ`、來源標題、處理者 `mashbean`、理由 `色情廣告`、申訴狀態與站方覆核狀態；原留言內容預設遮蔽，展開後可供申訴、覆核與社群稽核使用。                                               |
+| Public dashboard            | Pass | 公開頁首頁可讀取公開紀錄資料，近期紀錄與統計連動至 staging API 資料。                                                                                                                                                       |
+| Staff restore               | Pass | admin 執行 `restoreCommunityWatchComment(input: { uuid: "7ac9cd2d-abc9-4afb-bdce-ddecb4c5ca51", note: "manual staging validation restore" })` 後，公開紀錄更新為 `actionState: restored`、`reviewState: reversed`。       |
+| Original comment after restore | Pass | 原留言 GraphQL node 回到 `state: active`，且 `communityWatchAction: null`；原文恢復於文章留言串。                                                                                                                           |
+| Feature flag workflow       | Pass | `matters-server` develop 已包含 feature flag workflow 的 cache endpoint fallback：若 EB 環境未提供 `MATTERS_CACHE_HOST`，會透過 `ENV_STORE_PATH` 讀取 SSM，再清除使用者 full-query cache。                                 |
+
 ## 詳細驗收流程
 
 | 步驟 | 操作者     | 操作                                  | 預期結果                                           | 證據                                    | Pass/Fail |
