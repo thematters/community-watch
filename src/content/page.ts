@@ -75,7 +75,7 @@ export interface CommunityWatchContent {
 export const page: CommunityWatchContent = {
   pageTitle: "馬特市守望相助隊｜matters.town",
   pageDescription:
-    "馬特市守望相助隊公開透明紀錄頁。加入守望相助隊，一起杜絕垃圾廣告入侵馬特市小鎮，所有檢舉都會公開紀錄，可供申訴與覆核。",
+    "馬特市守望相助隊公開紀錄頁。加入守望相助隊，一起減少垃圾廣告留言，所有處理紀錄均公開查詢，供申訴、覆核與社群稽核使用。",
   lang: "zh-Hant",
   domain: "community-watch.matters.town",
   statusLabel: "公開紀錄",
@@ -83,11 +83,11 @@ export const page: CommunityWatchContent = {
     title: "馬特市守望相助隊",
     slogan: "馬特市向垃圾廣告宣戰",
     subtitle:
-      "加入守望相助隊，一起杜絕垃圾廣告入侵馬特市小鎮。\n在這裡，守望相助隊的所有檢舉，都會公開紀錄，\n讓申訴、覆核與社群自治都有地方可查。",
+      "加入守望相助隊，一起降低垃圾廣告留言對社群討論的干擾。\n在這裡，守望相助隊的所有處理紀錄均會公開，\n讓申訴、覆核與社群稽核都有依據。",
     primaryCta: { label: "查看處理紀錄", href: "#watch-log" },
     secondaryCta: { label: "我要申訴", href: "#appeal" },
-    note: "下廣告可以，但請去 Billboard 支持馬特市站方，\n站方很需要收入，請正規廣告主一起支持。",
-    imageAlt: "榕樹下的叔叔阿姨喝茶討論公告紀錄，象徵馬特市守望相助隊公開處理垃圾留言。",
+    note: "如需刊登廣告，請使用 Billboard 支持馬特市站方，\n也請正規廣告主一起支持社群永續。",
+    imageAlt: "馬特市守望相助隊公開處理垃圾留言紀錄的視覺圖像。",
   },
   metrics: [
     { label: "色情廣告", value: "18", note: "本月已移除" },
@@ -95,10 +95,10 @@ export const page: CommunityWatchContent = {
     { label: "申訴受理", value: "5", note: "站方評估中" },
   ],
   log: {
-    eyebrow: "巡守紀錄",
-    title: "最近被移除的留言",
+    eyebrow: "公開紀錄",
+    title: "近期處理紀錄",
     description:
-      "原留言預設以毛玻璃遮蔽，避免垃圾內容被二次散播；需要仲裁時，任何人仍可點開全文比對。正式 API 接上前，本頁先以示範資料展示公開紀錄格式。",
+      "原留言內容預設遮蔽，避免垃圾內容被二次散播；需要申訴、覆核或社群稽核時，使用者仍可點開全文比對。正式 API 接上前，本頁先以示範資料展示公開紀錄格式。",
     dataLabel: "示範資料",
     cases: [
       {
@@ -110,7 +110,7 @@ export const page: CommunityWatchContent = {
         reason: "濫發廣告",
         publicNotice: "本則貼文已由守望相助隊檢舉",
         commentPreview: "限時優惠，點擊連結領取投資教學名額，加客服可立即開通會員方案。",
-        watcher: "巷口阿伯",
+        watcher: "木棉街讀者",
         handledAt: "2026-05-09 18:22",
         appealStatus: "未申訴",
         reviewStatus: "待覆核",
@@ -124,7 +124,7 @@ export const page: CommunityWatchContent = {
         reason: "色情廣告",
         publicNotice: "本則貼文已由守望相助隊檢舉",
         commentPreview: "成人交友廣告，附外站聯絡方式與多組重複關鍵字，和原文討論無關。",
-        watcher: "公園大嬸",
+        watcher: "榕樹下讀者",
         handledAt: "2026-05-09 12:04",
         appealStatus: "站方覆核中",
         reviewStatus: "覆核中",
@@ -147,31 +147,31 @@ export const page: CommunityWatchContent = {
   },
   appeal: {
     eyebrow: "救濟機制",
-    title: "被刪留言可以申訴",
-    body: "如果你認為留言被誤判，請寄信到 hi@matters.town。站方會依留言 ID 查核原文、處理理由與守望相助隊操作紀錄。",
+    title: "被移除留言可提出申訴",
+    body: "若你認為留言遭誤判，請寄信至 hi@matters.town。站方會依留言 ID 查核原文、處理理由與守望相助隊操作紀錄。",
     email: "hi@matters.town",
     steps: [
-      { title: "附上留言 ID", body: "例如 cmt-8f2a71，公開紀錄中都會顯示。" },
-      { title: "說明你的帳號與理由", body: "請留下 Matters 帳號，以及為什麼認為這不是垃圾留言。" },
-      { title: "由站方覆核", body: "最終決策權仍在站方；必要時會恢復留言或調整守望相助隊權限。" },
+      { title: "附上留言 ID", body: "例如 cmt-8f2a71，公開紀錄中均會顯示。" },
+      { title: "說明帳號與理由", body: "請提供 Matters 帳號，並說明為何認為該留言不是垃圾留言。" },
+      { title: "由站方覆核", body: "站方保留最終決定權；必要時會恢復留言或調整守望相助隊權限。" },
     ],
   },
   training: {
     eyebrow: "下一步",
-    title: "馬特市守望相助 AI 訓練中",
-    body: "這批資料先以人工標註保存，之後可作為自動檢測 bot 的訓練與評測基礎；自動工具上線前，仍應保留人工覆核與申訴通道。",
+    title: "守望相助 AI 資料規劃",
+    body: "人工處理紀錄未來可整理為訓練與評測資料；第一階段 AI 僅得作為候選提示，不得直接刪除留言。",
     steps: [
       {
-        title: "先收乾淨資料",
-        body: "只收兩類明確樣本：色情廣告、濫發廣告，降低模型一開始誤判正常討論的風險。",
+        title: "整理明確樣本",
+        body: "僅收錄「色情廣告」與「濫發廣告」兩類明確樣本，降低模型誤判正常討論的風險。",
       },
       {
-        title: "再做海巡檢舉機器人",
-        body: "bot 先做候選提示與批次整理，不直接刪留言；正式刪除仍由人或站方確認。",
+        title: "僅作候選提示",
+        body: "自動檢測工具僅提供候選提示與批次整理，不直接刪除留言。",
       },
       {
-        title: "每次自動化都留痕",
-        body: "未來若導入模型，也要記錄模型版本、分數、人工覆核結果，方便退場與修正。",
+        title: "保留覆核依據",
+        body: "未來若導入模型，仍應記錄模型版本、分數與人工覆核結果，方便修正與追蹤。",
       },
     ],
   },

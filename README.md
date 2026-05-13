@@ -43,6 +43,18 @@ pnpm typecheck
 pnpm preview
 ```
 
+Read-only staging preflight:
+
+```bash
+pnpm staging:check
+```
+
+To also confirm the authenticated viewer role and `communityWatch` flag, provide a temporary staging token. The script sends it only as an `x-access-token` header and does not print or store it.
+
+```bash
+MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
+```
+
 Deployment notes live in [DEPLOYMENT.md](DEPLOYMENT.md).
 
 ## Scope
@@ -56,14 +68,14 @@ MVP scope:
   - `spam_ad`: 濫發廣告
 - Removed comments are replaced in-place with: `本則貼文已由守望相助隊檢舉`.
 - The replacement links to a public audit record on `community-watch.matters.town`.
-- Original removed content is blurred by default on the public page.
-- `original_content` is not automatically cleared in the current plan; privacy/personal-data requests can still clear stored content directly.
+- Original removed content is obscured by default on the public page.
+- Privacy or personal-data requests can clear stored original content while preserving non-personal audit metadata.
 - Appeals go through `hi@matters.town` with the removed comment ID.
 - AI is not allowed to remove comments in the first version. It can only provide future candidate detection or hints.
 
 Out of scope for MVP:
 
-- Circle comments, because circle is being sunset.
+- 圍爐 content.
 - Article deletion, moment body deletion, account suspension, or any site-wide ban power.
 - Heavy multi-step approval workflow.
 - AI auto-removal.

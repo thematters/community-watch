@@ -13,7 +13,7 @@ const title = watchCase
   : `公開紀錄不存在｜${page.hero.title}`;
 const description = watchCase
   ? `守望相助隊公開紀錄：${watchCase.commentId}，處理理由為${watchCase.reason}。`
-  : "守望相助隊公開紀錄頁。這筆紀錄目前無法在公開 API 中找到。";
+  : "守望相助隊公開紀錄頁。這筆紀錄目前無法於公開 API 查詢。";
 const mailSubject = encodeURIComponent(
   `守望相助隊申訴：${watchCase?.commentId ?? uuid}`
 );
@@ -126,7 +126,7 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
               </div>
             </header>
             <p class="record__notice">
-              這筆紀錄可能尚未同步到公開 API，或已不是有效的守望相助隊處理紀錄。
+              這筆紀錄可能尚未同步至公開 API，或已不是有效的守望相助隊處理紀錄。
             </p>
           </article>
         )
@@ -136,7 +136,7 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
         <p class="eyebrow">申訴</p>
         <h2 id="appeal-title">認為這則留言被誤判？</h2>
         <p>
-          請把留言 ID <strong>{watchCase?.commentId ?? uuid}</strong> 寄到
+          請將留言 ID <strong>{watchCase?.commentId ?? uuid}</strong> 寄至
           <a href={`mailto:${page.appeal.email}?subject=${mailSubject}`}>{page.appeal.email}</a>。
           站方會依公開紀錄、處理理由與原文進行覆核。
         </p>

@@ -29,10 +29,10 @@ These tasks can be completed before `thematters/matters-server` #4762 is merged 
 
 ## Environment Variables
 
-| Name | Required | When | Value |
-| --- | --- | --- | --- |
-| `COMMUNITY_WATCH_API_URL` | No | After server public query is deployed | `https://server.matters.town/graphql` for production, `https://server.matters.icu/graphql` for staging |
-| `COMMUNITY_WATCH_API_FIRST` | No | Optional record count tuning | Defaults to 50 |
+| Name                        | Required | When                                  | Value                                                                                                  |
+| --------------------------- | -------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `COMMUNITY_WATCH_API_URL`   | No       | After server public query is deployed | `https://server.matters.town/graphql` for production, `https://server.matters.icu/graphql` for staging |
+| `COMMUNITY_WATCH_API_FIRST` | No       | Optional record count tuning          | Defaults to 50                                                                                         |
 
 Do not put admin tokens or private API secrets in this site. The public page must use only public GraphQL queries.
 
@@ -98,9 +98,9 @@ COMMUNITY_WATCH_API_FIRST=50
 ## Public Routes
 
 - `/`: landing page, statistics, recent records, appeal copy.
-- `/records/{uuid}/`: public record detail page with blurred original content and appeal instructions.
+- `/records/{uuid}` and `/records/{uuid}/`: public record detail page with obscured original content and appeal instructions.
 
-These routes can be deployed before the Matters server public audit schema is deployed, because they fall back to local sample data. Once the API is configured, `/records/{uuid}/` queries the matching public audit record on demand.
+These routes can be deployed before the Matters server public audit schema is deployed, because they fall back to local sample data. Once the API is configured, the record route queries the matching public audit record on demand.
 
 ## Production Gate
 
@@ -109,7 +109,8 @@ Before enabling live records on `community-watch.matters.town`, confirm:
 - #4762 and dependent server PRs are deployed to the target environment.
 - A real Community Watch removal produces a public `uuid`.
 - The placeholder link from Matters web opens the matching `/records/{uuid}/` page.
+- `COMMUNITY_WATCH_API_URL` is set to the intended target environment; use `https://server.matters.icu/graphql` only for staging validation, and `https://server.matters.town/graphql` for production after approval.
 - The page shows actor display name only, not internal user ID.
-- `originalContent` is blurred by default.
+- `originalContent` is obscured by default.
 - `hi@matters.town` appeal ownership is assigned.
 - Production rollout has explicit human approval.
