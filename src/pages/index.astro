@@ -77,15 +77,6 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
           {page.flow.items.map((item, index) => (
             <article class="process-flow__item">
               <span class="process-flow__index">{index + 1}</span>
-              {
-                index < page.flow.items.length - 1 && (
-                  <span class="process-flow__connector" aria-hidden="true">
-                    <svg class="process-flow__chevron" viewBox="0 0 16 16" focusable="false">
-                      <path d="M6 3.5 10.5 8 6 12.5" />
-                    </svg>
-                  </span>
-                )
-              }
               <span class="process-flow__label">{item.label}</span>
               <h3>{item.title}</h3>
               <p>{item.body}</p>
@@ -415,38 +406,6 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
     border-radius: 8px;
     padding: 52px var(--space-sp16) var(--space-sp16);
     background: var(--board-bg);
-  }
-
-  .process-flow__connector {
-    position: absolute;
-    z-index: 3;
-    top: 26px;
-    left: calc(100% + var(--space-sp16));
-    width: 28px;
-    height: 28px;
-    border: 1px solid rgba(114, 88, 255, 0.24);
-    border-radius: 50%;
-    display: inline-flex;
-    align-items: center;
-    justify-content: center;
-    background: var(--board-bg);
-    color: var(--brand-purple);
-    box-shadow: var(--shadow-shadow1);
-    transform: translate(-50%, -50%);
-  }
-
-  .process-flow__chevron {
-    width: 16px;
-    height: 16px;
-    display: block;
-  }
-
-  .process-flow__chevron path {
-    fill: none;
-    stroke: currentColor;
-    stroke-width: 2;
-    stroke-linecap: round;
-    stroke-linejoin: round;
   }
 
   .process-flow__index {
@@ -797,10 +756,6 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
 
     .process-flow__item {
       padding: var(--space-sp12) var(--space-sp16) var(--space-sp16) 56px;
-    }
-
-    .process-flow__connector {
-      display: none;
     }
 
     .process-flow__index {
