@@ -1,142 +1,210 @@
-# Staging Verification
+# matters.icu Staging 驗收清單
 
-Run this full checklist on `matters.icu` before marking `thematters/matters-server` #4772 ready for production.
+本文件用於「馬特市守望相助隊」正式上線前的完整流程驗收。所有穩定流程須先於 `matters.icu` 驗證通過，才可將相關變更合併至 `master`。
 
-Production release rule:
+## 發布原則
 
-- Keep #4772 as draft until every required item below passes.
-- Do not merge #4772 to `master` from CI success alone.
-- If any stop condition is hit, pause production rollout and fix the issue on `develop` first.
+- `matters.icu` 必須完成端到端驗收，包含 admin 指定隊員、隊員處理留言、前端操作入口、公開頁紀錄、admin 覆核與恢復留言。
+- 不得僅因 CI 或 build 通過即合併至 `master`。
+- 若任一必要項目未通過，應先於 `develop` 修正並重新驗收。
+- production rollout 需由人員明確核准。
 
-## Environments
+## 驗收環境
 
-| Surface | URL | Expected State |
-| --- | --- | --- |
-| Matters staging web | `https://matters.icu` | Includes `thematters/matters-web` #5881 Community Watch UI. |
-| Matters staging GraphQL | `https://server.matters.icu/graphql` | Exposes Community Watch public queries and member/staff mutations. |
-| Community Watch public page | `https://community-watch.matters.town` or a staging Pages deployment | Can show audit records from the target GraphQL endpoint. |
-| Production release PR | https://github.com/thematters/matters-server/pull/4772 | Must remain draft until this checklist passes. |
+| 項目                    | 位置                                                      | 預期狀態                                                            |
+| ----------------------- | --------------------------------------------------------- | ------------------------------------------------------------------- |
+| Matters staging web     | `https://matters.icu`                                     | 包含守望相助隊留言操作入口與被移除留言 placeholder。                |
+| Matters staging GraphQL | `https://server.matters.icu/graphql`                      | 提供守望相助隊 public query、隊員操作 mutation、站方覆核 mutation。 |
+| 公開頁                  | `https://community-watch.matters.town` 或 staging preview | 可讀取目標 GraphQL endpoint 的公開紀錄。                            |
+| 發布 PR                 | 相關 `matters-server` / `matters-web` PR                  | 驗收通過前維持 draft 或不合併至 `master`。                          |
 
-If the public page is being tested against staging data, use a staging Pages deployment or local Cloudflare preview with:
+公開頁若使用 staging 資料，應以 staging preview 或本機 preview 驗證：
 
 ```bash
 COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql pnpm preview
 ```
 
-Do not point the production custom domain at staging data.
+不得讓正式公開域名長期指向 staging 資料。
 
-## Test Accounts
+## 最小通過門檻
 
-Fill this before starting.
+以下項目全部通過，才視為可進入 production review：
 
-| Role | Matters Account | Email/Login Owner | Notes |
-| --- | --- | --- | --- |
-| Admin/staff |  |  | Can assign feature flags and run staff review actions. |
-| Community Watch candidate |  |  | Will receive and later lose `communityWatch`. |
-| Normal user |  |  | Must never see Community Watch actions. |
-| Article author/commenter |  |  | Creates article comments to remove. |
-| Moment author/commenter |  |  | Creates moment comments to remove. |
+| 編號 | 必要流程           | 通過標準                                                                  | 證據                               |
+| ---- | ------------------ | ------------------------------------------------------------------------- | ---------------------------------- |
+| G1   | admin 指定隊員     | 指定後，隊員重新整理即可取得 `communityWatch` 權限。                      | 後台截圖或 API 結果。              |
+| G2   | 隊員處理留言       | 隊員可於文章留言與動態留言選擇「色情廣告」或「濫發廣告」。                | 操作截圖、留言 ID、公開紀錄 ID。   |
+| G3   | 一般使用者不可操作 | 一般使用者看不到守望相助隊處理入口，亦無法呼叫 mutation。                 | 截圖與 API 錯誤結果。              |
+| G4   | 前端替換文案       | 被處理留言於原處顯示 `本則貼文已由守望相助隊檢舉`，並連至公開紀錄。       | 原頁截圖與連結。                   |
+| G5   | 公開頁紀錄         | 公開頁顯示理由、處理者顯示名稱、時間、留言 ID、來源、申訴狀態與覆核狀態。 | 公開紀錄頁 URL 與截圖。            |
+| G6   | 原留言遮蔽         | 原留言內容預設遮蔽，點開後始顯示全文。                                    | 預設狀態與展開狀態截圖。           |
+| G7   | 站方覆核           | admin 可恢復留言、調整理由、標記申訴狀態、清除原留言內容。                | 前後截圖或 API 結果。              |
+| G8   | 權限取消           | admin 取消隊員權限後，該使用者不再看到操作入口，既有 mutation 也被拒絕。  | 後台截圖、前端截圖、API 錯誤結果。 |
 
-## Test Content
+## 測試帳號
 
-Create fresh staging content so the audit records are easy to identify.
+驗收前填寫。
 
-| Content | URL | Source ID | Comment ID | Comment Text Summary |
-| --- | --- | --- | --- | --- |
-| Article comment for `色情廣告` |  |  |  |  |
-| Article comment for `濫發廣告` |  |  |  |  |
-| Moment comment for `色情廣告` |  |  |  |  |
-| Moment comment for `濫發廣告` |  |  |  |  |
-| Circle comment, only if still available |  |  |  |  |
+| 角色              | Matters 帳號 | 登入方式 / 負責人 | 備註                                       |
+| ----------------- | ------------ | ----------------- | ------------------------------------------ |
+| Admin / staff     |              |                   | 可指定權限、覆核、恢復留言。               |
+| 守望相助隊候選人  |              |                   | 驗收中會取得並移除 `communityWatch` 權限。 |
+| 一般使用者        |              |                   | 不得看到處理入口。                         |
+| 文章作者 / 留言者 |              |                   | 建立文章留言測試資料。                     |
+| 動態作者 / 留言者 |              |                   | 建立動態留言測試資料。                     |
 
-Use obvious test spam text, but avoid real malicious links, real personal data, or real adult content.
+## 測試內容
 
-## Preflight
+請於 staging 建立新內容，避免與既有資料混淆。測試文字須明確可判斷，但不得包含真實惡意連結、真實成人內容或真實個資。
 
-| Check | Expected Result | Pass/Fail | Evidence |
-| --- | --- | --- | --- |
-| Staging server schema | `server.matters.icu` exposes `communityWatchActions`, `communityWatchAction`, `communityWatchRemoveComment`, `updateCommunityWatchActionState`, `restoreCommunityWatchComment`, and `clearCommunityWatchOriginalContent`. |  |  |
-| Staging web deployment | `matters.icu` includes Community Watch comment-menu UI from #5881. |  |  |
-| Public page data source | The test public page points at `server.matters.icu` when verifying staging records. |  |  |
-| Appeal owner | `hi@matters.town` owner knows this test is happening. |  |  |
-| Release PR state | #4772 is draft before staging verification starts. |  |  |
+| 內容     | URL | 來源 ID | 留言 ID | 測試理由 | 備註 |
+| -------- | --- | ------- | ------- | -------- | ---- |
+| 文章留言 |     |         |         | 色情廣告 |      |
+| 文章留言 |     |         |         | 濫發廣告 |      |
+| 動態留言 |     |         |         | 色情廣告 |      |
+| 動態留言 |     |         |         | 濫發廣告 |      |
 
-## Required Flow
+圍爐不納入本專案驗收範圍。
 
-| Step | Actor | Action | Expected Result | Evidence | Pass/Fail |
-| --- | --- | --- | --- | --- | --- |
-| 1 | Admin | Assign candidate the `communityWatch` feature flag. | Candidate has Community Watch permission after reload. | Admin action time, target account, screenshot or API result. |  |
-| 2 | Candidate | Open article comment menu. | `色情廣告` and `濫發廣告` actions are visible. | Screenshot. |  |
-| 3 | Candidate | Open moment comment menu. | `色情廣告` and `濫發廣告` actions are visible. | Screenshot. |  |
-| 4 | Normal user | Open the same article and moment comment menus. | Community Watch actions are not visible. | Screenshot. |  |
-| 5 | Candidate | Remove article comment with `色情廣告`. | Comment is removed; audit row is created. | Comment ID, audit UUID, mutation result or screenshot. |  |
-| 6 | Everyone | Reload original article. | Removed comment renders `本則貼文已由守望相助隊檢舉`. | Screenshot of placeholder. |  |
-| 7 | Everyone | Open placeholder link. | Public record opens for the same audit UUID. | Public record URL and screenshot. |  |
-| 8 | Candidate | Remove moment comment with `濫發廣告`. | Comment is removed; audit row is created. | Comment ID, audit UUID, mutation result or screenshot. |  |
-| 9 | Everyone | Reload original moment. | Removed comment renders the same placeholder and links to its public record. | Screenshot. |  |
-| 10 | Candidate | Try circle comment if the surface still exists. | Removal is rejected; no audit row is created. | Error result or screenshot. |  |
-| 11 | Candidate | Check available UI actions. | No path allows article deletion, moment body deletion, account suspension, or site-wide ban. | Notes and screenshots. |  |
-| 12 | Admin | Remove candidate's `communityWatch` feature flag. | Candidate loses permission after reload. | Admin action time and target account. |  |
-| 13 | Candidate | Retry comment menu and stale mutation after permission removal. | UI actions disappear; stale mutation is rejected. | Screenshot plus API error. |  |
-| 14 | Staff | Restore one removed comment. | Comment state is restored and audit review state becomes reversed. | Audit UUID, screenshot/API result. |  |
-| 15 | Staff | Adjust reason on one record. | Public record shows updated reason/review state. | Before/after screenshot. |  |
-| 16 | Staff | Mark appeal state on one record. | Public record shows appeal status change. | Before/after screenshot. |  |
-| 17 | Staff | Clear `originalContent` on one record. | Public record preserves metadata and shows cleared-content text. | Before/after screenshot. |  |
+## 事前檢查
 
-## Public Record Checks
+可先用 repo 內的只讀 preflight 腳本確認 staging API 是否已部署到位：
 
-Run these for every audit UUID created during the test.
+```bash
+pnpm staging:check
+```
 
-| Field/Behavior | Expected Result | Pass/Fail | Evidence |
-| --- | --- | --- | --- |
-| Public record URL | URL is `/records/{uuid}/` and matches the placeholder link. |  |  |
-| Comment ID | Shows the removed comment ID. |  |  |
-| Source | Shows article/moment source type and source title or ID. |  |  |
-| Reason | Shows only `色情廣告` or `濫發廣告`. |  |  |
-| Actor | Shows the Community Watch member's Matters display name, not internal user ID. |  |  |
-| Time | Shows removal time. |  |  |
-| Appeal | Shows `hi@matters.town` appeal instruction. |  |  |
-| Review state | Shows pending/upheld/reversed/reason-adjusted as staff actions change it. |  |  |
-| Original content default | Content is blurred by default. |  |  |
-| Reveal interaction | Clicking `顯示全文` reveals text and changes button to `收起全文`. |  |  |
-| No dialog | No extra warning confirmation appears before reveal. |  |  |
-| Footer warning | Bottom warning text remains visible on the page. |  |  |
-| Cleared content | After staff clearing, original content is not displayed, but audit metadata remains. |  |  |
+若需同時確認登入者是否為 admin / 守望相助隊員，提供臨時 staging access token。腳本只會把 token 作為 `x-access-token` header 呼叫 `server.matters.icu`，不會輸出或保存 token：
 
-## Stop Conditions
+```bash
+MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
+```
 
-Stop and do not mark #4772 ready if any of these happen:
+| 檢查項目               | 預期結果                                                                                 | Pass/Fail | 證據 |
+| ---------------------- | ---------------------------------------------------------------------------------------- | --------- | ---- |
+| Staging server schema  | `server.matters.icu` 提供守望相助隊 public query、隊員操作 mutation、站方覆核 mutation。 |           |      |
+| Staging web deployment | `matters.icu` 已包含守望相助隊留言選單與 placeholder UI。                                |           |      |
+| 公開頁資料來源         | 驗證 staging 紀錄時，公開頁指向 `server.matters.icu` 或明確的 staging preview。          |           |      |
+| 申訴信箱               | `hi@matters.town` 負責人知道本次 staging 驗收。                                          |           |      |
+| 發布狀態               | 相關 PR 尚未合併至 `master`。                                                            |           |      |
 
-- A non-member can see or call Community Watch removal.
-- A member can affect anything other than article or moment comments.
-- Circle comments can be removed.
-- Removed comments disappear entirely instead of showing the placeholder.
-- Placeholder links do not resolve to a matching public record.
-- Public records expose internal user IDs, emails, IP addresses, staff notes, or hidden account data.
-- Staff restore does not restore the comment while marking the audit state consistently.
-- Clearing `originalContent` deletes the whole audit record instead of preserving metadata.
-- The public page turns into a spam-content display wall without blur by default.
+## 2026-05-13 實際事前檢查紀錄
 
-## Failure Handling
+| 檢查項目                       | 結果                              | 證據 / 備註                                                                                                                                                                                                                           |
+| ------------------------------ | --------------------------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Matters staging web            | Pass                              | `https://matters.icu/a/ckl5le599uwc` 可開啟，Safari 已登入 `mashbean`。                                                                                                                                                               |
+| Admin UI signal                | Pass                              | 文章「更多操作」可見 `設為首頁精選`、`標記 SPAM`、`標記廣告`、`關小黑屋`、`凍結用戶`、`註銷用戶` 等 admin 操作。                                                                                                                      |
+| Staging server schema          | Pass                              | `https://server.matters.icu/graphql` 已提供 `communityWatchActions`、`communityWatchAction`、`communityWatchRemoveComment`、`updateCommunityWatchActionState`、`restoreCommunityWatchComment`、`clearCommunityWatchOriginalContent`。 |
+| Public audit records           | Pending data                      | `communityWatchActions(input: { first: 5 })` 回傳 `totalCount: 0`，staging 尚無可驗證公開紀錄。                                                                                                                                       |
+| Safari authenticated API check | Blocked by local browser settings | Safari 阻擋網址列 JavaScript，且未開啟 Apple Events JavaScript。未讀取或保存登入 token。後續可使用 `MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check` 做只讀權限確認。                                                             |
+| Feature flag management UI     | Not found                         | `matters-web` 目前未找到使用 `putUserFeatureFlags` 的後台 UI；communityWatch 指定仍沿用既有 admin GraphQL mutation。                                                                                                                  |
 
-| Symptom | First Check |
-| --- | --- |
-| Feature flag assignment does not take effect | Check `user_feature_flag` row and viewer `oss.featureFlags`. |
-| Candidate sees no menu actions | Confirm `matters.icu` web deployment includes #5881 and viewer feature flags are fresh after reload. |
-| Removal mutation fails for candidate | Check viewer permission and target comment source type. |
-| Removal succeeds but no public record appears | Check `community_watch_action` insert and public `communityWatchAction` query. |
-| Placeholder does not render | Check whether banned comments are included with `Comment.communityWatchAction` data. |
-| Public page has sample records only | Confirm the test page is using `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` and staging has at least one audit row. |
-| Restore/reason/appeal changes do not show | Check `community_watch_review_event` insert and public record query response. |
+## 2026-05-13 #4775 後續驗證紀錄
 
-## Release Decision
+| 檢查項目                     | 結果             | 證據 / 備註                                                                                                                                                                                                      |
+| ---------------------------- | ---------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Server follow-up PR          | Pass             | `thematters/matters-server` #4775 已 merge 到 `develop`，develop deploy、schema push、DB migration、EB deploy 與 Lambda deploys 均完成。                                                                         |
+| Stale public read fix        | Pass             | `pnpm staging:check` 顯示公開 API 目前有 1 筆紀錄：`957ebd2b-ac4a-4fa6-ba62-0e9c3d79e748`，reason `porn_ad`，action state `restored`，review state `reversed`，處理人 `mashbean`。                               |
+| Public API record detail     | Pass             | `communityWatchAction(input: { uuid })` 可由本機 Cloudflare preview 讀取，顯示留言 ID `Q29tbWVudDozNjkzMg`、來源 `A test a day, keeps the bugs away`、處理人 `mashbean`、站方覆核 `已恢復`。                     |
+| Public page staging preview  | Pass             | 以 `wrangler pages dev dist --binding COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` 啟動本機 preview 後，首頁顯示 `公開 API`，並顯示 staging 公開紀錄。                                            |
+| Production public domain     | Expected pending | `https://community-watch.matters.town` 仍顯示示範資料；正式域名不應長期指向 staging。staging 驗收請使用 staging preview 或本機 preview。                                                                         |
+| Authenticated full E2E rerun | Blocked          | Atlas 已登入 `matters.icu`，但「允許 Apple 事件的 JavaScript」目前關閉；Safari 目前只有錯誤頁。若要自動重跑建立留言、移除、覆核恢復流程，需要臨時 staging access token，或手動開啟瀏覽器 JavaScript 自動化通道。 |
 
-When every required item passes:
+## 2026-05-13 #4779 / #5887 後續驗證紀錄
 
-1. Save the evidence links/screenshots in the project tracker or rollout notes.
-2. Add a comment on #4772 summarizing the passed `matters.icu` verification.
-3. Mark #4772 ready for review.
-4. After approval, merge #4772 to `master`.
-5. Watch production `Push Schema to Apollo` and `Deploy` workflows.
-6. Verify `server.matters.town/graphql` exposes Community Watch queries/mutations.
-7. Verify `community-watch.matters.town` reads live production audit records once a production record exists.
+| 檢查項目                     | 結果                | 證據 / 備註                                                                                                                                                                                                                      |
+| ---------------------------- | ------------------- | -------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Server placeholder list fix  | Pass                | `thematters/matters-server` #4779 已 merge；移除留言後，文章 comments query 回傳 banned comment 與 `communityWatchAction.uuid`。                                                                                                 |
+| Web article comment gate fix | Pass                | `thematters/matters-web` #5887 已 merge；文章留言抽屜打開後，原處顯示 `本則貼文已由守望相助隊檢舉`。                                                                                                                             |
+| Authenticated E2E remove     | Pass                | 測試留言 `Q29tbWVudDozNjkzNA`，公開紀錄 `73cfede7-8d54-48ec-bb41-42b96b0b92ce`，理由 `porn_ad`，處理人 `mashbean`。                                                                                                              |
+| Placeholder link             | Pass with follow-up | 原處 placeholder 連至 `https://community-watch.matters.town/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce`；需補尾斜線或讓公開頁同時接受 no-slash URL。                                                                           |
+| Public page live domain      | Blocked             | `https://community-watch.matters.town/records/{uuid}/` 可進頁面，但目前 production domain 未設定 `COMMUNITY_WATCH_API_URL`，因此無法讀取 staging record。                                                                        |
+| Public page local preview    | Pass                | 本機 `wrangler pages dev dist --binding COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` 可顯示該 record：來源 `Fediverse staging 測試文章 2026-05-12`、處理人 `mashbean`、理由 `色情廣告`，原留言預設 `is-blurred`。 |
+| Staff restore                | Pass                | 已用 admin mutation 恢復 `73cfede7-8d54-48ec-bb41-42b96b0b92ce`；留言狀態回到 `active`，公開紀錄為 `actionState: restored`、`reviewState: reversed`。                                                                            |
+
+## 詳細驗收流程
+
+| 步驟 | 操作者     | 操作                                  | 預期結果                                           | 證據                                    | Pass/Fail |
+| ---- | ---------- | ------------------------------------- | -------------------------------------------------- | --------------------------------------- | --------- |
+| 1    | Admin      | 指定候選人 `communityWatch` 權限。    | 候選人重新整理後取得隊員權限。                     | 後台截圖或 API 結果。                   |           |
+| 2    | 隊員       | 開啟文章留言選單。                    | 顯示「色情廣告」與「濫發廣告」操作。               | 截圖。                                  |           |
+| 3    | 隊員       | 開啟動態留言選單。                    | 顯示「色情廣告」與「濫發廣告」操作。               | 截圖。                                  |           |
+| 4    | 一般使用者 | 開啟相同文章與動態留言選單。          | 不顯示守望相助隊操作。                             | 截圖。                                  |           |
+| 5    | 隊員       | 以「色情廣告」處理一則文章留言。      | 留言被處理，產生公開紀錄。                         | 留言 ID、公開紀錄 ID、截圖或 API 結果。 |           |
+| 6    | 使用者     | 重新整理原文章頁。                    | 原留言位置顯示 `本則貼文已由守望相助隊檢舉`。      | 截圖。                                  |           |
+| 7    | 使用者     | 點擊 placeholder 連結。               | 開啟同一筆公開紀錄。                               | 公開紀錄 URL 與截圖。                   |           |
+| 8    | 隊員       | 以「濫發廣告」處理一則動態留言。      | 留言被處理，產生公開紀錄。                         | 留言 ID、公開紀錄 ID、截圖或 API 結果。 |           |
+| 9    | 使用者     | 重新整理原動態頁。                    | 原留言位置顯示 placeholder，並連至公開紀錄。       | 截圖。                                  |           |
+| 10   | 隊員       | 檢查可用操作。                        | 不存在刪文章、刪動態本文、限制帳號或全站停權入口。 | 截圖與操作紀錄。                        |           |
+| 11   | Admin      | 移除隊員 `communityWatch` 權限。      | 隊員重新整理後失去權限。                           | 後台截圖或 API 結果。                   |           |
+| 12   | 原隊員     | 再次開啟留言選單並嘗試既有 mutation。 | UI 操作消失，mutation 被拒絕。                     | 截圖與 API 錯誤結果。                   |           |
+| 13   | Admin      | 恢復一則被處理留言。                  | 留言恢復，公開紀錄覆核狀態更新。                   | 公開紀錄 ID、前後截圖或 API 結果。      |           |
+| 14   | Admin      | 調整一筆公開紀錄理由。                | 公開頁顯示更新後理由與覆核狀態。                   | 前後截圖。                              |           |
+| 15   | Admin      | 標記一筆申訴狀態。                    | 公開頁顯示申訴狀態變更。                           | 前後截圖。                              |           |
+| 16   | Admin      | 清除一筆 `originalContent`。          | 公開頁保留 metadata，不再顯示原留言內容。          | 前後截圖或 API 結果。                   |           |
+
+## 公開紀錄檢查
+
+每筆公開紀錄均需檢查。
+
+| 欄位 / 行為    | 預期結果                                                              | Pass/Fail | 證據 |
+| -------------- | --------------------------------------------------------------------- | --------- | ---- |
+| 公開紀錄 URL   | URL 為 `/records/{uuid}/`，且與原留言 placeholder 連結一致。          |           |      |
+| 留言 ID        | 顯示被處理留言 ID。                                                   |           |      |
+| 來源           | 顯示文章或動態來源類型，以及來源標題或 ID。                           |           |      |
+| 理由           | 僅顯示「色情廣告」或「濫發廣告」。                                    |           |      |
+| 處理者         | 顯示隊員的 Matters 顯示名稱，不顯示內部 user ID、電子郵件或 IP 位址。 |           |      |
+| 處理時間       | 顯示處理時間。                                                        |           |      |
+| 申訴           | 顯示 `hi@matters.town` 申訴說明。                                     |           |      |
+| 覆核狀態       | 隨 admin 操作正確更新。                                               |           |      |
+| 原留言預設狀態 | 原留言內容預設遮蔽。                                                  |           |      |
+| 原留言展開     | 點擊「顯示全文」後顯示文字，按鈕改為「收起全文」。                    |           |      |
+| 額外確認       | 點開全文前不出現額外確認視窗。                                        |           |      |
+| 頁底警示       | 頁底仍顯示公開原文使用警示。                                          |           |      |
+| 清除內容       | 清除 `originalContent` 後，公開紀錄保留非個資 metadata。              |           |      |
+
+## 停止條件
+
+若發生以下任一情況，不得進入 production review：
+
+- 非隊員可看到或呼叫守望相助隊處理功能。
+- 隊員可影響文章、動態本文、帳號、圍爐內容或全站停權狀態。
+- 被處理留言完全消失，未在原處顯示 placeholder。
+- placeholder 連結無法開啟對應公開紀錄。
+- 公開紀錄顯示內部 user ID、電子郵件、IP 位址、站方備註或隱藏帳號資料。
+- 站方恢復留言後，留言狀態或公開紀錄覆核狀態不一致。
+- 清除 `originalContent` 時刪除整筆公開紀錄，而非保留非個資 metadata。
+- 公開頁預設直接顯示垃圾內容，造成二次散播風險。
+
+## 問題排查
+
+| 狀況                          | 優先檢查                                                                                        |
+| ----------------------------- | ----------------------------------------------------------------------------------------------- |
+| 權限指定後未生效              | 檢查 `user_feature_flag` row 與 viewer feature flags。                                          |
+| 隊員看不到操作入口            | 確認 `matters.icu` web deployment 包含最新 UI，並重新整理 viewer 權限。                         |
+| 隊員 mutation 失敗            | 檢查 viewer 權限與目標留言來源類型。                                                            |
+| mutation 成功但公開紀錄未出現 | 檢查 audit table insert 與 public query response。                                              |
+| placeholder 未顯示            | 檢查被處理留言是否仍回傳 placeholder 所需資料。                                                 |
+| 公開頁仍顯示示範資料          | 確認 `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` 並確認 staging 已有公開紀錄。 |
+| admin 覆核後公開頁未更新      | 檢查 review event 寫入與公開 query response。                                                   |
+
+## 驗收結論
+
+| 項目                             | 填寫 |
+| -------------------------------- | ---- |
+| 驗收日期                         |      |
+| 驗收人                           |      |
+| matters.icu web 版本 / commit    |      |
+| server.matters.icu 版本 / commit |      |
+| 公開頁版本 / commit              |      |
+| 是否通過最小門檻                 |      |
+| 未解問題                         |      |
+| 是否可進入 production review     |      |
+
+驗收全數通過後：
+
+1. 保存證據連結與截圖。
+2. 於相關 PR 留言摘要 `matters.icu` 驗收結果。
+3. 將 PR 標記為 ready for review。
+4. 經人員核准後，才可合併至 `master`。
+5. production 部署後，再確認 `server.matters.town/graphql` 與 `community-watch.matters.town` 讀取正式資料正常。

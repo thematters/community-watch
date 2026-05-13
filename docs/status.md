@@ -1,6 +1,6 @@
 # Status
 
-Last updated: 2026-05-11
+Last updated: 2026-05-13
 
 ## Current Phase
 
@@ -104,6 +104,30 @@ Phase 1 through Phase 5 are on `develop`. The Phase 5 staff review API is deploy
   - Added 60-second public cache headers on the landing page and record detail pages.
   - Updated local preview to use `wrangler pages dev` because Astro 4's Cloudflare adapter does not support `astro preview`.
   - Updated deployment docs to describe runtime API reads and Cloudflare Pages Functions output.
+- Added a read-only staging preflight script in `scripts/staging-check.mjs`:
+  - Confirms `server.matters.icu` exposes the required Community Watch public queries and staff/member mutations.
+  - Confirms public audit record count without authentication.
+  - Optionally checks the authenticated viewer role and `communityWatch` feature flag when `MATTERS_STAGING_ACCESS_TOKEN` is provided.
+  - Does not run mutations, output tokens, or store credentials.
+- Began `matters.icu` staging validation on 2026-05-13:
+  - Safari is logged in as `mashbean`.
+  - The article admin menu confirms admin-level UI access on staging.
+  - Public API schema is deployed, but `communityWatchActions(input: { first: 5 })` currently returns `totalCount: 0`.
+  - Safari does not currently allow JavaScript from the address bar or Apple Events, so authenticated API preflight requires a temporary staging access token or manual browser operation.
+- Merged server follow-up PR #4775 on 2026-05-13:
+  - Repository: `thematters/matters-server`
+  - Branch: `codex/community-watch-primary-audit-read`
+  - PR: https://github.com/thematters/matters-server/pull/4775
+  - Reason: staging E2E showed staff restore returned the updated action, but the public query could still read stale read-replica values.
+  - Change: `CommentService` now reads Community Watch audit records from the primary database for the active comment action, public action detail, and public action list.
+  - Local verification: `npm run build`, targeted Community Watch Jest files, and targeted ESLint passed.
+  - GitHub checks: push build, pull_request build, `codecov/patch`, and `codecov/project` passed.
+  - Develop deployment passed: schema push, DB migration, EB deploy, Lambda deploys, and notification all completed successfully.
+- Re-verified staging public reads after #4775:
+  - `pnpm staging:check` passed against `https://server.matters.icu/graphql`.
+  - Public API now returns the prior E2E record `957ebd2b-ac4a-4fa6-ba62-0e9c3d79e748` as `actionState: restored` and `reviewState: reversed`.
+  - Local Cloudflare preview with `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` shows data source `公開 API`, the record detail page, comment ID `Q29tbWVudDozNjkzMg`, actor display name `mashbean`, and review status `已恢復`.
+  - `community-watch.matters.town` still uses production/sample data, so staging public-page validation should use a staging preview or local preview until production rollout is approved.
 
 ## Phase 1 PR Scope
 
@@ -311,6 +335,12 @@ Server PR #4771:
 - Governance rules:
   - Added `docs/community-watch-rules.md` as the v0.1 trial rules for Community Watch membership.
   - Covers joining, exit, trial period, term length, qualification maintenance, suspension, handling scope, conflicts of interest, public audit records, appeal/review, privacy, and AI boundaries.
+- Governance and staging copy refresh:
+  - Updated `docs/community-watch-rules.md` to the latest v0.1 wording: formal Taiwan usage, `濫用風險`, `紀錄公開`, no automatic seven-day original-content clearing statement, and first-stage AI as candidate hints only.
+  - Regenerated `docs/馬特市守望相助隊規章-v0.1.docx` from the latest rules.
+  - Reworked `docs/staging-verification.md` into a `matters.icu` release gate focused on admin assignment, member removal, frontend placeholder, public records, staff review, restore, reason adjustment, appeal state update, and original-content clearing.
+  - Updated public-page copy in `src/content/page.ts`, live API fallback copy in `src/content/communityWatchData.ts`, and record-detail appeal wording in `src/pages/records/[uuid].astro` to match the formal rules.
+  - Verification: `pnpm typecheck` passed; `pnpm build` passed with the existing Cloudflare adapter cleanup warning.
 - PR merge status:
   - `thematters/matters-server` #4762, #4763, #4764, #4765, #4769, and #4771 are merged.
   - `thematters/matters-web` #5881 is merged.

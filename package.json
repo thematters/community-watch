@@ -9,6 +9,7 @@
     "dev": "astro dev",
     "build": "astro build",
     "preview": "pnpm build && wrangler pages dev dist --compatibility-date=2026-05-07 --port 4321",
+    "staging:check": "node scripts/staging-check.mjs",
     "typecheck": "astro check"
   },
   "dependencies": {

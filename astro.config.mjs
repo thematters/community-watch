@@ -12,6 +12,6 @@ export default defineConfig({
   base,
   output: "server",
   adapter: cloudflare({ imageService: "passthrough" }),
-  trailingSlash: "always",
+  trailingSlash: "ignore",
   build: { format: "directory" },
 });

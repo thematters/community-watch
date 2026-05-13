@@ -209,7 +209,7 @@ const buildPage = (
     ...page.log,
     description:
       source === "api"
-        ? "原留言預設以毛玻璃遮蔽，避免垃圾內容被二次散播；需要仲裁時，任何人仍可點開全文比對。"
+        ? "原留言內容預設遮蔽，避免垃圾內容被二次散播；需要申訴、覆核或社群稽核時，使用者仍可點開全文比對。"
         : page.log.description,
     dataLabel: source === "api" ? "公開 API" : page.log.dataLabel,
     cases,
