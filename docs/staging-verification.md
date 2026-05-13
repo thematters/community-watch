@@ -122,6 +122,17 @@ MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
 | Public page local preview    | Pass                | 本機 `wrangler pages dev dist --binding COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` 可顯示該 record：來源 `Fediverse staging 測試文章 2026-05-12`、處理人 `mashbean`、理由 `色情廣告`，原留言預設 `is-blurred`。 |
 | Staff restore                | Pass                | 已用 admin mutation 恢復 `73cfede7-8d54-48ec-bb41-42b96b0b92ce`；留言狀態回到 `active`，公開紀錄為 `actionState: restored`、`reviewState: reversed`。                                                                            |
 
+## 2026-05-14 Cloudflare Pages staging data binding
+
+| 檢查項目                 | 結果                   | 證據 / 備註                                                                                                                                                                                                                  |
+| ------------------------ | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| Production Pages binding | Pass                   | Cloudflare Pages production secret `COMMUNITY_WATCH_API_URL` 已暫時設定為 `https://server.matters.icu/graphql`，僅供 `matters.icu` staging 驗收使用。正式上線前不得讓 production domain 長期指向 staging data。              |
+| Manual deployment        | Pass                   | `wrangler pages deploy dist --project-name community-watch --branch main` 已完成；deployment URL 為 `https://cad3cd32.community-watch.pages.dev`。                                                                           |
+| Public domain root       | Pass                   | `https://community-watch.matters.town/?verify=20260514T0602` 回傳 200，顯示 `公開 API` 與 staging 紀錄。                                                                                                                     |
+| Public record route      | Pass                   | `https://community-watch.matters.town/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce` 與 `/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce/` 均回傳 200。                                                                         |
+| Public record content    | Pass                   | 公開紀錄顯示留言 `Q29tbWVudDozNjkzNA`、處理者 `mashbean`、來源 `Fediverse staging 測試文章 2026-05-12`、理由 `色情廣告`、覆核狀態 `已恢復`，且原留言預設仍有 `is-blurred` 遮蔽。                                             |
+| Production switch        | Required before master | 正式 rollout 前，需將 `COMMUNITY_WATCH_API_URL` 改為 `https://server.matters.town/graphql`，或移除該 binding 回到 sample fallback；切換後需重新驗證 root、record route、placeholder link 與 staff restore 後的公開紀錄狀態。 |
+
 ## 詳細驗收流程
 
 | 步驟 | 操作者     | 操作                                  | 預期結果                                           | 證據                                    | Pass/Fail |
