@@ -58,7 +58,7 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
 
       <section class="metric-strip" aria-label="目前處理統計">
         {page.metrics.map((metric) => (
-          <article class="metric">
+          <article class:list={["metric", metric.label === "誤刪申訴" && "metric--low-is-good"]}>
             <span>{metric.label}</span>
             <strong>{metric.value}</strong>
             <small>{metric.note}</small>
@@ -353,6 +353,10 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
     color: var(--brand-purple);
     font-size: clamp(36px, 6vw, 56px);
     line-height: 1;
+  }
+
+  .metric--low-is-good strong {
+    color: var(--ink);
   }
 
   .metric small {

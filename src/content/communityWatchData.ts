@@ -195,7 +195,7 @@ const buildLiveMetrics = (cases: WatchCase[]): Metric[] => {
   return [
     { label: "色情廣告", value: String(pornCount), note: "近期公開紀錄" },
     { label: "濫發廣告", value: String(spamCount), note: "近期公開紀錄" },
-    { label: "申訴受理", value: String(appealCount), note: "近期公開紀錄" },
+    { label: "誤刪申訴", value: String(appealCount), note: "這個數字越小越好" },
   ];
 };
 

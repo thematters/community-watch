@@ -105,7 +105,7 @@ export const page: CommunityWatchContent = {
   metrics: [
     { label: "色情廣告", value: "18", note: "本月已移除" },
     { label: "濫發廣告", value: "42", note: "本月已移除" },
-    { label: "申訴受理", value: "5", note: "站方評估中" },
+    { label: "誤刪申訴", value: "5", note: "這個數字越小越好" },
   ],
   flow: {
     eyebrow: "處理流程",
