@@ -180,6 +180,24 @@ img {
   line-height: 1.5;
 }
 
+.page__footer ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: var(--space-sp16);
+}
+
+.page__footer a {
+  color: var(--ink-muted);
+  text-decoration: none;
+}
+
+.page__footer a:hover {
+  color: var(--brand-purple);
+}
+
 @media (min-width: 720px) {
   .page__footer {
     flex-direction: row;
