@@ -228,6 +228,7 @@ const requestGraphQL = async <T>(
   try {
     const response = await fetch(apiUrl, {
       method: "POST",
+      cache: "no-store",
       headers: { "content-type": "application/json" },
       body: JSON.stringify({ query, variables }),
     });
