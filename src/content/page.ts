@@ -62,7 +62,6 @@ export interface CommunityWatchContent {
     eyebrow: string;
     title: string;
     description: string;
-    dataLabel: string;
     cases: WatchCase[];
   };
   appeal: {
@@ -141,7 +140,6 @@ export const page: CommunityWatchContent = {
     title: "近期處理紀錄",
     description:
       "原留言內容預設遮蔽，避免垃圾內容被二次散播；需要申訴、覆核或社群稽核時，使用者仍可點開全文比對。正式 API 接上前，本頁先以示範資料展示公開紀錄格式。",
-    dataLabel: "示範資料",
     cases: [
       {
         id: "cw-demo-8f2a71",

@@ -101,7 +101,7 @@ Phase 1 through Phase 5 are on `develop`. The Phase 5 staff review API is deploy
 - Advanced Phase 6 public-site reliability work after #4771 merged:
   - Converted the public site from static-only Astro output to Cloudflare server rendering with `@astrojs/cloudflare`.
   - Kept the existing visual page and sample fallback, but changed `/records/{uuid}/` to resolve records on demand through the public GraphQL detail query.
-  - Added 60-second public cache headers on the landing page and record detail pages.
+  - Added public cache headers on the landing page and record detail pages; later changed both dynamic pages to `Cache-Control: no-store` for staging validation freshness.
   - Updated local preview to use `wrangler pages dev` because Astro 4's Cloudflare adapter does not support `astro preview`.
   - Updated deployment docs to describe runtime API reads and Cloudflare Pages Functions output.
 - Added a read-only staging preflight script in `scripts/staging-check.mjs`:
@@ -126,14 +126,15 @@ Phase 1 through Phase 5 are on `develop`. The Phase 5 staff review API is deploy
 - Re-verified staging public reads after #4775:
   - `pnpm staging:check` passed against `https://server.matters.icu/graphql`.
   - Public API now returns the prior E2E record `957ebd2b-ac4a-4fa6-ba62-0e9c3d79e748` as `actionState: restored` and `reviewState: reversed`.
-  - Local Cloudflare preview with `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` shows data source `公開 API`, the record detail page, comment ID `Q29tbWVudDozNjkzMg`, actor display name `mashbean`, and review status `已恢復`.
+  - Local Cloudflare preview with `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` shows the record detail page, comment ID `Q29tbWVudDozNjkzMg`, actor display name `mashbean`, and review status `已恢復`.
   - `community-watch.matters.town` still uses production/sample data, so staging public-page validation should use a staging preview or local preview until production rollout is approved.
 - Temporarily configured Cloudflare Pages production binding for staging validation:
   - Project: `community-watch`.
   - Binding: `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql`.
-  - Manual deployment completed at `https://cad3cd32.community-watch.pages.dev`.
+  - Manual deployment completed at `https://ca069b50.community-watch.pages.dev`.
   - `https://community-watch.matters.town` now reads staging public records for `matters.icu` validation.
   - Verified both `/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce` and `/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce/` return 200 and show the restored staging audit record.
+  - Re-verified root and record pages return `Cache-Control: no-store`; the root page no longer shows the former `公開 API` label.
   - Before production rollout, switch this binding to `https://server.matters.town/graphql` after server production deploy, or remove it to return to sample fallback.
 
 ## Phase 1 PR Scope
