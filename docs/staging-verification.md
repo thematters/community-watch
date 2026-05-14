@@ -151,6 +151,8 @@ MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
 | Badge UI deployment         | Pass | `matters-web` #5891 與 #5892 已 merge 並部署；個人頁 badge UI 會使用既有徽章系統顯示守望相助隊火炬 badge。                                                                                                                |
 | Staging API preflight       | Pass | `pnpm staging:check` 通過；`server.matters.icu` 提供必要 public queries 與 member/staff mutations，並回傳 4 筆公開紀錄。                                                                                                    |
 | Public page no-store redeploy | Pass | `community-watch.matters.town` 已重新部署至 `https://ca069b50.community-watch.pages.dev`；首頁與公開紀錄頁 header 均為 `Cache-Control: no-store`，首頁不再顯示 `公開 API` 標籤。                                         |
+| Admin profile toggle        | Pass | Safari 於 `https://matters.icu/@mashbeanmatters` 開啟個人頁更多操作後，admin 選單顯示「取消守望相助隊」，表示前端指定 / 取消入口已部署且目前使用者具有 `communityWatch` 權限。                                         |
+| Existing member badge backfill | Follow-up | 同一頁未顯示火炬 badge；原因判斷為 `mashbean` 的 `communityWatch` 權限是在 badge sync 上線前指定，需由 `matters-server` #4790 補 existing flag 的 `community_watch` badge backfill，部署後再重驗。                         |
 
 ## 詳細驗收流程
 
