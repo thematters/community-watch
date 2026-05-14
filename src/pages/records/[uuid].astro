@@ -18,7 +18,7 @@ const mailSubject = encodeURIComponent(
   `守望相助隊申訴：${watchCase?.commentId ?? uuid}`
 );
 
-Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
+Astro.response.headers.set("cache-control", "no-store");
 ---
 
 <PageLayout
