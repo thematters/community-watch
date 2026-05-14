@@ -13,7 +13,7 @@ const processFlowImages = [
   "images/process-flow-appeal.jpg",
 ];
 
-Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
+Astro.response.headers.set("cache-control", "no-store");
 ---
 
 <PageLayout
@@ -101,7 +101,6 @@ Astro.response.headers.set("cache-control", "public, max-age=60, s-maxage=60");
           <p class="eyebrow">{page.log.eyebrow}</p>
           <h2 id="watch-log-title">{page.log.title}</h2>
           <p>{page.log.description}</p>
-          <span class="data-label">{page.log.dataLabel}</span>
         </div>
 
         <div class="case-list">
