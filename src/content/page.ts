@@ -219,6 +219,7 @@ export const page: CommunityWatchContent = {
     note: "© Matters Lab · community-watch.matters.town",
     warning: "公開原文僅供申訴、覆核與社群稽核使用；請勿轉貼垃圾連結、色情廣告或詐騙內容。",
     links: [
+      { label: "隊員規章", href: "/rules/" },
       { label: "申訴信箱", href: "mailto:hi@matters.town" },
       { label: "Matters 首頁", href: "https://matters.town" },
       { label: "Billboard", href: "https://matters.town/billboard" },

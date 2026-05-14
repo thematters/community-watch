@@ -1,0 +1,304 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import { page } from "../content/page";
+
+const baseUrl = import.meta.env.BASE_URL;
+Astro.response.headers.set("cache-control", "no-store");
+---
+
+<PageLayout
+  title="馬特市守望相助隊規章｜matters.town"
+  description="馬特市守望相助隊 v0.1 試行草案，說明隊員資格、處理準則、申訴覆核、資料隱私與 AI 使用邊界。"
+  lang="zh-Hant"
+>
+  <div class="page">
+    <header class="page__header">
+      <a class="page__brand" href="https://matters.town">
+        <img src={`${baseUrl}matters-lettering-black.svg`} alt="Matters" />
+        <span aria-hidden="true"></span>
+        <strong>守望相助隊</strong>
+      </a>
+      <nav class="page__nav" aria-label="主要導覽">
+        <a href={`${baseUrl}`}>處理紀錄</a>
+        <a href={`${baseUrl}#appeal`}>申訴</a>
+        <a href="https://matters.town/billboard">Billboard</a>
+      </nav>
+    </header>
+
+    <main class="page__main rules-main">
+      <article class="rules-document" aria-labelledby="rules-title">
+        <p class="eyebrow">v0.1 試行草案</p>
+        <h1 id="rules-title">馬特市守望相助隊規章</h1>
+        <p class="rules-lead">
+          本規章適用於「馬特市守望相助隊」第一階段試行。目的在於讓少數受託市民協助處理明確垃圾留言，並以公開紀錄、站方覆核與申訴管道降低濫權風險。
+        </p>
+
+        <section>
+          <h2>基本原則</h2>
+          <ul>
+            <li>權限最小化：隊員僅得處理留言，不得刪除文章、動態本文、帳號，亦不得限制帳號使用。</li>
+            <li>範圍明確：第一階段僅處理明確垃圾留言，理由限於「色情廣告」與「濫發廣告」。</li>
+            <li>流程從簡：隊員可直接處理明確垃圾留言；防弊機制以公開紀錄、站方覆核、申訴與停用資格為主。</li>
+            <li>全程留痕：處理者、處理時間、處理理由與留言資訊，均應於公開紀錄頁查詢。</li>
+            <li>站方保留最終決定權：站方得覆核、恢復留言、調整理由，並得停用隊員資格。</li>
+            <li>避免二次散播：公開頁中的原留言內容預設遮蔽，使用者點開後始得閱讀。</li>
+            <li>AI 不得自動刪除：第一階段 AI 僅得作為候選檢測或提示，不得直接移除留言。</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>隊員身分</h2>
+          <p>守望相助隊員由站方指定，屬受託使用者，不是一般使用者的預設權限，也不代表站方員工身分。</p>
+          <p>公開頁顯示隊員在 Matters 站上自行設定的顯示名稱。系統內部得保留必要使用者 ID 作為稽核資料，但公開頁不顯示內部 ID、電子郵件、IP 位址或其他個資。</p>
+        </section>
+
+        <section>
+          <h2>加入資格</h2>
+          <ul>
+            <li>為 Matters 使用者，且帳號狀態正常。</li>
+            <li>理解守望相助隊僅處理留言垃圾廣告，不處理立場、觀點、爭議或人際衝突。</li>
+            <li>同意所有處理紀錄公開。</li>
+            <li>同意接受站方覆核，並接受誤判時恢復留言或停用資格。</li>
+            <li>同意以自己的 Matters 顯示名稱出現在公開紀錄中。</li>
+          </ul>
+          <p>第一階段建議採邀請制或少量開放申請，由管理員手動指定 <code>communityWatch</code> 權限。此階段不建立大型報名、投票或多層審核流程。</p>
+        </section>
+
+        <section>
+          <h2>加入流程</h2>
+          <ol>
+            <li>站方確認候選人理解本規章。</li>
+            <li>站方確認候選人了解處理紀錄將公開。</li>
+            <li>管理員於既有後台或管理工具指定該帳號的 <code>communityWatch</code> 權限。</li>
+            <li>候選人重新登入或重新整理後，於留言選單看到守望相助隊操作。</li>
+            <li>站方得先於測試站安排一至兩則測試留言，確認候選人理解操作邊界。</li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>任期與試行期</h2>
+          <ul>
+            <li>試行期：首次加入後 30 天。</li>
+            <li>正式任期：試行期通過後，每期 3 個月。</li>
+            <li>續任：任期屆滿前由站方確認是否續任，不另設複雜審核。</li>
+            <li>人數：第一階段維持少數隊員，建議 5 至 20 人。</li>
+          </ul>
+          <p>試行期與任期不作為績效考核，也不設定最低處理數量。守望相助隊的目的不是鼓勵多刪，而是讓明確垃圾留言能被及時處理。</p>
+        </section>
+
+        <section>
+          <h2>資格維持</h2>
+          <ul>
+            <li>僅處理明確垃圾留言。</li>
+            <li>僅使用「色情廣告」與「濫發廣告」兩種理由。</li>
+            <li>不得將本權限用於立場分歧、批評、冒犯感、私人爭執或其他正常留言。</li>
+            <li>遇到無法明確判斷的邊界案例，應交由站方處理，或不進行處理。</li>
+            <li>不得公開轉貼被移除留言中的垃圾連結、色情內容、詐騙內容或個資。</li>
+            <li>不得使用自動化工具大量操作。</li>
+            <li>應配合站方覆核、說明與停用資格之決定。</li>
+          </ul>
+          <p>站方得定期抽查處理紀錄。抽查重點為理由是否合理、是否越權、是否重複誤判，而非處理數量。</p>
+        </section>
+
+        <section>
+          <h2>處理準則</h2>
+          <p>隊員得移除以下留言：</p>
+          <ul>
+            <li>明確色情廣告。</li>
+            <li>明確濫發廣告。</li>
+            <li>多處重複張貼的推銷、詐騙、導流或外部聯絡廣告。</li>
+            <li>與原討論無關，且主要目的明顯為廣告或導流的留言。</li>
+          </ul>
+          <p>隊員不得移除以下內容：</p>
+          <ul>
+            <li>政治立場、社會議題或價值觀不同的留言。</li>
+            <li>批評作者、批評平台，或語氣尖銳但仍屬討論的留言。</li>
+            <li>品質不佳或離題，但不明顯屬於垃圾廣告的留言。</li>
+            <li>需要脈絡判斷的爭議留言。</li>
+            <li>文章、動態本文、帳號、個人頁、頻道或圍爐內容。</li>
+            <li>圍爐（circle）相關留言；圍爐即將停止服務，不納入本專案範圍。</li>
+          </ul>
+          <p>若留言同時包含垃圾廣告與其他內容，以垃圾廣告是否明確作為判斷標準。若無法確認廣告目的，不得使用守望相助隊權限。</p>
+        </section>
+
+        <section>
+          <h2>利益衝突與自我約束</h2>
+          <p>隊員得處理自己文章或動態下的明確垃圾留言，但不得使用守望相助隊權限處理與自己發生爭執的正常留言。</p>
+          <p>若留言涉及隊員本人、人際衝突、長期爭議，或檢舉對象為隊員熟人或對立方，建議交由站方處理。</p>
+        </section>
+
+        <section>
+          <h2>退出</h2>
+          <ul>
+            <li>通知站方或指定聯絡窗口。</li>
+            <li>管理員移除該帳號的 <code>communityWatch</code> 權限。</li>
+            <li>權限移除後，隊員不再看到處理入口，也不得呼叫移除留言 API。</li>
+          </ul>
+          <p>退出不影響既有公開稽核紀錄。過去紀錄仍保留供社群稽核；如涉及有效個資請求，站方得清除原留言內容。</p>
+        </section>
+
+        <section>
+          <h2>停用與暫停資格</h2>
+          <ul>
+            <li>超出權限範圍。</li>
+            <li>多次誤刪正常留言。</li>
+            <li>處理與自身衝突相關的留言。</li>
+            <li>嘗試規避公開留痕。</li>
+            <li>轉貼或擴散垃圾內容、色情內容、詐騙連結或個資。</li>
+            <li>拒絕配合站方覆核。</li>
+            <li>帳號本身出現安全風險或違規行為。</li>
+            <li>長期未登入或無法聯絡，站方認為需清理權限。</li>
+          </ul>
+          <p>停用不需多層審核。為保護社群與降低風險，站方得先停用資格，再視情況說明或恢復。</p>
+        </section>
+
+        <section>
+          <h2>申訴與覆核</h2>
+          <p>被移除留言的使用者得寄信至 <a href="mailto:hi@matters.town">hi@matters.town</a> 申訴，並附上留言 ID 或公開紀錄連結。</p>
+          <ul>
+            <li>維持原處理。</li>
+            <li>恢復留言。</li>
+            <li>調整理由。</li>
+            <li>標記申訴狀態。</li>
+            <li>清除原留言內容，並保留非個資稽核資料。</li>
+            <li>暫停或取消隊員資格。</li>
+          </ul>
+          <p>所有站方覆核操作均應留痕。</p>
+        </section>
+
+        <section>
+          <h2>公開紀錄</h2>
+          <p>每次隊員處理留言均應產生公開紀錄，至少包含：</p>
+          <ul>
+            <li>公開紀錄 ID。</li>
+            <li>留言 ID。</li>
+            <li>來源類型。</li>
+            <li>來源標題或來源 ID。</li>
+            <li>移除理由。</li>
+            <li>隊員顯示名稱。</li>
+            <li>處理時間。</li>
+            <li>申訴狀態。</li>
+            <li>站方覆核狀態。</li>
+          </ul>
+          <p>公開頁中的原留言內容預設遮蔽。使用者得點開全文，但頁面應提醒該內容僅供申訴、覆核與社群稽核使用，不鼓勵轉貼或擴散。</p>
+        </section>
+
+        <section>
+          <h2>資料與隱私</h2>
+          <p>守望相助隊不應蒐集不必要個資。稽核資料僅保存必要資訊。</p>
+          <p>若 <code>originalContent</code> 包含個資，且收到有效個資或隱私請求，站方得清除 <code>originalContent</code>，並保留非個資稽核資料。</p>
+          <p>目前不執行自動七天清空 <code>originalContent</code>。保留或清除期限，待後續產品與隱私決策確認。</p>
+        </section>
+
+        <section>
+          <h2>AI 使用邊界</h2>
+          <p>未來得以人工處理紀錄整理訓練或評測資料，但應遵守以下原則：</p>
+          <ul>
+            <li>僅收錄明確的「色情廣告」與「濫發廣告」樣本。</li>
+            <li>去除或遮蔽個資與危險外部連結。</li>
+            <li>保留人工理由、覆核結果與資料來源。</li>
+            <li>第一階段 AI 僅得作為候選提示，不得直接刪除留言。</li>
+          </ul>
+        </section>
+
+        <section>
+          <h2>規章調整</h2>
+          <p>本規章為第一階段試行版。站方得依測試站驗證、申訴案例、誤刪率、隊員回饋與隱私風險調整。</p>
+          <p>任何擴大權限範圍的變更，例如處理文章、動態本文、帳號或自動刪除，均不屬於本規章小幅修訂，須另行進行產品決策。</p>
+        </section>
+      </article>
+    </main>
+
+    <footer class="page__footer">
+      <div class="page__footer-copy">
+        <span>{page.footer.note}</span>
+        <strong>{page.footer.warning}</strong>
+      </div>
+      {
+        page.footer.links && page.footer.links.length > 0 && (
+          <nav aria-label="footer">
+            <ul>
+              {page.footer.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </footer>
+  </div>
+</PageLayout>
+
+<style>
+  .rules-main {
+    padding-top: var(--space-watch-48);
+  }
+
+  .rules-document {
+    width: 100%;
+    max-width: 780px;
+    margin: 0 auto;
+    padding: 0 0 var(--space-watch-48);
+  }
+
+  .rules-document h1,
+  .rules-document h2,
+  .rules-document p,
+  .rules-document ul,
+  .rules-document ol {
+    overflow-wrap: anywhere;
+  }
+
+  .rules-document h1 {
+    margin: 0 0 var(--space-sp16);
+    font-family: var(--font-reading);
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.25;
+    letter-spacing: 0;
+  }
+
+  .rules-lead {
+    margin: 0 0 var(--space-watch-48);
+    color: var(--ink-muted);
+    font-size: 18px;
+    line-height: 1.8;
+  }
+
+  .rules-document section {
+    padding: var(--space-watch-24) 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .rules-document h2 {
+    margin: 0 0 var(--space-sp12);
+    font-size: 22px;
+    line-height: 1.4;
+    letter-spacing: 0;
+  }
+
+  .rules-document p,
+  .rules-document li {
+    color: var(--ink-muted);
+  }
+
+  .rules-document p {
+    margin: 0 0 var(--space-sp12);
+  }
+
+  .rules-document ul,
+  .rules-document ol {
+    margin: 0 0 var(--space-sp16);
+    padding-left: 1.5rem;
+  }
+
+  .rules-document li + li {
+    margin-top: var(--space-sp8);
+  }
+
+  .rules-document code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 0.92em;
+  }
+</style>
