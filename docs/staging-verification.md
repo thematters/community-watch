@@ -106,7 +106,7 @@ MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
 | Server follow-up PR          | Pass             | `thematters/matters-server` #4775 已 merge 到 `develop`，develop deploy、schema push、DB migration、EB deploy 與 Lambda deploys 均完成。                                                                         |
 | Stale public read fix        | Pass             | `pnpm staging:check` 顯示公開 API 目前有 1 筆紀錄：`957ebd2b-ac4a-4fa6-ba62-0e9c3d79e748`，reason `porn_ad`，action state `restored`，review state `reversed`，處理人 `mashbean`。                               |
 | Public API record detail     | Pass             | `communityWatchAction(input: { uuid })` 可由本機 Cloudflare preview 讀取，顯示留言 ID `Q29tbWVudDozNjkzMg`、來源 `A test a day, keeps the bugs away`、處理人 `mashbean`、站方覆核 `已恢復`。                     |
-| Public page staging preview  | Pass             | 以 `wrangler pages dev dist --binding COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` 啟動本機 preview 後，首頁顯示 `公開 API`，並顯示 staging 公開紀錄。                                            |
+| Public page staging preview  | Pass             | 以 `wrangler pages dev dist --binding COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql` 啟動本機 preview 後，首頁顯示 staging 公開紀錄。                                                              |
 | Production public domain     | Expected pending | `https://community-watch.matters.town` 仍顯示示範資料；正式域名不應長期指向 staging。staging 驗收請使用 staging preview 或本機 preview。                                                                         |
 | Authenticated full E2E rerun | Blocked          | Atlas 已登入 `matters.icu`，但「允許 Apple 事件的 JavaScript」目前關閉；Safari 目前只有錯誤頁。若要自動重跑建立留言、移除、覆核恢復流程，需要臨時 staging access token，或手動開啟瀏覽器 JavaScript 自動化通道。 |
 
@@ -127,8 +127,8 @@ MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
 | 檢查項目                 | 結果                   | 證據 / 備註                                                                                                                                                                                                                  |
 | ------------------------ | ---------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
 | Production Pages binding | Pass                   | Cloudflare Pages production secret `COMMUNITY_WATCH_API_URL` 已暫時設定為 `https://server.matters.icu/graphql`，僅供 `matters.icu` staging 驗收使用。正式上線前不得讓 production domain 長期指向 staging data。              |
-| Manual deployment        | Pass                   | `wrangler pages deploy dist --project-name community-watch --branch main` 已完成；deployment URL 為 `https://cad3cd32.community-watch.pages.dev`。                                                                           |
-| Public domain root       | Pass                   | `https://community-watch.matters.town/?verify=20260514T0602` 回傳 200，顯示 `公開 API` 與 staging 紀錄。                                                                                                                     |
+| Manual deployment        | Pass                   | `CLOUDFLARE_ACCOUNT_ID=757aaed316df635d8deb63859258808c wrangler pages deploy dist --project-name community-watch --branch main` 已完成；deployment URL 為 `https://ca069b50.community-watch.pages.dev`。                    |
+| Public domain root       | Pass                   | `https://community-watch.matters.town/?verify=20260514T1140` 回傳 200，`Cache-Control: no-store`，首頁 `公開 API` 字串出現次數為 0，並顯示 staging 紀錄。                                                                      |
 | Public record route      | Pass                   | `https://community-watch.matters.town/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce` 與 `/records/73cfede7-8d54-48ec-bb41-42b96b0b92ce/` 均回傳 200。                                                                         |
 | Public record content    | Pass                   | 公開紀錄顯示留言 `Q29tbWVudDozNjkzNA`、處理者 `mashbean`、來源 `Fediverse staging 測試文章 2026-05-12`、理由 `色情廣告`、覆核狀態 `已恢復`，且原留言預設仍有 `is-blurred` 遮蔽。                                             |
 | Production switch        | Required before master | 正式 rollout 前，需將 `COMMUNITY_WATCH_API_URL` 改為 `https://server.matters.town/graphql`，或移除該 binding 回到 sample fallback；切換後需重新驗證 root、record route、placeholder link 與 staff restore 後的公開紀錄狀態。 |
@@ -147,6 +147,10 @@ MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
 | Staff restore               | Pass | admin 執行 `restoreCommunityWatchComment(input: { uuid: "7ac9cd2d-abc9-4afb-bdce-ddecb4c5ca51", note: "manual staging validation restore" })` 後，公開紀錄更新為 `actionState: restored`、`reviewState: reversed`。       |
 | Original comment after restore | Pass | 原留言 GraphQL node 回到 `state: active`，且 `communityWatchAction: null`；原文恢復於文章留言串。                                                                                                                           |
 | Feature flag workflow       | Pass | `matters-server` develop 已包含 feature flag workflow 的 cache endpoint fallback：若 EB 環境未提供 `MATTERS_CACHE_HOST`，會透過 `ENV_STORE_PATH` 讀取 SSM，再清除使用者 full-query cache。                                 |
+| Badge schema deployment     | Pass | `matters-server` #4786 已 merge 到 `develop`；develop DB migration 與 EB deploy 已通過。`server.matters.icu` GraphQL introspection 已回傳 `BadgeType.community_watch` 與 `UserFeatureFlagType.communityWatch`。             |
+| Badge UI deployment         | Pass | `matters-web` #5891 與 #5892 已 merge 並部署；個人頁 badge UI 會使用既有徽章系統顯示守望相助隊火炬 badge。                                                                                                                |
+| Staging API preflight       | Pass | `pnpm staging:check` 通過；`server.matters.icu` 提供必要 public queries 與 member/staff mutations，並回傳 4 筆公開紀錄。                                                                                                    |
+| Public page no-store redeploy | Pass | `community-watch.matters.town` 已重新部署至 `https://ca069b50.community-watch.pages.dev`；首頁與公開紀錄頁 header 均為 `Cache-Control: no-store`，首頁不再顯示 `公開 API` 標籤。                                         |
 
 ## 詳細驗收流程
 
