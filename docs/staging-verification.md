@@ -152,9 +152,14 @@ MATTERS_STAGING_ACCESS_TOKEN=... pnpm staging:check
 | Staging API preflight       | Pass | `pnpm staging:check` 通過；`server.matters.icu` 提供必要 public queries 與 member/staff mutations，並回傳 4 筆公開紀錄。                                                                                                    |
 | Public page no-store redeploy | Pass | `community-watch.matters.town` 已重新部署至 `https://ca069b50.community-watch.pages.dev`；首頁與公開紀錄頁 header 均為 `Cache-Control: no-store`，首頁不再顯示 `公開 API` 標籤。                                         |
 | Admin profile toggle        | Pass | Safari 於 `https://matters.icu/@mashbeanmatters` 開啟個人頁更多操作後，admin 選單顯示「取消守望相助隊」，表示前端指定 / 取消入口已部署且目前使用者具有 `communityWatch` 權限。                                         |
-| Existing member badge backfill | Follow-up | 同一頁未顯示火炬 badge；原因判斷為 `mashbean` 的 `communityWatch` 權限是在 badge sync 上線前指定。`matters-server` #4790 已補 existing flag 的 `community_watch` badge backfill，build 與 Codecov 已通過；目前受 branch protection 阻擋，需人工合併後部署再重驗。 |
-| Moment comment support      | Repo/API pass, live E2E pending | `matters-web` 的動態詳情留言使用共用 `CommentFeed`，且會保留 `node.state === 'active' || node.communityWatchAction` 的留言；守望相助隊選單允許 `comment.type === 'article' || comment.type === 'moment'`。`matters-server` 的 `communityWatchRemoveComment` 也只允許 `article` 與 `moment`。實際 staging 動態留言移除流程待建立測試動態與測試留言後驗證。 |
+| Existing member badge backfill | Pass | 同一頁曾未顯示火炬 badge；原因判斷為 `mashbean` 的 `communityWatch` 權限是在 badge sync 上線前指定。`matters-server` #4790 已 merge，develop DB migration 與 EB deploy 已通過；staging GraphQL viewer 回傳 `info.badges: [{ type: "community_watch" }]`。 |
+| Moment comment support      | Pass | `matters-web` 的動態詳情留言使用共用 `CommentFeed`，且會保留 `node.state === 'active' || node.communityWatchAction` 的留言；守望相助隊選單允許 `comment.type === 'article' || comment.type === 'moment'`。`matters-server` 的 `communityWatchRemoveComment` 也只允許 `article` 與 `moment`。 |
 | Authenticated staging viewer | Pass | Safari 目前登入 `mashbeanmatters`；GraphQL viewer 回傳 `oss.featureFlags` 包含 `communityWatch`。檢查未輸出或保存 access token。                                                                                         |
+| Moment E2E test content     | Pass | 建立測試動態 `TW9tZW50OjY2Ng`（short hash `drvhqo6n623n`）與動態留言 `Q29tbWVudDozNjkzNg`；測試文字均為明確 staging marker，不含真實廣告連結、成人內容或個資。 |
+| Moment Community Watch removal | Pass | 隊員 `mashbean` 以「濫發廣告」處理動態留言後，留言狀態變為 `banned`，產生公開紀錄 `014cb8ce-cc22-42a8-bbb9-55233c01a525`，`sourceType: moment`，`reason: spam_ad`，`reviewState: pending`。 |
+| Moment public record detail | Pass | `https://community-watch.matters.town/records/014cb8ce-cc22-42a8-bbb9-55233c01a525/` 回傳 200，`Cache-Control: no-store`；頁面顯示「動態留言」、留言 ID、來源 ID、處理人 `mashbean`、理由「濫發廣告」、原留言預設 `is-blurred`，並提供 `hi@matters.town` 申訴連結。 |
+| Moment staff restore        | Pass | admin 執行 `restoreCommunityWatchComment` 後，公開紀錄更新為 `actionState: restored`、`reviewState: reversed`；原動態留言 GraphQL node 回到 `state: active`，且 `communityWatchAction: null`。 |
+| Public dashboard after moment test | Pass | `https://community-watch.matters.town/` 首頁顯示本次動態留言紀錄，統計列更新為「濫發廣告 1」，近期紀錄包含 `014cb8ce-cc22-42a8-bbb9-55233c01a525`。 |
 
 ## 詳細驗收流程
 
