@@ -169,6 +169,14 @@ const formatHandledAt = (createdAt: string) =>
     .format(new Date(createdAt))
     .replace(/\//g, "-");
 
+const toPlainText = (content: string) =>
+  content
+    .replace(/<br\s*\/?>/gi, "\n")
+    .replace(/<\/p\s*>/gi, "\n")
+    .replace(/<[^>]*>/g, "")
+    .replace(/&nbsp;/g, " ")
+    .trim();
+
 const mapAction = (action: CommunityWatchActionNode): WatchCase => ({
   id: action.uuid,
   commentId: action.commentId,
@@ -180,7 +188,7 @@ const mapAction = (action: CommunityWatchActionNode): WatchCase => ({
   commentPreview:
     action.contentCleared || action.originalContent === null
       ? CLEARED_CONTENT_TEXT
-      : action.originalContent,
+      : toPlainText(action.originalContent),
   watcher: action.actorDisplayName,
   handledAt: formatHandledAt(action.createdAt),
   appealStatus: mapAppealStatus(action.appealState),
