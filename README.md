@@ -102,6 +102,7 @@ Phase 0 is complete as repo-backed planning, and the standalone public page is n
 - [docs/phase-5-staff-review.md](docs/phase-5-staff-review.md)
 - [docs/privacy-original-content.md](docs/privacy-original-content.md)
 - [docs/staging-verification.md](docs/staging-verification.md)
+- [docs/production-rollout.md](docs/production-rollout.md)
 - [docs/status.md](docs/status.md)
 
 Next implementation target: after the server-side public query is deployed, set `COMMUNITY_WATCH_API_URL` in the Pages environment and verify the public page against real audit records.
