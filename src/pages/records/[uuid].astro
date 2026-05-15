@@ -488,7 +488,7 @@ Astro.response.headers.set("cache-control", "no-store");
   .context-list div,
   .audit-list div {
     min-width: 0;
-    padding: var(--space-sp14) 0;
+    padding: var(--space-sp14) var(--space-sp16);
     border-bottom: 1px solid var(--line);
   }
 
@@ -542,7 +542,6 @@ Astro.response.headers.set("cache-control", "no-store");
   .context-list {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(160px, 0.4fr) minmax(180px, 0.5fr);
-    padding: 0 var(--space-sp16);
   }
 
   .context-list div {
