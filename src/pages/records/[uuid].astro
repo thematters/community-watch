@@ -17,6 +17,22 @@ const description = watchCase
 const mailSubject = encodeURIComponent(
   `守望相助隊申訴：${watchCase?.commentId ?? uuid}`
 );
+const reasonVariant = watchCase?.reason === "色情廣告" ? "adult" : "spam";
+const reviewTone =
+  watchCase?.reviewStatus === "已恢復"
+    ? "positive"
+    : watchCase?.reviewStatus === "待覆核"
+      ? "pending"
+      : "neutral";
+const appealTone = watchCase?.appealStatus === "未申訴" ? "muted" : "pending";
+const reviewSummary =
+  watchCase?.reviewStatus === "已恢復"
+    ? "站方已恢復留言"
+    : watchCase?.reviewStatus === "維持處理"
+      ? "站方維持原處理"
+      : watchCase?.reviewStatus === "理由已調整"
+        ? "站方已調整理由"
+        : "等待站方覆核";
 
 Astro.response.headers.set("cache-control", "no-store");
 ---
@@ -51,57 +67,72 @@ Astro.response.headers.set("cache-control", "no-store");
             <header class="record__header">
               <div>
                 <p class="eyebrow">公開紀錄</p>
-                <h1>{watchCase.commentId}</h1>
+                <h1>{watchCase.sourceTitle}</h1>
+                <p class="record__summary">
+                  {watchCase.sourceType} · {watchCase.handledAt} · 由 {watchCase.watcher} 處理
+                </p>
               </div>
-              <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
-                {watchCase.reason}
-              </span>
+              <div class="record__badges" aria-label="處理狀態">
+                <span class={`reason reason--${reasonVariant}`}>{watchCase.reason}</span>
+                <span class={`status-pill status-pill--${reviewTone}`}>{watchCase.reviewStatus}</span>
+              </div>
             </header>
 
-            <p class="record__notice">{watchCase.publicNotice}</p>
+            <section class="record-brief" aria-label="快速判讀">
+              <div class="record-brief__notice">
+                <span aria-hidden="true"></span>
+                <div>
+                  <strong>{watchCase.publicNotice}</strong>
+                  <p>{reviewSummary}</p>
+                </div>
+              </div>
+              <dl class="record-brief__status">
+                <div>
+                  <dt>處理理由</dt>
+                  <dd>{watchCase.reason}</dd>
+                </div>
+                <div>
+                  <dt>申訴狀態</dt>
+                  <dd><span class={`status-text status-text--${appealTone}`}>{watchCase.appealStatus}</span></dd>
+                </div>
+                <div>
+                  <dt>站方覆核</dt>
+                  <dd><span class={`status-text status-text--${reviewTone}`}>{watchCase.reviewStatus}</span></dd>
+                </div>
+              </dl>
+            </section>
 
-            <dl class="record-grid" aria-label="處理資訊">
-              <div>
-                <dt>公開紀錄 ID</dt>
-                <dd>{watchCase.id}</dd>
+            <section class="record-section" aria-labelledby="context-title">
+              <div class="section-heading">
+                <p class="eyebrow">處理脈絡</p>
+                <h2 id="context-title">這則留言來自哪裡</h2>
               </div>
-              <div>
-                <dt>留言 ID</dt>
-                <dd>{watchCase.commentId}</dd>
-              </div>
-              <div>
-                <dt>來源類型</dt>
-                <dd>{watchCase.sourceType}</dd>
-              </div>
-              <div>
-                <dt>來源標題或 ID</dt>
-                <dd>{watchCase.sourceTitle}</dd>
-              </div>
-              <div>
-                <dt>來源 ID</dt>
-                <dd>{watchCase.sourceId}</dd>
-              </div>
-              <div>
-                <dt>處理人</dt>
-                <dd>{watchCase.watcher}</dd>
-              </div>
-              <div>
-                <dt>處理時間</dt>
-                <dd>{watchCase.handledAt}</dd>
-              </div>
-              <div>
-                <dt>申訴狀態</dt>
-                <dd>{watchCase.appealStatus}</dd>
-              </div>
-              <div>
-                <dt>站方覆核</dt>
-                <dd>{watchCase.reviewStatus}</dd>
-              </div>
-            </dl>
+              <dl class="context-list">
+                <div>
+                  <dt>來源</dt>
+                  <dd>{watchCase.sourceTitle}</dd>
+                </div>
+                <div>
+                  <dt>類型</dt>
+                  <dd>{watchCase.sourceType}</dd>
+                </div>
+                <div>
+                  <dt>處理人</dt>
+                  <dd>{watchCase.watcher}</dd>
+                </div>
+                <div>
+                  <dt>處理時間</dt>
+                  <dd>{watchCase.handledAt}</dd>
+                </div>
+              </dl>
+            </section>
 
-            <section class="content-box" aria-labelledby="original-content">
+            <section class="record-section content-box" aria-labelledby="original-content">
               <div class="content-box__header">
-                <h2 id="original-content">原留言內容</h2>
+                <div class="section-heading">
+                  <p class="eyebrow">原文檢視</p>
+                  <h2 id="original-content">原留言內容</h2>
+                </div>
                 <button
                   class="content-box__toggle"
                   type="button"
@@ -115,6 +146,27 @@ Astro.response.headers.set("cache-control", "no-store");
               <p class="content-box__hint">
                 原文預設遮蔽，避免垃圾內容被二次散播；點開僅供申訴、覆核與社群稽核使用。
               </p>
+            </section>
+
+            <section class="record-section audit-box" aria-labelledby="audit-title">
+              <div class="section-heading">
+                <p class="eyebrow">稽核資訊</p>
+                <h2 id="audit-title">供申訴與系統查詢使用</h2>
+              </div>
+              <dl class="audit-list">
+                <div>
+                  <dt>公開紀錄 ID</dt>
+                  <dd><code>{watchCase.id}</code></dd>
+                </div>
+                <div>
+                  <dt>留言 ID</dt>
+                  <dd><code>{watchCase.commentId}</code></dd>
+                </div>
+                <div>
+                  <dt>來源 ID</dt>
+                  <dd><code>{watchCase.sourceId}</code></dd>
+                </div>
+              </dl>
             </section>
           </article>
         ) : (
@@ -197,55 +249,184 @@ Astro.response.headers.set("cache-control", "no-store");
   .record h1 {
     margin: 0;
     font-family: var(--font-reading);
-    font-size: clamp(32px, 5vw, 44px);
-    line-height: 1.2;
+    font-size: clamp(30px, 4vw, 42px);
+    line-height: 1.24;
+    overflow-wrap: anywhere;
   }
 
-  .record__notice {
-    margin: var(--space-watch-20) 0;
-    border-left: 4px solid var(--brand-lime);
-    padding-left: var(--space-sp12);
+  .record__summary {
+    margin: var(--space-sp8) 0 0;
+    color: var(--ink-muted);
+    font-size: 15px;
+    font-weight: 600;
+  }
+
+  .record__badges {
+    display: flex;
+    align-items: flex-start;
+    justify-content: flex-end;
+    flex-wrap: wrap;
+    gap: var(--space-sp8);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    min-height: 32px;
+    align-items: center;
+    border-radius: 999px;
+    border: 1px solid var(--line);
+    padding: 4px 12px;
     color: var(--ink);
+    background: var(--surface-muted);
+    font-size: 14px;
     font-weight: 800;
   }
 
-  .record-grid {
+  .status-pill--positive {
+    border-color: var(--brand-lime);
+    background: color-mix(in srgb, var(--brand-lime) 24%, white);
+  }
+
+  .status-pill--pending {
+    border-color: var(--brand-purple);
+    color: var(--brand-purple);
+    background: var(--surface-purple);
+  }
+
+  .record-brief {
     display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    gap: 0;
+    grid-template-columns: minmax(0, 1.15fr) minmax(280px, 0.85fr);
+    gap: var(--space-sp16);
+    margin-top: var(--space-watch-24);
+    align-items: start;
+  }
+
+  .record-brief__notice,
+  .record-brief__status,
+  .context-list,
+  .audit-list {
     margin: 0;
     border: 1px solid var(--line);
     border-radius: 8px;
-    overflow: hidden;
-  }
-
-  .record-grid div {
-    min-width: 0;
-    padding: var(--space-sp14);
-    border-right: 1px solid var(--line);
-    border-bottom: 1px solid var(--line);
     background: var(--board-bg);
   }
 
-  .record-grid div:nth-child(3n) {
-    border-right: 0;
+  .record-brief__notice {
+    display: flex;
+    gap: var(--space-sp14);
+    align-items: flex-start;
+    padding: var(--space-sp16);
   }
 
-  .record-grid dt {
+  .record-brief__notice > span {
+    width: 4px;
+    align-self: stretch;
+    min-height: 64px;
+    border-radius: 999px;
+    background: var(--brand-lime);
+  }
+
+  .record-brief__notice strong {
+    display: block;
+    color: var(--ink);
+    font-size: 20px;
+    line-height: 1.4;
+  }
+
+  .record-brief__notice p {
+    margin: var(--space-sp4) 0 0;
+    color: var(--ink-muted);
+    font-weight: 600;
+  }
+
+  .record-brief__status {
+    display: grid;
+    grid-template-columns: 1fr;
+  }
+
+  .record-brief__status div,
+  .context-list div,
+  .audit-list div {
+    min-width: 0;
+    padding: var(--space-sp14) var(--space-sp16);
+    border-bottom: 1px solid var(--line);
+  }
+
+  .record-brief__status div:last-child,
+  .context-list div:last-child,
+  .audit-list div:last-child {
+    border-bottom: 0;
+  }
+
+  .record-brief__status dt,
+  .context-list dt,
+  .audit-list dt {
     color: var(--ink-muted);
     font-size: 13px;
     font-weight: 700;
   }
 
-  .record-grid dd {
+  .record-brief__status dd,
+  .context-list dd,
+  .audit-list dd {
     margin: var(--space-sp4) 0 0;
     color: var(--ink);
     font-weight: 700;
     overflow-wrap: anywhere;
   }
 
-  .content-box {
+  .status-text {
+    color: var(--ink);
+  }
+
+  .status-text--positive {
+    color: var(--color-function-positive-dark, #0d7a3f);
+  }
+
+  .status-text--pending {
+    color: var(--brand-purple);
+  }
+
+  .status-text--muted {
+    color: var(--ink-muted);
+  }
+
+  .record-section {
     margin-top: var(--space-watch-24);
+  }
+
+  .section-heading {
+    margin-bottom: var(--space-sp12);
+  }
+
+  .section-heading h2,
+  .content-box__header {
+    margin: 0;
+  }
+
+  .section-heading h2,
+  .appeal-box h2 {
+    font-family: var(--font-reading);
+    font-size: 24px;
+    line-height: 1.35;
+  }
+
+  .section-heading h2 {
+    margin: 0;
+  }
+
+  .context-list {
+    display: grid;
+    grid-template-columns: 1.3fr 0.7fr 0.7fr 0.8fr;
+  }
+
+  .context-list div {
+    border-bottom: 0;
+    border-right: 1px solid var(--line);
+  }
+
+  .context-list div:last-child {
+    border-right: 0;
   }
 
   .content-box__header {
@@ -253,14 +434,6 @@ Astro.response.headers.set("cache-control", "no-store");
     align-items: center;
     justify-content: space-between;
     gap: var(--space-sp12);
-  }
-
-  .content-box h2,
-  .appeal-box h2 {
-    margin: 0;
-    font-family: var(--font-reading);
-    font-size: 24px;
-    line-height: 1.35;
   }
 
   .content-box__body {
@@ -301,6 +474,12 @@ Astro.response.headers.set("cache-control", "no-store");
     color: var(--ink-muted);
   }
 
+  .audit-list code {
+    font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+    font-size: 14px;
+    white-space: normal;
+  }
+
   .appeal-box a {
     font-weight: 800;
     text-decoration: none;
@@ -311,13 +490,22 @@ Astro.response.headers.set("cache-control", "no-store");
       display: grid;
     }
 
-    .record-grid {
+    .record__badges {
+      justify-content: flex-start;
+    }
+
+    .record-brief,
+    .context-list {
       grid-template-columns: 1fr;
     }
 
-    .record-grid div,
-    .record-grid div:nth-child(3n) {
+    .context-list div {
       border-right: 0;
+      border-bottom: 1px solid var(--line);
+    }
+
+    .context-list div:last-child {
+      border-bottom: 0;
     }
   }
 </style>
