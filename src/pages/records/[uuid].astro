@@ -8,15 +8,14 @@ const runtimeEnv = (Astro.locals as { runtime?: { env?: Record<string, string | 
 const uuid = Astro.params.uuid ?? "";
 const watchCase = await getCommunityWatchActionData(uuid, runtimeEnv);
 const baseUrl = import.meta.env.BASE_URL;
+const recordDisplayId = watchCase?.displayId ?? watchCase?.id ?? uuid;
 const title = watchCase
-  ? `${watchCase.commentId}｜${page.hero.title}`
+  ? `${recordDisplayId}｜${page.hero.title}`
   : `公開紀錄不存在｜${page.hero.title}`;
 const description = watchCase
-  ? `守望相助隊公開紀錄：${watchCase.commentId}，處理理由為${watchCase.reason}。`
+  ? `守望相助隊公開紀錄：${recordDisplayId}，留言 ID 為${watchCase.commentId}，處理理由為${watchCase.reason}。`
   : "守望相助隊公開紀錄頁。這筆紀錄目前無法於公開 API 查詢。";
-const mailSubject = encodeURIComponent(
-  `守望相助隊申訴：${watchCase?.commentId ?? uuid}`
-);
+const mailSubject = encodeURIComponent(`守望相助隊覆核：${recordDisplayId}`);
 const reasonVariant = watchCase?.reason === "色情廣告" ? "adult" : "spam";
 const reviewTone =
   watchCase?.reviewStatus === "已恢復"
@@ -37,11 +36,7 @@ const reviewSummary =
 Astro.response.headers.set("cache-control", "no-store");
 ---
 
-<PageLayout
-  title={title}
-  description={description}
-  lang={page.lang}
->
+<PageLayout title={title} description={description} lang={page.lang}>
   <div class="page">
     <header class="page__header">
       <a class="page__brand" href={baseUrl}>
@@ -52,7 +47,6 @@ Astro.response.headers.set("cache-control", "no-store");
       <nav class="page__nav" aria-label="主要導覽">
         <a href={`${baseUrl}#watch-log`}>處理紀錄</a>
         <a href={`${baseUrl}#appeal`}>申訴</a>
-        <a href="https://matters.town/billboard">Billboard</a>
       </nav>
     </header>
 
@@ -66,11 +60,6 @@ Astro.response.headers.set("cache-control", "no-store");
           <article class="record board">
             <header class="record__hero">
               <div class="record__hero-copy">
-                <p class="record__kicker">
-                  <span>公開紀錄</span>
-                  <span>{watchCase.sourceType}</span>
-                  <span>{watchCase.reason}</span>
-                </p>
                 <h1 class="record-title">{watchCase.sourceTitle}</h1>
                 <p class="record__summary">
                   {watchCase.handledAt} · 由 {watchCase.watcher} 處理
@@ -83,14 +72,18 @@ Astro.response.headers.set("cache-control", "no-store");
                 </div>
                 <div>
                   <dt>申訴狀態</dt>
-                  <dd><span class={`status-text status-text--${appealTone}`}>{watchCase.appealStatus}</span></dd>
+                  <dd>
+                    <span class={`status-text status-text--${appealTone}`}>
+                      {watchCase.appealStatus}
+                    </span>
+                  </dd>
                 </div>
               </dl>
             </header>
 
             <section class="decision-strip" aria-label="快速判讀">
               <div class="decision-strip__notice">
-                <span aria-hidden="true"></span>
+                <span aria-hidden="true" />
                 <div>
                   <strong>{watchCase.publicNotice}</strong>
                   <p>{reviewSummary}</p>
@@ -99,7 +92,9 @@ Astro.response.headers.set("cache-control", "no-store");
               <dl class="decision-strip__meta">
                 <div>
                   <dt>處理理由</dt>
-                  <dd><span class={`reason reason--${reasonVariant}`}>{watchCase.reason}</span></dd>
+                  <dd>
+                    <span class={`reason reason--${reasonVariant}`}>{watchCase.reason}</span>
+                  </dd>
                 </div>
                 <div>
                   <dt>來源類型</dt>
@@ -129,7 +124,9 @@ Astro.response.headers.set("cache-control", "no-store");
                       顯示全文
                     </button>
                   </div>
-                  <p class="content-box__body is-blurred" data-watch-body>{watchCase.commentPreview}</p>
+                  <p class="content-box__body is-blurred" data-watch-body>
+                    {watchCase.commentPreview}
+                  </p>
                   <p class="content-box__hint">
                     原文預設遮蔽，避免垃圾內容被二次散播；點開僅供申訴、覆核與社群稽核使用。
                   </p>
@@ -150,7 +147,7 @@ Astro.response.headers.set("cache-control", "no-store");
                       <dd>{watchCase.watcher}</dd>
                     </div>
                     <div>
-                      <dt>處理時間</dt>
+                      <dt>處理日期</dt>
                       <dd>{watchCase.handledAt}</dd>
                     </div>
                   </dl>
@@ -166,26 +163,35 @@ Astro.response.headers.set("cache-control", "no-store");
                   <dl class="audit-list">
                     <div>
                       <dt>公開紀錄 ID</dt>
-                      <dd><code>{watchCase.id}</code></dd>
+                      <dd>
+                        <code>{recordDisplayId}</code>
+                      </dd>
                     </div>
                     <div>
                       <dt>留言 ID</dt>
-                      <dd><code>{watchCase.commentId}</code></dd>
+                      <dd>
+                        <code>{watchCase.commentId}</code>
+                      </dd>
                     </div>
                     <div>
                       <dt>來源 ID</dt>
-                      <dd><code>{watchCase.sourceId}</code></dd>
+                      <dd>
+                        <code>{watchCase.sourceId}</code>
+                      </dd>
                     </div>
                   </dl>
                 </section>
 
                 <section class="side-panel appeal-box" aria-labelledby="appeal-title">
-                  <p class="eyebrow">申訴</p>
-                  <h2 id="appeal-title">需要覆核？</h2>
+                  <p class="eyebrow">覆核</p>
+                  <h2 id="appeal-title">需要申訴？</h2>
                   <p>
-                    請將留言 ID <strong>{watchCase.commentId}</strong> 寄至
-                    <a href={`mailto:${page.appeal.email}?subject=${mailSubject}`}>{page.appeal.email}</a>。
-                    站方會依公開紀錄、處理理由與原文進行覆核。
+                    請將公開紀錄 ID <strong>{recordDisplayId}</strong> 與留言 ID{" "}
+                    <strong>{watchCase.commentId}</strong> 寄至
+                    <a href={`mailto:${page.appeal.email}?subject=${mailSubject}`}>
+                      {page.appeal.email}
+                    </a>
+                    。 站方會依公開紀錄、處理理由與原文進行覆核。
                   </p>
                 </section>
               </aside>
@@ -206,17 +212,19 @@ Astro.response.headers.set("cache-control", "no-store");
         )
       }
 
-      {!watchCase && (
-        <aside class="appeal-box board" aria-labelledby="appeal-title">
-          <p class="eyebrow">申訴</p>
-          <h2 id="appeal-title">認為這則留言被誤判？</h2>
-          <p>
-            請將留言 ID <strong>{uuid}</strong> 寄至
-            <a href={`mailto:${page.appeal.email}?subject=${mailSubject}`}>{page.appeal.email}</a>。
-            站方會依公開紀錄、處理理由與原文進行覆核。
-          </p>
-        </aside>
-      )}
+      {
+        !watchCase && (
+          <aside class="appeal-box board" aria-labelledby="appeal-title">
+            <p class="eyebrow">覆核</p>
+            <h2 id="appeal-title">需要申訴？</h2>
+            <p>
+              請將公開紀錄 ID 與留言 ID <strong>{uuid}</strong> 寄至
+              <a href={`mailto:${page.appeal.email}?subject=${mailSubject}`}>{page.appeal.email}</a>
+              。 站方會依公開紀錄、處理理由與原文進行覆核。
+            </p>
+          </aside>
+        )
+      }
     </main>
 
     <footer class="page__footer">
@@ -488,8 +496,15 @@ Astro.response.headers.set("cache-control", "no-store");
   .context-list div,
   .audit-list div {
     min-width: 0;
-    padding: var(--space-sp14) 0;
     border-bottom: 1px solid var(--line);
+  }
+
+  .context-list div {
+    padding: var(--space-sp14) 0;
+  }
+
+  .audit-list div {
+    padding: var(--space-sp16) var(--space-watch-20);
   }
 
   .context-list div:last-child,
@@ -568,7 +583,9 @@ Astro.response.headers.set("cache-control", "no-store");
     border-radius: 8px;
     background: var(--surface-muted);
     padding: var(--space-sp16);
-    transition: filter 0.16s ease, opacity 0.16s ease;
+    transition:
+      filter 0.16s ease,
+      opacity 0.16s ease;
   }
 
   .content-box__body.is-blurred {

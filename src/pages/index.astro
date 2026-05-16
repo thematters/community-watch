@@ -16,11 +16,7 @@ const processFlowImages = [
 Astro.response.headers.set("cache-control", "no-store");
 ---
 
-<PageLayout
-  title={page.pageTitle}
-  description={page.pageDescription}
-  lang={page.lang}
->
+<PageLayout title={page.pageTitle} description={page.pageDescription} lang={page.lang}>
   <div class="page">
     <header class="page__header">
       <a class="page__brand" href={baseUrl}>
@@ -31,7 +27,6 @@ Astro.response.headers.set("cache-control", "no-store");
       <nav class="page__nav" aria-label="主要導覽">
         <a href="#watch-log">處理紀錄</a>
         <a href="#appeal">申訴</a>
-        <a href="https://matters.town/billboard">Billboard</a>
       </nav>
     </header>
 
@@ -49,7 +44,9 @@ Astro.response.headers.set("cache-control", "no-store");
           <p class="hero__slogan">{page.hero.slogan}</p>
           <p class="hero__subtitle">{page.hero.subtitle}</p>
           <div class="hero__actions" aria-label="主要操作">
-            <a class="btn btn--primary" href={page.hero.primaryCta.href}>{page.hero.primaryCta.label}</a>
+            <a class="btn btn--primary" href={page.hero.primaryCta.href}
+              >{page.hero.primaryCta.label}</a
+            >
             {
               page.hero.secondaryCta && (
                 <a class="btn btn--ghost" href={page.hero.secondaryCta.href}>
@@ -63,13 +60,15 @@ Astro.response.headers.set("cache-control", "no-store");
       </section>
 
       <section class="metric-strip" aria-label="目前處理統計">
-        {page.metrics.map((metric) => (
-          <article class:list={["metric", metric.label === "誤刪申訴" && "metric--low-is-good"]}>
-            <span>{metric.label}</span>
-            <strong>{metric.value}</strong>
-            <small>{metric.note}</small>
-          </article>
-        ))}
+        {
+          page.metrics.map((metric) => (
+            <article class:list={["metric", metric.label === "誤刪申訴" && "metric--low-is-good"]}>
+              <span>{metric.label}</span>
+              <strong>{metric.value}</strong>
+              <small>{metric.note}</small>
+            </article>
+          ))
+        }
       </section>
 
       <section class="board process-flow" aria-labelledby="process-flow-title">
@@ -80,17 +79,19 @@ Astro.response.headers.set("cache-control", "no-store");
         </div>
 
         <div class="process-flow__track" aria-label="廣告留言、守望相助隊、刪除行為與申訴行為關係">
-          {page.flow.items.map((item, index) => (
-            <article
-              class="process-flow__item"
-              style={`--flow-bg: url(${baseUrl}${processFlowImages[index]})`}
-            >
-              <span class="process-flow__index">{index + 1}</span>
-              <span class="process-flow__label">{item.label}</span>
-              <h3>{item.title}</h3>
-              <p>{item.body}</p>
-            </article>
-          ))}
+          {
+            page.flow.items.map((item, index) => (
+              <article
+                class="process-flow__item"
+                style={`--flow-bg: url(${baseUrl}${processFlowImages[index]})`}
+              >
+                <span class="process-flow__index">{index + 1}</span>
+                <span class="process-flow__label">{item.label}</span>
+                <h3>{item.title}</h3>
+                <p>{item.body}</p>
+              </article>
+            ))
+          }
         </div>
 
         <p class="process-flow__note">{page.flow.note}</p>
@@ -104,60 +105,66 @@ Astro.response.headers.set("cache-control", "no-store");
         </div>
 
         <div class="case-list">
-          {page.log.cases.map((watchCase) => (
-            <article class="case-row" id={`case-${watchCase.id}`}>
-              <div class="case-row__main">
-                <header class="case-row__header">
-                  <div class="case-row__source">
-                    <span class="case-row__type">{watchCase.sourceType}</span>
-                    <h3>{watchCase.sourceTitle}</h3>
-                  </div>
-                  <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
-                    {watchCase.reason}
-                  </span>
-                </header>
-
-                <div class="case-row__notice">
-                  <span>{watchCase.publicNotice}</span>
-                  <a href={`${baseUrl}records/${watchCase.id}/`}>#{watchCase.commentId}</a>
-                </div>
-
-                <div class="case-row__content">
-                  <div class="case-row__content-header">
-                    <span class="case-row__label">原留言</span>
-                    <button
-                      class="case-row__toggle"
-                      type="button"
-                      data-watch-toggle
-                      aria-expanded="false"
+          {
+            page.log.cases.map((watchCase) => (
+              <article class="case-row" id={`case-${watchCase.id}`}>
+                <div class="case-row__main">
+                  <header class="case-row__header">
+                    <div class="case-row__source">
+                      <span class="case-row__type">{watchCase.sourceType}</span>
+                      <h3>{watchCase.sourceTitle}</h3>
+                    </div>
+                    <span
+                      class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}
                     >
-                      顯示全文
-                    </button>
-                  </div>
-                  <p class="case-row__body is-blurred" data-watch-body>{watchCase.commentPreview}</p>
-                </div>
-              </div>
+                      {watchCase.reason}
+                    </span>
+                  </header>
 
-              <dl class="case-row__meta" aria-label="處理資訊">
-                <div>
-                  <dt>處理人</dt>
-                  <dd>{watchCase.watcher}</dd>
+                  <div class="case-row__notice">
+                    <span>{watchCase.publicNotice}</span>
+                    <a href={`${baseUrl}records/${watchCase.id}/`}>#{watchCase.commentId}</a>
+                  </div>
+
+                  <div class="case-row__content">
+                    <div class="case-row__content-header">
+                      <span class="case-row__label">原留言</span>
+                      <button
+                        class="case-row__toggle"
+                        type="button"
+                        data-watch-toggle
+                        aria-expanded="false"
+                      >
+                        顯示全文
+                      </button>
+                    </div>
+                    <p class="case-row__body is-blurred" data-watch-body>
+                      {watchCase.commentPreview}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <dt>日期</dt>
-                  <dd>{watchCase.handledAt}</dd>
-                </div>
-                <div>
-                  <dt>申訴狀態</dt>
-                  <dd>{watchCase.appealStatus}</dd>
-                </div>
-                <div>
-                  <dt>站方覆核</dt>
-                  <dd>{watchCase.reviewStatus}</dd>
-                </div>
-              </dl>
-            </article>
-          ))}
+
+                <dl class="case-row__meta" aria-label="處理資訊">
+                  <div>
+                    <dt>處理人</dt>
+                    <dd>{watchCase.watcher}</dd>
+                  </div>
+                  <div>
+                    <dt>日期</dt>
+                    <dd>{watchCase.handledAt}</dd>
+                  </div>
+                  <div>
+                    <dt>申訴狀態</dt>
+                    <dd>{watchCase.appealStatus}</dd>
+                  </div>
+                  <div>
+                    <dt>站方覆核</dt>
+                    <dd>{watchCase.reviewStatus}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))
+          }
         </div>
       </section>
 
@@ -168,12 +175,14 @@ Astro.response.headers.set("cache-control", "no-store");
           <p>{page.appeal.body}</p>
           <a class="mail-link" href={`mailto:${page.appeal.email}`}>{page.appeal.email}</a>
           <ol class="step-list">
-            {page.appeal.steps.map((step) => (
-              <li>
-                <strong>{step.title}</strong>
-                <span>{step.body}</span>
-              </li>
-            ))}
+            {
+              page.appeal.steps.map((step) => (
+                <li>
+                  <strong>{step.title}</strong>
+                  <span>{step.body}</span>
+                </li>
+              ))
+            }
           </ol>
         </article>
 
@@ -182,12 +191,14 @@ Astro.response.headers.set("cache-control", "no-store");
           <h2>{page.training.title}</h2>
           <p>{page.training.body}</p>
           <ol class="step-list">
-            {page.training.steps.map((step) => (
-              <li>
-                <strong>{step.title}</strong>
-                <span>{step.body}</span>
-              </li>
-            ))}
+            {
+              page.training.steps.map((step) => (
+                <li>
+                  <strong>{step.title}</strong>
+                  <span>{step.body}</span>
+                </li>
+              ))
+            }
           </ol>
         </article>
       </section>
@@ -244,8 +255,7 @@ Astro.response.headers.set("cache-control", "no-store");
     content: "";
     position: absolute;
     inset: 0;
-    background:
-      linear-gradient(
+    background: linear-gradient(
         90deg,
         rgba(255, 255, 255, 1) 0%,
         rgba(255, 255, 255, 0.99) 34%,
@@ -253,11 +263,7 @@ Astro.response.headers.set("cache-control", "no-store");
         rgba(255, 255, 255, 0.58) 72%,
         rgba(255, 255, 255, 0.18) 100%
       ),
-      linear-gradient(
-        180deg,
-        rgba(255, 255, 255, 0.2) 0%,
-        rgba(247, 247, 247, 0.56) 100%
-      );
+      linear-gradient(180deg, rgba(255, 255, 255, 0.2) 0%, rgba(247, 247, 247, 0.56) 100%);
     pointer-events: none;
   }
 
@@ -375,8 +381,7 @@ Astro.response.headers.set("cache-control", "no-store");
   .process-flow {
     position: relative;
     overflow: hidden;
-    background:
-      linear-gradient(135deg, rgba(195, 244, 50, 0.2) 0%, rgba(195, 244, 50, 0) 34%),
+    background: linear-gradient(135deg, rgba(195, 244, 50, 0.2) 0%, rgba(195, 244, 50, 0) 34%),
       linear-gradient(315deg, rgba(114, 88, 255, 0.12) 0%, rgba(114, 88, 255, 0) 36%),
       var(--board-bg);
   }
@@ -439,8 +444,12 @@ Astro.response.headers.set("cache-control", "no-store");
 
   .process-flow__item::after {
     z-index: -1;
-    background:
-      linear-gradient(180deg, rgba(255, 255, 255, 0.88) 0%, rgba(255, 255, 255, 0.72) 48%, rgba(255, 255, 255, 0.48) 100%),
+    background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 0.88) 0%,
+        rgba(255, 255, 255, 0.72) 48%,
+        rgba(255, 255, 255, 0.48) 100%
+      ),
       radial-gradient(circle at 24% 18%, rgba(255, 255, 255, 0.78) 0%, rgba(255, 255, 255, 0) 54%);
   }
 
@@ -635,7 +644,9 @@ Astro.response.headers.set("cache-control", "no-store");
     padding: var(--space-sp14);
     background: var(--surface-muted);
     border: 1px solid var(--line);
-    transition: filter 0.16s ease, opacity 0.16s ease;
+    transition:
+      filter 0.16s ease,
+      opacity 0.16s ease;
   }
 
   .case-row__body.is-blurred {
@@ -808,14 +819,13 @@ Astro.response.headers.set("cache-control", "no-store");
     }
 
     .hero::after {
-      background:
-        linear-gradient(
-          180deg,
-          rgba(255, 255, 255, 1) 0%,
-          rgba(255, 255, 255, 0.98) 42%,
-          rgba(255, 255, 255, 0.76) 70%,
-          rgba(255, 255, 255, 0.22) 100%
-        );
+      background: linear-gradient(
+        180deg,
+        rgba(255, 255, 255, 1) 0%,
+        rgba(255, 255, 255, 0.98) 42%,
+        rgba(255, 255, 255, 0.76) 70%,
+        rgba(255, 255, 255, 0.22) 100%
+      );
     }
 
     .hero__image {

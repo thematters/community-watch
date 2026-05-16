@@ -38,10 +38,16 @@ Local development:
 ```bash
 pnpm install
 pnpm dev
+pnpm lint:fix
+pnpm lint
 pnpm build
 pnpm typecheck
 pnpm preview
 ```
+
+Before every agent push, run `pnpm lint:fix` followed by `pnpm lint` and report
+the result in the PR or handoff note. See [AGENTS.md](AGENTS.md) for the
+repository rule.
 
 Read-only staging preflight:
 

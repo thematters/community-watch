@@ -1,9 +1,4 @@
-import {
-  page,
-  type CommunityWatchContent,
-  type Metric,
-  type WatchCase,
-} from "./page";
+import { page, type CommunityWatchContent, type Metric, type WatchCase } from "./page";
 
 type SourceType = "article" | "moment";
 type Reason = "porn_ad" | "spam_ad";
@@ -53,8 +48,15 @@ type CommunityWatchEnv = Record<string, string | undefined>;
 const PUBLIC_NOTICE = "本則貼文已由守望相助隊檢舉";
 const CLEARED_CONTENT_TEXT = "原留言內容已因隱私或個資請求清空。";
 const DEFAULT_FIRST = 50;
-const UUID_PATTERN =
-  /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+const UUID_PATTERN = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+
+const formatDisplayId = (index: number) => String(index + 1).padStart(6, "0");
+
+const addDisplayIds = (cases: WatchCase[]) =>
+  cases.map((watchCase, index) => ({
+    ...watchCase,
+    displayId: formatDisplayId(index),
+  }));
 
 const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
   query CommunityWatchActions($input: CommunityWatchActionsInput!) {
@@ -101,9 +103,11 @@ const COMMUNITY_WATCH_ACTION_QUERY = /* GraphQL */ `
 `;
 
 const getBuildEnv = () =>
-  (globalThis as typeof globalThis & {
-    process?: { env?: Record<string, string | undefined> };
-  }).process?.env ?? {};
+  (
+    globalThis as typeof globalThis & {
+      process?: { env?: Record<string, string | undefined> };
+    }
+  ).process?.env ?? {};
 
 const getRuntimeEnv = (runtimeEnv?: CommunityWatchEnv) => ({
   ...getBuildEnv(),
@@ -114,10 +118,7 @@ const getApiUrl = (runtimeEnv?: CommunityWatchEnv) =>
   getRuntimeEnv(runtimeEnv).COMMUNITY_WATCH_API_URL?.trim();
 
 const getFirst = (runtimeEnv?: CommunityWatchEnv) => {
-  const raw = Number.parseInt(
-    getRuntimeEnv(runtimeEnv).COMMUNITY_WATCH_API_FIRST ?? "",
-    10
-  );
+  const raw = Number.parseInt(getRuntimeEnv(runtimeEnv).COMMUNITY_WATCH_API_FIRST ?? "", 10);
   if (Number.isFinite(raw) && raw > 0) {
     return Math.min(raw, 100);
   }
@@ -162,9 +163,6 @@ const formatHandledAt = (createdAt: string) =>
     year: "numeric",
     month: "2-digit",
     day: "2-digit",
-    hour: "2-digit",
-    minute: "2-digit",
-    hour12: false,
   })
     .format(new Date(createdAt))
     .replace(/\//g, "-");
@@ -201,25 +199,22 @@ const buildLiveMetrics = (cases: WatchCase[]): Metric[] => {
   const appealCount = cases.filter((item) => item.appealStatus !== "未申訴").length;
 
   return [
-    { label: "色情廣告", value: String(pornCount), note: "近期公開紀錄" },
-    { label: "濫發廣告", value: String(spamCount), note: "近期公開紀錄" },
+    { label: "隊員已一起揪出", value: String(pornCount), note: "則色情廣告" },
+    { label: "隊員已一起揪出", value: String(spamCount), note: "則濫發廣告" },
     { label: "誤刪申訴", value: String(appealCount), note: "這個數字越小越好" },
   ];
 };
 
-const buildPage = (
-  cases: WatchCase[],
-  source: CommunityWatchPageData["source"]
-) => ({
+const buildPage = (cases: WatchCase[], source: CommunityWatchPageData["source"]) => ({
   ...page,
   metrics: source === "api" ? buildLiveMetrics(cases) : page.metrics,
   log: {
     ...page.log,
     description:
       source === "api"
-        ? "原留言內容預設遮蔽，避免垃圾內容被二次散播；需要申訴、覆核或社群稽核時，使用者仍可點開全文比對。"
+        ? "已針對原留言內容進行遮蔽，避免垃圾二次散播；需要申訴或稽核時，仍可點開全文比對。"
         : page.log.description,
-    cases,
+    cases: addDisplayIds(cases),
   },
 });
 
@@ -286,7 +281,7 @@ const getLiveCase = async (uuid: string, runtimeEnv?: CommunityWatchEnv) => {
 };
 
 const findSampleCase = (uuid: string) =>
-  page.log.cases.find((watchCase) => watchCase.id === uuid);
+  addDisplayIds(page.log.cases).find((watchCase) => watchCase.id === uuid);
 
 const loadCommunityWatchPageData = async (
   runtimeEnv?: CommunityWatchEnv
@@ -303,12 +298,17 @@ export const getCommunityWatchPageData = async (
   runtimeEnv?: CommunityWatchEnv
 ): Promise<CommunityWatchPageData> => loadCommunityWatchPageData(runtimeEnv);
 
-export const getCommunityWatchActionData = async (
-  uuid: string,
-  runtimeEnv?: CommunityWatchEnv
-) => {
+export const getCommunityWatchActionData = async (uuid: string, runtimeEnv?: CommunityWatchEnv) => {
   if (!UUID_PATTERN.test(uuid)) {
     return findSampleCase(uuid) ?? null;
+  }
+
+  const liveCases = await getLiveCases(runtimeEnv);
+  if (liveCases) {
+    const indexedCase = addDisplayIds(liveCases).find((watchCase) => watchCase.id === uuid);
+    if (indexedCase) {
+      return indexedCase;
+    }
   }
 
   const liveCase = await getLiveCase(uuid, runtimeEnv);
