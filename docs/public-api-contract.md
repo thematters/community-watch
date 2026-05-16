@@ -109,9 +109,9 @@ Review state:
 
 ## Cache
 
-- Recent list: public cache for about 60 seconds.
-- Detail page: public cache for about 60 seconds.
-- Staff review changes can rely on short TTL at MVP; explicit invalidation can be added later.
+- Recent list: `Cache-Control: no-store`.
+- Detail page: `Cache-Control: no-store`.
+- Staff review changes should be visible after reload without relying on a public TTL.
 
 ## Site Environment
 

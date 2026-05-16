@@ -4,7 +4,7 @@ This checklist starts after the `matters.icu` staging flow has passed. Do not us
 
 ## Current Staging Evidence
 
-Verified on 2026-05-14:
+Verified on 2026-05-14 and updated on 2026-05-16:
 
 - Article comment flow passed on `matters.icu`.
 - Moment comment flow passed on `matters.icu`.
@@ -12,6 +12,8 @@ Verified on 2026-05-14:
 - Existing member badge backfill is visible through staging GraphQL: `info.badges: [{ type: "community_watch" }]`.
 - `community-watch.matters.town` currently reads staging data through the temporary Pages binding `COMMUNITY_WATCH_API_URL=https://server.matters.icu/graphql`.
 - Public record pages return `Cache-Control: no-store`.
+- The production GraphQL endpoint `https://server.matters.town/graphql` does not expose the Community Watch schema before the server release PR is merged.
+- The production public site must not keep reading staging records after the production server is deployed.
 
 Important staging records:
 
@@ -35,6 +37,19 @@ As of 2026-05-14 after `matters-server` #4790:
 - WIP check: blocked while draft.
 - Review: required.
 
+Web production release PR:
+
+- PR: `https://github.com/thematters/matters-web/pull/5901`
+- Base: `master`
+- Head: `develop`
+- Title: `Release Community Watch web to production`
+- State: draft until production approval.
+
+Server follow-up already merged to `develop`:
+
+- PR: `https://github.com/thematters/matters-server/pull/4797`
+- Purpose: keep `originalContent` without automatic seven-day clearing until the product and privacy policy is finalized.
+
 ## Go / No-Go Gate
 
 Proceed only when all items are true:
@@ -48,14 +63,17 @@ Proceed only when all items are true:
 - Existing Community Watch members have the `community_watch` badge after backfill.
 - `hi@matters.town` is prepared to receive appeals.
 - Human approval is given for production rollout.
+- `thematters/matters-server` #4797 is included in the server production release diff.
+- `thematters/matters-web` #5901 has passed required checks before merge.
 
 ## Production Rollout Steps
 
-1. Mark `thematters/matters-server` #4772 ready for review.
-2. Wait for required review approval and branch protection checks.
-3. Merge #4772 into `master`.
-4. Wait for production server migration and deployment to finish.
-5. Verify production GraphQL exposes the public Community Watch fields:
+1. Confirm `thematters/matters-server` #4772 includes the merged #4797 retention fix.
+2. Mark `thematters/matters-server` #4772 ready for review.
+3. Wait for required review approval and branch protection checks.
+4. Merge #4772 into `master`.
+5. Wait for production server migration and deployment to finish.
+6. Verify production GraphQL exposes the public Community Watch fields:
 
 ```sh
 curl -sS https://server.matters.town/graphql \
@@ -64,17 +82,18 @@ curl -sS https://server.matters.town/graphql \
   | rg 'communityWatchAction|communityWatchActions'
 ```
 
-6. In Cloudflare Pages, change the production runtime binding:
+7. Merge `thematters/matters-web` #5901 into `master` after server production is healthy.
+8. In Cloudflare Pages, change the production runtime binding:
 
 ```txt
 COMMUNITY_WATCH_API_URL=https://server.matters.town/graphql
 ```
 
-7. Redeploy `community-watch` production Pages after the binding change.
-8. Verify `https://community-watch.matters.town/` returns 200 and `Cache-Control: no-store`.
-9. Verify the homepage reads production records or shows an empty live state, not staging records.
-10. Verify `/records/{uuid}/` for a production record after the first real production action.
-11. Run a production smoke test with a controlled test comment only after human approval.
+9. Redeploy `community-watch` production Pages after the binding change.
+10. Verify `https://community-watch.matters.town/` returns 200 and `Cache-Control: no-store`.
+11. Verify the homepage reads production records or shows an empty live state, not staging records.
+12. Verify `/records/{uuid}/` for a production record after the first real production action.
+13. Run a production smoke test with a controlled test comment only after human approval.
 
 ## Production Smoke Test
 
