@@ -503,10 +503,6 @@ Astro.response.headers.set("cache-control", "no-store");
     padding: var(--space-sp16) var(--space-sp32);
   }
 
-  .context-list > div:nth-child(n + 2) {
-    padding-left: var(--space-watch-48);
-  }
-
   .audit-list div {
     padding: var(--space-sp16) var(--space-watch-20);
   }
@@ -638,8 +634,7 @@ Astro.response.headers.set("cache-control", "no-store");
       grid-template-columns: 1fr;
     }
 
-    .context-list > div,
-    .context-list > div:nth-child(n + 2) {
+    .context-list > div {
       padding-right: var(--space-watch-20);
       padding-left: var(--space-watch-20);
       border-right: 0;
