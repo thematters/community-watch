@@ -493,21 +493,25 @@ Astro.response.headers.set("cache-control", "no-store");
     padding: var(--space-sp16);
   }
 
-  .context-list div,
+  .context-list > div,
   .audit-list div {
     min-width: 0;
     border-bottom: 1px solid var(--line);
   }
 
-  .context-list div {
-    padding: var(--space-sp14) 0;
+  .context-list > div {
+    padding: var(--space-sp16) var(--space-sp32);
+  }
+
+  .context-list > div:nth-child(n + 2) {
+    padding-left: var(--space-watch-48);
   }
 
   .audit-list div {
     padding: var(--space-sp16) var(--space-watch-20);
   }
 
-  .context-list div:last-child,
+  .context-list > div:last-child,
   .audit-list div:last-child {
     border-bottom: 0;
   }
@@ -557,15 +561,15 @@ Astro.response.headers.set("cache-control", "no-store");
   .context-list {
     display: grid;
     grid-template-columns: minmax(0, 1.2fr) minmax(160px, 0.4fr) minmax(180px, 0.5fr);
-    padding: 0 var(--space-sp16);
+    padding: 0;
   }
 
-  .context-list div {
+  .context-list > div {
     border-bottom: 0;
     border-right: 1px solid var(--line);
   }
 
-  .context-list div:last-child {
+  .context-list > div:last-child {
     border-right: 0;
   }
 
@@ -634,12 +638,15 @@ Astro.response.headers.set("cache-control", "no-store");
       grid-template-columns: 1fr;
     }
 
-    .context-list div {
+    .context-list > div,
+    .context-list > div:nth-child(n + 2) {
+      padding-right: var(--space-watch-20);
+      padding-left: var(--space-watch-20);
       border-right: 0;
       border-bottom: 1px solid var(--line);
     }
 
-    .context-list div:last-child {
+    .context-list > div:last-child {
       border-bottom: 0;
     }
   }
