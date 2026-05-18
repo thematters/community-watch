@@ -16,6 +16,7 @@ interface CommunityWatchActionNode {
   sourceType: SourceType;
   sourceTitle: string;
   sourceId: string;
+  sourceUrl: string | null;
   reason: Reason;
   actorDisplayName: string;
   actionState: "active" | "restored" | "voided";
@@ -66,6 +67,7 @@ const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
           sourceType
           sourceTitle
           sourceId
+          sourceUrl
           reason
           actorDisplayName
           actionState
@@ -88,6 +90,7 @@ const COMMUNITY_WATCH_ACTION_QUERY = /* GraphQL */ `
       sourceType
       sourceTitle
       sourceId
+      sourceUrl
       reason
       actorDisplayName
       actionState
@@ -183,6 +186,8 @@ const mapAction = (action: CommunityWatchActionNode): WatchCase => ({
   sourceType: mapSourceType(action.sourceType),
   sourceTitle: action.sourceTitle,
   sourceId: action.sourceId,
+  sourceUrl: action.sourceUrl,
+  actionState: action.actionState,
   reason: mapReason(action.reason),
   publicNotice: PUBLIC_NOTICE,
   commentPreview:
@@ -196,9 +201,10 @@ const mapAction = (action: CommunityWatchActionNode): WatchCase => ({
 });
 
 const buildLiveMetrics = (cases: WatchCase[]): Metric[] => {
-  const pornCount = cases.filter((item) => item.reason === "色情廣告").length;
-  const spamCount = cases.filter((item) => item.reason === "濫發廣告").length;
-  const appealCount = cases.filter((item) => item.appealStatus !== "未申訴").length;
+  const activeCases = cases.filter((item) => item.actionState === "active");
+  const pornCount = activeCases.filter((item) => item.reason === "色情廣告").length;
+  const spamCount = activeCases.filter((item) => item.reason === "濫發廣告").length;
+  const appealCount = activeCases.filter((item) => item.appealStatus !== "未申訴").length;
 
   return [
     { label: "色情廣告", value: String(pornCount), note: "近期公開紀錄" },
