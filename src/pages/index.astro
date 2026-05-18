@@ -120,6 +120,9 @@ Astro.response.headers.set("cache-control", "no-store");
                 <div class="case-row__notice">
                   <span>{watchCase.publicNotice}</span>
                   <a href={`${baseUrl}records/${watchCase.id}/`}>#{watchCase.commentId}</a>
+                  {watchCase.sourceUrl && (
+                    <a href={watchCase.sourceUrl} rel="noopener noreferrer">回到站上留言</a>
+                  )}
                 </div>
 
                 <div class="case-row__content">

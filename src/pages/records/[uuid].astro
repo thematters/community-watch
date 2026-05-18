@@ -145,6 +145,16 @@ Astro.response.headers.set("cache-control", "no-store");
                       <dt>來源標題</dt>
                       <dd>{watchCase.sourceTitle}</dd>
                     </div>
+                    {watchCase.sourceUrl && (
+                      <div>
+                        <dt>站上位置</dt>
+                        <dd>
+                          <a href={watchCase.sourceUrl} rel="noopener noreferrer">
+                            回到被檢舉留言
+                          </a>
+                        </dd>
+                      </div>
+                    )}
                     <div>
                       <dt>處理人</dt>
                       <dd>{watchCase.watcher}</dd>

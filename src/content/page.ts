@@ -15,6 +15,8 @@ export interface WatchCase {
   sourceType: "動態留言" | "文章留言";
   sourceTitle: string;
   sourceId: string;
+  sourceUrl?: string | null;
+  actionState?: "active" | "restored" | "voided";
   reason: "色情廣告" | "濫發廣告";
   publicNotice: string;
   commentPreview: string;
