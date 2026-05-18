@@ -109,7 +109,7 @@ export const page: CommunityWatchContent = {
   ],
   flow: {
     eyebrow: "守望相助流程",
-    title: "發現！刪除！申訴！",
+    title: "發現！打掃！申訴！",
     description:
       "守望相助隊只處理明確的垃圾廣告留言；每次移除都會留下公開紀錄，讓社群成員都能查核。",
     items: [
@@ -120,21 +120,21 @@ export const page: CommunityWatchContent = {
       },
       {
         label: "守望相助隊",
-        title: "隊員協力判斷刪除",
+        title: "隊員協力判斷打掃",
         body: "守望相助隊員目前僅處理留言，並需選擇色情廣告或濫發廣告作為理由。",
       },
       {
-        label: "刪除行為",
+        label: "打掃行為",
         title: "留言替換並公開紀錄",
         body: "原留言會改為處理提示，公開紀錄保留留言 ID、處理人、日期與處理理由。",
       },
       {
         label: "申訴救濟",
-        title: "被刪除者可申訴",
+        title: "被打掃者可申訴",
         body: "若認為遭誤判，可用留言 ID 寄信申訴；站方保留恢復留言與調整權限的最終決定權。",
       },
     ],
-    note: "透明紀錄的目的是為了讓刪除、申訴與覆核之間形成可查核的社群自治風氣。",
+    note: "透明紀錄的目的是為了讓打掃、申訴與覆核之間形成可查核的社群自治風氣。",
   },
   log: {
     eyebrow: "公開紀錄",
@@ -200,7 +200,7 @@ export const page: CommunityWatchContent = {
   training: {
     eyebrow: "下一步",
     title: "守望相助機器人規劃",
-    body: "人工處理紀錄未來可整理為訓練與評測資料；第一階段 AI 僅得作為候選提示，不得直接刪除留言。",
+    body: "人工處理紀錄未來可整理為訓練與評測資料；第一階段 AI 僅得作為候選提示，不得直接打掃留言。",
     steps: [
       {
         title: "整理明確樣本",
@@ -208,7 +208,7 @@ export const page: CommunityWatchContent = {
       },
       {
         title: "僅作候選提示",
-        body: "自動檢測工具僅提供候選提示與批次整理，不直接刪除留言。",
+        body: "自動檢測工具僅提供候選提示與批次整理，不直接打掃留言。",
       },
       {
         title: "保留覆核依據",
