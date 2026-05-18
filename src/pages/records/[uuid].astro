@@ -71,7 +71,7 @@ Astro.response.headers.set("cache-control", "no-store");
                   <span>{watchCase.sourceType}</span>
                   <span>{watchCase.reason}</span>
                 </p>
-                <h1 class="record-title">{watchCase.sourceTitle}</h1>
+                <h1 class="record-title">苦主：{watchCase.sourceTitle}</h1>
                 <p class="record__summary">
                   {watchCase.handledAt} · 由 {watchCase.watcher} 處理
                 </p>
@@ -142,7 +142,7 @@ Astro.response.headers.set("cache-control", "no-store");
                   </div>
                   <dl class="context-list">
                     <div>
-                      <dt>來源標題</dt>
+                      <dt>苦主</dt>
                       <dd>{watchCase.sourceTitle}</dd>
                     </div>
                     {watchCase.sourceUrl && (
