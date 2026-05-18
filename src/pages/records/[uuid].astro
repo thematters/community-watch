@@ -25,15 +25,6 @@ const reviewTone =
       ? "pending"
       : "neutral";
 const appealTone = watchCase?.appealStatus === "未申訴" ? "muted" : "pending";
-const reviewSummary =
-  watchCase?.reviewStatus === "已恢復"
-    ? "站方已恢復留言"
-    : watchCase?.reviewStatus === "維持處理"
-      ? "站方維持原處理"
-      : watchCase?.reviewStatus === "理由已調整"
-        ? "站方已調整理由"
-        : "等待站方覆核";
-
 Astro.response.headers.set("cache-control", "no-store");
 ---
 
@@ -68,53 +59,23 @@ Astro.response.headers.set("cache-control", "no-store");
               <div class="record__hero-copy">
                 <p class="record__kicker">
                   <span>公開紀錄</span>
-                  <span>{watchCase.sourceType}</span>
-                  <span>{watchCase.reason}</span>
                 </p>
                 <h1 class="record-title">{watchCase.publicNotice}</h1>
+                <div class="record__status-list" aria-label="主要處理狀態">
+                  <span class="status-pill status-pill--reported">已被檢舉</span>
+                  <span class={`reason reason--${reasonVariant}`}>{watchCase.reason}</span>
+                  <span class={`status-pill status-pill--${reviewTone}`}>{watchCase.reviewStatus}</span>
+                </div>
                 <p class="record__source-chip" aria-label={`苦主：${watchCase.sourceTitle}`}>
                   <span>苦主</span>
                   <strong>{watchCase.sourceTitle}</strong>
                 </p>
-                <p class="record__summary">
-                  {watchCase.handledAt} · 由 {watchCase.watcher} 處理
-                </p>
               </div>
-              <dl class="decision-card" aria-label="處理狀態">
-                <div class={`decision-card__primary decision-card__primary--${reviewTone}`}>
-                  <dt>站方覆核</dt>
-                  <dd>{watchCase.reviewStatus}</dd>
-                </div>
-                <div>
-                  <dt>申訴狀態</dt>
-                  <dd><span class={`status-text status-text--${appealTone}`}>{watchCase.appealStatus}</span></dd>
-                </div>
-              </dl>
+              <aside class="record__appeal-status" aria-label="申訴狀態">
+                <span>申訴狀態</span>
+                <strong class={`status-text status-text--${appealTone}`}>{watchCase.appealStatus}</strong>
+              </aside>
             </header>
-
-            <section class="decision-strip" aria-label="快速判讀">
-              <div class="decision-strip__notice">
-                <span aria-hidden="true"></span>
-                <div>
-                  <strong>{watchCase.publicNotice}</strong>
-                  <p>{reviewSummary}</p>
-                </div>
-              </div>
-              <dl class="decision-strip__meta">
-                <div>
-                  <dt>處理理由</dt>
-                  <dd><span class={`reason reason--${reasonVariant}`}>{watchCase.reason}</span></dd>
-                </div>
-                <div>
-                  <dt>來源類型</dt>
-                  <dd>{watchCase.sourceType}</dd>
-                </div>
-                <div>
-                  <dt>原處替換</dt>
-                  <dd>已顯示</dd>
-                </div>
-              </dl>
-            </section>
 
             <div class="record-layout">
               <div class="record-layout__main">
@@ -146,8 +107,8 @@ Astro.response.headers.set("cache-control", "no-store");
                   </div>
                   <dl class="context-list">
                     <div>
-                      <dt>苦主</dt>
-                      <dd>{watchCase.sourceTitle}</dd>
+                      <dt>來源類型</dt>
+                      <dd>{watchCase.sourceType}</dd>
                     </div>
                     {watchCase.sourceUrl && (
                       <div>
@@ -166,6 +127,10 @@ Astro.response.headers.set("cache-control", "no-store");
                     <div>
                       <dt>處理時間</dt>
                       <dd>{watchCase.handledAt}</dd>
+                    </div>
+                    <div>
+                      <dt>原處替換</dt>
+                      <dd>已顯示</dd>
                     </div>
                   </dl>
                 </section>
@@ -277,8 +242,8 @@ Astro.response.headers.set("cache-control", "no-store");
 
   .record__hero {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(240px, 300px);
-    align-items: start;
+    grid-template-columns: minmax(0, 1fr) auto;
+    align-items: end;
     gap: var(--space-watch-24);
     border-bottom: 1px solid var(--line);
     padding-bottom: var(--space-watch-24);
@@ -323,6 +288,13 @@ Astro.response.headers.set("cache-control", "no-store");
     overflow-wrap: anywhere;
   }
 
+  .record__status-list {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sp8);
+    margin-top: var(--space-sp14);
+  }
+
   .record__source-chip {
     display: inline-flex;
     max-width: 100%;
@@ -353,32 +325,29 @@ Astro.response.headers.set("cache-control", "no-store");
     white-space: nowrap;
   }
 
-  .record__summary {
-    margin: var(--space-sp10) 0 0;
-    color: var(--ink-muted);
-    font-size: 15px;
-    font-weight: 600;
-  }
-
-  .decision-card {
-    margin: 0;
+  .record__appeal-status {
+    min-width: 160px;
     border: 1px solid var(--line);
     border-radius: 8px;
     background: var(--surface-muted);
-    overflow: hidden;
-  }
-
-  .decision-card div {
     padding: var(--space-sp14) var(--space-sp16);
-    border-bottom: 1px solid var(--line);
   }
 
-  .decision-card div:last-child {
-    border-bottom: 0;
+  .record__appeal-status span {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+    line-height: 18px;
   }
 
-  .decision-card dt,
-  .decision-strip__meta dt,
+  .record__appeal-status strong {
+    display: block;
+    margin-top: var(--space-sp4);
+    font-size: 18px;
+    line-height: 28px;
+  }
+
   .context-list dt,
   .audit-list dt {
     margin: 0;
@@ -388,8 +357,6 @@ Astro.response.headers.set("cache-control", "no-store");
     line-height: 18px;
   }
 
-  .decision-card dd,
-  .decision-strip__meta dd,
   .context-list dd,
   .audit-list dd {
     margin: var(--space-sp4) 0 0;
@@ -398,83 +365,6 @@ Astro.response.headers.set("cache-control", "no-store");
     font-weight: 600;
     line-height: 24px;
     overflow-wrap: anywhere;
-  }
-
-  .decision-card__primary dd {
-    font-size: 20px;
-    line-height: 30px;
-  }
-
-  .decision-card__primary--positive {
-    background: var(--color-secondary-0);
-  }
-
-  .decision-card__primary--pending {
-    background: var(--surface-purple);
-  }
-
-  .decision-card__primary--neutral {
-    background: var(--board-bg);
-  }
-
-  .decision-strip {
-    display: grid;
-    grid-template-columns: minmax(0, 1fr) minmax(320px, 0.92fr);
-    margin-top: var(--space-watch-24);
-    border: 1px solid var(--line);
-    border-radius: 8px;
-    background: var(--board-bg);
-    overflow: hidden;
-    align-items: start;
-  }
-
-  .decision-strip__notice {
-    display: flex;
-    gap: var(--space-sp14);
-    align-items: flex-start;
-    min-height: 100%;
-    padding: var(--space-sp16);
-  }
-
-  .decision-strip__notice > span {
-    width: 4px;
-    align-self: stretch;
-    min-height: 76px;
-    border-radius: 999px;
-    background: var(--brand-lime);
-  }
-
-  .decision-strip__notice strong {
-    display: block;
-    color: var(--ink);
-    font-size: 18px;
-    font-weight: 600;
-    line-height: 28px;
-  }
-
-  .decision-strip__notice p {
-    margin: var(--space-sp4) 0 0;
-    color: var(--ink-muted);
-    font-weight: 600;
-  }
-
-  .decision-strip__meta {
-    margin: 0;
-    display: grid;
-    grid-template-columns: repeat(3, minmax(0, 1fr));
-    min-height: 100%;
-    border-left: 1px solid var(--line);
-    background: var(--surface-muted);
-  }
-
-  .decision-strip__meta div {
-    min-width: 0;
-    padding: var(--space-sp16);
-    border-right: 1px solid var(--line);
-  }
-
-  .decision-strip__meta div:last-child {
-    border-right: 0;
   }
 
   .reason {
@@ -496,6 +386,38 @@ Astro.response.headers.set("cache-control", "no-store");
   .reason--spam {
     background: var(--spam-bg);
     color: var(--spam-ink);
+  }
+
+  .status-pill {
+    display: inline-flex;
+    min-height: 30px;
+    align-items: center;
+    border-radius: 999px;
+    padding: 4px 10px;
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.3;
+  }
+
+  .status-pill--reported {
+    background: var(--surface-purple);
+    color: var(--brand-purple);
+  }
+
+  .status-pill--positive {
+    background: var(--color-secondary-0);
+    color: var(--color-function-positive-dark, #0d7a3f);
+  }
+
+  .status-pill--pending {
+    background: var(--surface-purple);
+    color: var(--brand-purple);
+  }
+
+  .status-pill--neutral {
+    border: 1px solid var(--line);
+    background: var(--board-bg);
+    color: var(--ink);
   }
 
   .record-layout {
@@ -585,16 +507,20 @@ Astro.response.headers.set("cache-control", "no-store");
 
   .context-list {
     display: grid;
-    grid-template-columns: minmax(0, 1.2fr) minmax(160px, 0.4fr) minmax(180px, 0.5fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 
   .context-list div {
-    border-bottom: 0;
     border-right: 1px solid var(--line);
+    border-bottom: 1px solid var(--line);
   }
 
-  .context-list div:last-child {
+  .context-list div:nth-child(2n) {
     border-right: 0;
+  }
+
+  .context-list div:nth-last-child(-n + 2) {
+    border-bottom: 0;
   }
 
   .content-box__header {
@@ -646,14 +572,13 @@ Astro.response.headers.set("cache-control", "no-store");
 
   @media (max-width: 900px) {
     .record__hero,
-    .decision-strip,
     .record-layout {
       grid-template-columns: 1fr;
     }
 
-    .decision-strip__meta {
-      border-top: 1px solid var(--line);
-      border-left: 0;
+    .record__appeal-status {
+      width: fit-content;
+      min-width: 0;
     }
 
     .context-list {
@@ -665,6 +590,14 @@ Astro.response.headers.set("cache-control", "no-store");
       border-bottom: 1px solid var(--line);
     }
 
+    .context-list div:nth-child(2n) {
+      border-right: 0;
+    }
+
+    .context-list div:nth-last-child(-n + 2) {
+      border-bottom: 1px solid var(--line);
+    }
+
     .context-list div:last-child {
       border-bottom: 0;
     }
@@ -673,19 +606,6 @@ Astro.response.headers.set("cache-control", "no-store");
   @media (max-width: 640px) {
     .record__hero {
       display: grid;
-    }
-
-    .decision-strip__meta {
-      grid-template-columns: 1fr;
-    }
-
-    .decision-strip__meta div {
-      border-right: 0;
-      border-bottom: 1px solid var(--line);
-    }
-
-    .decision-strip__meta div:last-child {
-      border-bottom: 0;
     }
 
     .content-box__header {
