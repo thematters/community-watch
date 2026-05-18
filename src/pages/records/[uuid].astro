@@ -71,7 +71,11 @@ Astro.response.headers.set("cache-control", "no-store");
                   <span>{watchCase.sourceType}</span>
                   <span>{watchCase.reason}</span>
                 </p>
-                <h1 class="record-title">苦主：{watchCase.sourceTitle}</h1>
+                <h1 class="record-title">{watchCase.publicNotice}</h1>
+                <p class="record__source-chip" aria-label={`苦主：${watchCase.sourceTitle}`}>
+                  <span>苦主</span>
+                  <strong>{watchCase.sourceTitle}</strong>
+                </p>
                 <p class="record__summary">
                   {watchCase.handledAt} · 由 {watchCase.watcher} 處理
                 </p>
@@ -317,6 +321,36 @@ Astro.response.headers.set("cache-control", "no-store");
     line-height: 54px;
     letter-spacing: 1.2px;
     overflow-wrap: anywhere;
+  }
+
+  .record__source-chip {
+    display: inline-flex;
+    max-width: 100%;
+    align-items: center;
+    gap: var(--space-sp8);
+    margin: var(--space-sp12) 0 0;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp8);
+    background: var(--surface-muted);
+    color: var(--ink-muted);
+    font-size: 14px;
+    line-height: 1.4;
+  }
+
+  .record__source-chip span {
+    flex: 0 0 auto;
+    color: var(--brand-purple);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .record__source-chip strong {
+    min-width: 0;
+    overflow: hidden;
+    font-weight: 700;
+    text-overflow: ellipsis;
+    white-space: nowrap;
   }
 
   .record__summary {

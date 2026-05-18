@@ -108,13 +108,18 @@ Astro.response.headers.set("cache-control", "no-store");
             <article class="case-row" id={`case-${watchCase.id}`}>
               <div class="case-row__main">
                 <header class="case-row__header">
-                  <div class="case-row__source">
-                    <span class="case-row__type">{watchCase.sourceType}</span>
-                    <h3>苦主：{watchCase.sourceTitle}</h3>
+                  <div class="case-row__priority" aria-label="主要處理狀態">
+                    <span class="case-row__status">已被檢舉</span>
+                    <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
+                      {watchCase.reason}
+                    </span>
+                    <span class="case-row__review">{watchCase.reviewStatus}</span>
                   </div>
-                  <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
-                    {watchCase.reason}
-                  </span>
+                  <div class="case-row__source">
+                    <span class="case-row__source-label">苦主</span>
+                    <span class="case-row__source-title">{watchCase.sourceTitle}</span>
+                    <span class="case-row__type">{watchCase.sourceType}</span>
+                  </div>
                 </header>
 
                 <div class="case-row__notice">
@@ -558,17 +563,25 @@ Astro.response.headers.set("cache-control", "no-store");
 
   .case-row__header {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-sp16);
-    align-items: start;
+    gap: var(--space-sp10);
   }
 
+  .case-row__priority,
   .case-row__source {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sp8);
     min-width: 0;
   }
 
+  .case-row__priority {
+    gap: var(--space-sp10);
+  }
+
   .case-row__type,
-  .case-row__label {
+  .case-row__label,
+  .case-row__source-label {
     display: block;
     color: var(--ink-muted);
     font-size: 13px;
@@ -576,10 +589,58 @@ Astro.response.headers.set("cache-control", "no-store");
     line-height: 1.4;
   }
 
-  .case-row h3 {
-    margin: var(--space-sp4) 0 0;
-    font-size: 20px;
+  .case-row__source {
+    width: fit-content;
+    max-width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp8);
+    background: var(--surface-muted);
+  }
+
+  .case-row__source-label {
+    color: var(--brand-purple);
+  }
+
+  .case-row__source-title {
+    min-width: 0;
+    max-width: min(38rem, 100%);
+    overflow: hidden;
+    color: var(--ink-muted);
+    font-size: 14px;
+    font-weight: 700;
     line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .case-row__type {
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .case-row__status,
+  .case-row__review {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp10);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
+  .case-row__status {
+    background: var(--surface-purple);
+    color: var(--brand-purple);
+  }
+
+  .case-row__review {
+    border: 1px solid var(--line);
+    background: var(--board-bg);
+    color: var(--ink);
   }
 
   .reason {
