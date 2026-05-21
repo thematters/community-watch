@@ -113,7 +113,6 @@ Astro.response.headers.set("cache-control", "no-store");
                     <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
                       {watchCase.reason}
                     </span>
-                    <span class="case-row__review">{watchCase.reviewStatus}</span>
                   </div>
                   <div class="case-row__source">
                     <span class="case-row__source-label">苦主</span>
@@ -158,10 +157,6 @@ Astro.response.headers.set("cache-control", "no-store");
                 <div>
                   <dt>申訴狀態</dt>
                   <dd>{watchCase.appealStatus}</dd>
-                </div>
-                <div>
-                  <dt>站方覆核</dt>
-                  <dd>{watchCase.reviewStatus}</dd>
                 </div>
               </dl>
             </article>
@@ -620,8 +615,7 @@ Astro.response.headers.set("cache-control", "no-store");
     font-weight: 600;
   }
 
-  .case-row__status,
-  .case-row__review {
+  .case-row__status {
     display: inline-flex;
     align-items: center;
     min-height: 28px;
@@ -635,12 +629,6 @@ Astro.response.headers.set("cache-control", "no-store");
   .case-row__status {
     background: var(--surface-purple);
     color: var(--brand-purple);
-  }
-
-  .case-row__review {
-    border: 1px solid var(--line);
-    background: var(--board-bg);
-    color: var(--ink);
   }
 
   .reason {
