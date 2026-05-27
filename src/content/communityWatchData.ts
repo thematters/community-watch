@@ -27,12 +27,29 @@ interface CommunityWatchActionNode {
   createdAt: string;
 }
 
+interface CommunityWatchActionsConnection<T> {
+  edges: Array<{
+    node: T;
+  }>;
+  pageInfo?: {
+    endCursor: string | null;
+    hasNextPage: boolean;
+  };
+}
+
+type CommunityWatchActionMetricNode = Pick<
+  CommunityWatchActionNode,
+  "reason" | "actionState" | "appealState"
+>;
+
 interface CommunityWatchActionsResponse {
   communityWatchActions: {
-    edges: Array<{
-      node: CommunityWatchActionNode;
-    }>;
+    edges: CommunityWatchActionsConnection<CommunityWatchActionNode>["edges"];
   };
+}
+
+interface CommunityWatchActionMetricsResponse {
+  communityWatchActions: CommunityWatchActionsConnection<CommunityWatchActionMetricNode>;
 }
 
 interface CommunityWatchActionResponse {
@@ -77,6 +94,24 @@ const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
           contentCleared
           createdAt
         }
+      }
+    }
+  }
+`;
+
+const COMMUNITY_WATCH_ACTION_METRICS_QUERY = /* GraphQL */ `
+  query CommunityWatchActionMetrics($input: CommunityWatchActionsInput!) {
+    communityWatchActions(input: $input) {
+      edges {
+        node {
+          reason
+          actionState
+          appealState
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
       }
     }
   }
@@ -200,25 +235,26 @@ const mapAction = (action: CommunityWatchActionNode): WatchCase => ({
   reviewStatus: mapReviewStatus(action.reviewState),
 });
 
-const buildLiveMetrics = (cases: WatchCase[]): Metric[] => {
-  const activeCases = cases.filter((item) => item.actionState === "active");
-  const pornCount = activeCases.filter((item) => item.reason === "色情廣告").length;
-  const spamCount = activeCases.filter((item) => item.reason === "濫發廣告").length;
-  const appealCount = activeCases.filter((item) => item.appealStatus !== "未申訴").length;
+const buildLiveMetrics = (actions: CommunityWatchActionMetricNode[]): Metric[] => {
+  const activeActions = actions.filter((item) => item.actionState === "active");
+  const pornCount = activeActions.filter((item) => item.reason === "porn_ad").length;
+  const spamCount = activeActions.filter((item) => item.reason === "spam_ad").length;
+  const appealCount = activeActions.filter((item) => item.appealState !== "none").length;
 
   return [
-    { label: "色情廣告", value: String(pornCount), note: "近期公開紀錄" },
-    { label: "濫發廣告", value: String(spamCount), note: "近期公開紀錄" },
+    { label: "色情廣告", value: String(pornCount), note: "全部公開紀錄" },
+    { label: "濫發廣告", value: String(spamCount), note: "全部公開紀錄" },
     { label: "誤刪申訴", value: String(appealCount), note: "這個數字越小越好" },
   ];
 };
 
 const buildPage = (
   cases: WatchCase[],
-  source: CommunityWatchPageData["source"]
+  source: CommunityWatchPageData["source"],
+  metrics = page.metrics
 ) => ({
   ...page,
-  metrics: source === "api" ? buildLiveMetrics(cases) : page.metrics,
+  metrics: source === "api" ? metrics : page.metrics,
   log: {
     ...page.log,
     description:
@@ -277,6 +313,35 @@ const getLiveCases = async (runtimeEnv?: CommunityWatchEnv) => {
   return nodes.map(mapAction);
 };
 
+const getLiveMetrics = async (runtimeEnv?: CommunityWatchEnv) => {
+  const actions: CommunityWatchActionMetricNode[] = [];
+  let after: string | null = null;
+
+  do {
+    const input: Record<string, unknown> = { first: 100 };
+    if (after) {
+      input.after = after;
+    }
+
+    const data = await requestGraphQL<CommunityWatchActionMetricsResponse>(
+      COMMUNITY_WATCH_ACTION_METRICS_QUERY,
+      { input },
+      runtimeEnv
+    );
+    if (!data) {
+      return null;
+    }
+
+    const connection = data.communityWatchActions;
+    actions.push(...connection.edges.map(({ node }) => node));
+    after = connection.pageInfo?.hasNextPage
+      ? connection.pageInfo.endCursor ?? null
+      : null;
+  } while (after);
+
+  return buildLiveMetrics(actions);
+};
+
 const getLiveCase = async (uuid: string, runtimeEnv?: CommunityWatchEnv) => {
   const data = await requestGraphQL<CommunityWatchActionResponse>(
     COMMUNITY_WATCH_ACTION_QUERY,
@@ -299,7 +364,22 @@ const loadCommunityWatchPageData = async (
 ): Promise<CommunityWatchPageData> => {
   const liveCases = await getLiveCases(runtimeEnv);
   if (liveCases) {
-    return { page: buildPage(liveCases, "api"), source: "api" };
+    const liveMetrics = await getLiveMetrics(runtimeEnv);
+    return {
+      page: buildPage(
+        liveCases,
+        "api",
+        liveMetrics ??
+          buildLiveMetrics(
+            liveCases.map((watchCase) => ({
+              actionState: watchCase.actionState ?? "active",
+              appealState: watchCase.appealStatus === "未申訴" ? "none" : "received",
+              reason: watchCase.reason === "色情廣告" ? "porn_ad" : "spam_ad",
+            }))
+          )
+      ),
+      source: "api",
+    };
   }
 
   return { page: buildPage(page.log.cases, "sample"), source: "sample" };
