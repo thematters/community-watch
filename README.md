@@ -101,6 +101,7 @@ Phase 0 is complete as repo-backed planning, and the standalone public page is n
 - [docs/pre-merge-work.md](docs/pre-merge-work.md)
 - [docs/phase-5-staff-review.md](docs/phase-5-staff-review.md)
 - [docs/privacy-original-content.md](docs/privacy-original-content.md)
+- [docs/signals-api.md](docs/signals-api.md)
 - [docs/staging-verification.md](docs/staging-verification.md)
 - [docs/production-rollout.md](docs/production-rollout.md)
 - [docs/status.md](docs/status.md)
