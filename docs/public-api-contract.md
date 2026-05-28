@@ -7,11 +7,12 @@ The public site can ship with static sample data before the Matters server publi
 ## Routes
 
 - `/`: public landing page, summary metrics, recent records.
+- `/records/`: paginated public list for all Community Watch actions.
 - `/records/{uuid}/`: public detail page for one Community Watch action.
 
-## Minimum List Query
+## Minimum Homepage List Query
 
-GraphQL shape used by the site:
+GraphQL shape used by the homepage recent-record list:
 
 ```graphql
 query CommunityWatchActions($input: CommunityWatchActionsInput!) {
@@ -54,7 +55,50 @@ Required behavior:
 - Include active, restored, and voided records once Phase 5 review exists.
 - Do not include unrelated generic banned comments.
 - Do not require login.
-- The public site uses `originalContent` in the list query so recent records can render without one detail request per row. Detail pages use the single-record query below so new `/records/{uuid}/` links can resolve on demand.
+- The homepage uses `originalContent` for the recent-record list only. The full `/records/` list should not request original content.
+
+## Minimum Full List Query
+
+GraphQL shape used by `/records/`:
+
+```graphql
+query CommunityWatchActionList($input: CommunityWatchActionsInput!) {
+  communityWatchActions(input: $input) {
+    edges {
+      node {
+        uuid
+        commentId
+        sourceType
+        sourceTitle
+        sourceId
+        sourceUrl
+        reason
+        actorDisplayName
+        actionState
+        appealState
+        reviewState
+        createdAt
+      }
+    }
+    pageInfo {
+      endCursor
+      hasNextPage
+    }
+  }
+}
+```
+
+Example variables:
+
+```json
+{ "input": { "first": 50, "after": "optional-cursor" } }
+```
+
+Required behavior:
+
+- Return stable cursor pagination so URLs such as `/records/?after=...` can reproduce the same page.
+- Do not return `originalContent` in the full list query.
+- Each row must link to `/records/{uuid}/` for detailed audit and appeal review.
 
 ## Minimum Detail Query
 

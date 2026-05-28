@@ -98,9 +98,10 @@ COMMUNITY_WATCH_API_FIRST=50
 ## Public Routes
 
 - `/`: landing page, statistics, recent records, appeal copy.
+- `/records/`: paginated public list for all Community Watch actions.
 - `/records/{uuid}` and `/records/{uuid}/`: public record detail page with obscured original content and appeal instructions.
 
-These routes can be deployed before the Matters server public audit schema is deployed, because they fall back to local sample data. Once the API is configured, the record route queries the matching public audit record on demand.
+These routes can be deployed before the Matters server public audit schema is deployed, because they fall back to local sample data. Once the API is configured, `/records/` queries a paginated list and the record route queries the matching public audit record on demand.
 
 ## Production Gate
 

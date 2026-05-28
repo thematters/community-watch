@@ -1,0 +1,441 @@
+---
+import PageLayout from "../../layouts/PageLayout.astro";
+import { getCommunityWatchRecordListData } from "../../content/communityWatchData";
+import { page } from "../../content/page";
+
+const baseUrl = import.meta.env.BASE_URL;
+const runtimeEnv = (
+  Astro.locals as { runtime?: { env?: Record<string, string | undefined> } }
+).runtime?.env;
+const rawAfter = Astro.url.searchParams.get("after");
+const after = rawAfter && rawAfter.length <= 512 ? rawAfter : null;
+const pageSize = 50;
+const { cases, pageInfo, source } = await getCommunityWatchRecordListData(
+  { first: pageSize, after },
+  runtimeEnv
+);
+const nextSearch = new URLSearchParams();
+if (pageInfo.endCursor) {
+  nextSearch.set("after", pageInfo.endCursor);
+}
+const nextUrl = pageInfo.hasNextPage
+  ? `${baseUrl}records/?${nextSearch.toString()}`
+  : null;
+
+const actionStateLabel = (state?: string) => {
+  switch (state) {
+    case "restored":
+      return "已恢復";
+    case "voided":
+      return "已撤銷";
+    case "active":
+    default:
+      return "已被檢舉";
+  }
+};
+
+Astro.response.headers.set("cache-control", "no-store");
+---
+
+<PageLayout
+  title={`完整公開紀錄｜${page.pageTitle}`}
+  description="馬特市守望相助隊完整公開紀錄列表，可分頁查核近期 50 筆以外的處理紀錄。"
+  lang={page.lang}
+>
+  <div class="page">
+    <header class="page__header">
+      <a class="page__brand" href={baseUrl}>
+        <img src={`${baseUrl}matters-lettering-black.svg`} alt="Matters" />
+        <span aria-hidden="true"></span>
+        <strong>守望相助隊</strong>
+      </a>
+      <nav class="page__nav" aria-label="主要導覽">
+        <a href={baseUrl}>首頁</a>
+        <a href={`${baseUrl}records/`}>完整紀錄</a>
+        <a href={`${baseUrl}#appeal`}>申訴</a>
+      </nav>
+    </header>
+
+    <main class="page__main records-page">
+      <section class="board records-heading" aria-labelledby="records-title">
+        <p class="eyebrow">完整公開紀錄</p>
+        <h1 id="records-title">所有守望相助處理紀錄</h1>
+        <p>
+          首頁只顯示最新 {pageSize} 筆，完整紀錄在此逐頁公開。列表不展開原留言全文，避免垃圾內容被二次散播；需要申訴、覆核或社群稽核時，可進入單筆紀錄查核。
+        </p>
+        {source === "sample" && (
+          <p class="records-heading__notice">
+            目前公開 API 未啟用或暫時無法連線，此頁顯示示範資料。
+          </p>
+        )}
+        {source === "unavailable" && (
+          <p class="records-heading__notice">
+            公開 API 暫時無法連線，完整紀錄目前無法載入，請稍後再試。
+          </p>
+        )}
+      </section>
+
+      <section class="board records-log" aria-labelledby="records-log-title">
+        <div class="records-log__header">
+          <div>
+            <p class="eyebrow">公開紀錄庫</p>
+            <h2 id="records-log-title">本頁紀錄</h2>
+          </div>
+          <p class="records-log__count">每頁最多 {pageSize} 筆</p>
+        </div>
+
+        {cases.length > 0 ? (
+          <div class="record-list">
+            {cases.map((watchCase) => (
+              <article class="record-row" id={`case-${watchCase.id}`}>
+                <div class="record-row__main">
+                  <header class="record-row__header">
+                    <div class="record-row__priority" aria-label="主要處理狀態">
+                      <span
+                        class:list={[
+                          "record-row__status",
+                          watchCase.actionState === "restored" && "record-row__status--restored",
+                          watchCase.actionState === "voided" && "record-row__status--voided",
+                        ]}
+                      >
+                        {actionStateLabel(watchCase.actionState)}
+                      </span>
+                      <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
+                        {watchCase.reason}
+                      </span>
+                    </div>
+                    <div class="record-row__source">
+                      <span class="record-row__source-label">苦主</span>
+                      <span class="record-row__source-title">{watchCase.sourceTitle}</span>
+                      <span class="record-row__type">{watchCase.sourceType}</span>
+                    </div>
+                  </header>
+
+                  <div class="record-row__notice">
+                    <span>{watchCase.publicNotice}</span>
+                    <a href={`${baseUrl}records/${watchCase.id}/`}>#{watchCase.commentId}</a>
+                    {watchCase.sourceUrl && (
+                      <a href={watchCase.sourceUrl} rel="noopener noreferrer">回到站上留言</a>
+                    )}
+                  </div>
+                </div>
+
+                <dl class="record-row__meta" aria-label="處理資訊">
+                  <div>
+                    <dt>處理人</dt>
+                    <dd>{watchCase.watcher}</dd>
+                  </div>
+                  <div>
+                    <dt>日期</dt>
+                    <dd>{watchCase.handledAt}</dd>
+                  </div>
+                  <div>
+                    <dt>申訴狀態</dt>
+                    <dd>{watchCase.appealStatus}</dd>
+                  </div>
+                  <div>
+                    <dt>站方覆核</dt>
+                    <dd>{watchCase.reviewStatus}</dd>
+                  </div>
+                </dl>
+              </article>
+            ))}
+          </div>
+        ) : (
+          <p class="records-log__empty">目前沒有可顯示的公開紀錄。</p>
+        )}
+
+        {cases.length > 0 && (
+          <nav class="records-pagination" aria-label="公開紀錄分頁">
+            {after && <a class="btn btn--ghost" href={`${baseUrl}records/`}>回到第一頁</a>}
+            {
+              nextUrl ? (
+                <a class="btn btn--primary" href={nextUrl}>下一頁</a>
+              ) : (
+                <span class="records-pagination__end">已到最後一頁</span>
+              )
+            }
+          </nav>
+        )}
+      </section>
+    </main>
+
+    <footer class="page__footer">
+      <div class="page__footer-copy">
+        <span>{page.footer.note}</span>
+        <strong>{page.footer.warning}</strong>
+      </div>
+      {
+        page.footer.links && page.footer.links.length > 0 && (
+          <nav aria-label="footer">
+            <ul>
+              {page.footer.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </footer>
+  </div>
+</PageLayout>
+
+<style>
+  .records-page {
+    padding-top: var(--space-sp32);
+  }
+
+  .records-heading h1,
+  .records-log h2 {
+    margin: 0;
+    font-family: var(--font-reading);
+    line-height: 1.34;
+  }
+
+  .records-heading h1 {
+    font-size: clamp(32px, 5vw, 48px);
+  }
+
+  .records-log h2 {
+    font-size: clamp(26px, 4vw, 34px);
+  }
+
+  .records-heading p:not(.eyebrow),
+  .records-log__count {
+    color: var(--ink-muted);
+  }
+
+  .records-heading__notice {
+    border-left: 3px solid var(--brand-lime);
+    padding-left: var(--space-sp12);
+    font-weight: 700;
+  }
+
+  .records-log {
+    display: grid;
+    gap: var(--space-watch-24);
+  }
+
+  .records-log__header {
+    display: flex;
+    align-items: end;
+    justify-content: space-between;
+    gap: var(--space-sp16);
+  }
+
+  .records-log__count {
+    margin: 0;
+    font-size: 14px;
+    font-weight: 700;
+  }
+
+  .record-list {
+    display: flex;
+    flex-direction: column;
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    overflow: hidden;
+    background: var(--board-bg);
+  }
+
+  .record-row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) minmax(176px, 0.28fr);
+    gap: var(--space-watch-20);
+    border-bottom: 1px solid var(--line);
+    padding: var(--space-watch-20);
+    background: var(--board-bg);
+  }
+
+  .record-row:last-child {
+    border-bottom: 0;
+  }
+
+  .record-row__main {
+    min-width: 0;
+  }
+
+  .record-row__header {
+    display: grid;
+    gap: var(--space-sp10);
+  }
+
+  .record-row__priority,
+  .record-row__source {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sp8);
+    min-width: 0;
+  }
+
+  .record-row__priority {
+    gap: var(--space-sp10);
+  }
+
+  .record-row__type,
+  .record-row__source-label {
+    display: block;
+    color: var(--ink-muted);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .record-row__source {
+    width: fit-content;
+    max-width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp8);
+    background: var(--surface-muted);
+  }
+
+  .record-row__source-label {
+    color: var(--brand-purple);
+  }
+
+  .record-row__source-title {
+    min-width: 0;
+    max-width: min(38rem, 100%);
+    overflow: hidden;
+    color: var(--ink-muted);
+    font-size: 14px;
+    font-weight: 700;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .record-row__type {
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .record-row__status,
+  .reason {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp10);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
+  .record-row__status {
+    background: var(--surface-purple);
+    color: var(--brand-purple);
+  }
+
+  .record-row__status--restored,
+  .record-row__status--voided {
+    background: var(--surface-muted);
+    color: var(--ink-muted);
+  }
+
+  .reason--adult {
+    background: var(--adult-bg);
+    color: var(--adult-ink);
+  }
+
+  .reason--spam {
+    background: var(--spam-bg);
+    color: var(--spam-ink);
+  }
+
+  .record-row__notice {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sp8);
+    align-items: center;
+    margin-top: var(--space-sp16);
+    border-left: 3px solid var(--brand-lime);
+    padding: var(--space-sp8) 0 var(--space-sp8) var(--space-sp12);
+    font-weight: 700;
+    line-height: 1.5;
+  }
+
+  .record-row__notice a {
+    font-family: var(--font-family-mono, ui-monospace, SFMono-Regular, Menlo, monospace);
+    font-size: 14px;
+    text-decoration: none;
+  }
+
+  .record-row__meta {
+    align-self: stretch;
+    display: grid;
+    grid-template-columns: 1fr;
+    gap: var(--space-sp12);
+    margin: 0;
+    padding-left: var(--space-watch-20);
+    border-left: 1px solid var(--line);
+  }
+
+  .record-row__meta div {
+    min-width: 0;
+  }
+
+  .record-row__meta dt {
+    color: var(--ink-muted);
+    font-size: 13px;
+    font-weight: 700;
+    line-height: 1.4;
+  }
+
+  .record-row__meta dd {
+    margin: var(--space-sp2) 0 0;
+    font-weight: 700;
+    line-height: 1.45;
+  }
+
+  .records-pagination {
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-end;
+    gap: var(--space-sp12);
+  }
+
+  .records-pagination__end {
+    display: inline-flex;
+    align-items: center;
+    min-height: 48px;
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+
+  @media (max-width: 880px) {
+    .records-log__header {
+      align-items: start;
+      flex-direction: column;
+    }
+
+    .record-row {
+      grid-template-columns: 1fr;
+    }
+
+    .record-row__meta {
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      padding-left: 0;
+      padding-top: var(--space-sp16);
+      border-left: 0;
+      border-top: 1px solid var(--line);
+    }
+  }
+
+  @media (max-width: 620px) {
+    .record-row__meta {
+      grid-template-columns: 1fr;
+      gap: var(--space-sp8);
+    }
+
+    .records-pagination,
+    .records-pagination .btn {
+      width: 100%;
+    }
+  }
+</style>
