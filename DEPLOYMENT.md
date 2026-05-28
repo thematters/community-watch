@@ -29,10 +29,10 @@ These tasks can be completed before `thematters/matters-server` #4762 is merged 
 
 ## Environment Variables
 
-| Name                        | Required | When                                  | Value                                                                                                  |
-| --------------------------- | -------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `COMMUNITY_WATCH_API_URL`   | No       | After server public query is deployed | `https://server.matters.town/graphql` for production, `https://server.matters.icu/graphql` for staging |
-| `COMMUNITY_WATCH_API_FIRST` | No       | Optional record count tuning          | Defaults to 50                                                                                         |
+| Name                        | Required | When                                   | Value                                                                                                  |
+| --------------------------- | -------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `COMMUNITY_WATCH_API_URL`   | No       | After server public query is deployed  | `https://server.matters.town/graphql` for production, `https://server.matters.icu/graphql` for staging |
+| `COMMUNITY_WATCH_API_FIRST` | No       | Optional homepage recent-record tuning | Defaults to 20                                                                                         |
 
 Do not put admin tokens or private API secrets in this site. The public page must use only public GraphQL queries.
 
@@ -92,15 +92,16 @@ Optional build-time environment:
 
 ```bash
 COMMUNITY_WATCH_API_URL=https://server.matters.town/graphql
-COMMUNITY_WATCH_API_FIRST=50
+COMMUNITY_WATCH_API_FIRST=20
 ```
 
 ## Public Routes
 
 - `/`: landing page, statistics, recent records, appeal copy.
+- `/records/`: paginated public list for all Community Watch actions.
 - `/records/{uuid}` and `/records/{uuid}/`: public record detail page with obscured original content and appeal instructions.
 
-These routes can be deployed before the Matters server public audit schema is deployed, because they fall back to local sample data. Once the API is configured, the record route queries the matching public audit record on demand.
+These routes can be deployed before the Matters server public audit schema is deployed, because they fall back to local sample data. Once the API is configured, `/records/` queries a paginated list and the record route queries the matching public audit record on demand.
 
 ## Production Gate
 

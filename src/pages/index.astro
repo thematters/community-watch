@@ -30,6 +30,7 @@ Astro.response.headers.set("cache-control", "no-store");
       </a>
       <nav class="page__nav" aria-label="主要導覽">
         <a href="#watch-log">處理紀錄</a>
+        <a href={`${baseUrl}records/`}>完整紀錄</a>
         <a href="#appeal">申訴</a>
         <a href="https://matters.town/billboard">Billboard</a>
       </nav>
@@ -108,13 +109,17 @@ Astro.response.headers.set("cache-control", "no-store");
             <article class="case-row" id={`case-${watchCase.id}`}>
               <div class="case-row__main">
                 <header class="case-row__header">
-                  <div class="case-row__source">
-                    <span class="case-row__type">{watchCase.sourceType}</span>
-                    <h3>苦主：{watchCase.sourceTitle}</h3>
+                  <div class="case-row__priority" aria-label="主要處理狀態">
+                    <span class="case-row__status">已被檢舉</span>
+                    <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
+                      {watchCase.reason}
+                    </span>
                   </div>
-                  <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
-                    {watchCase.reason}
-                  </span>
+                  <div class="case-row__source">
+                    <span class="case-row__source-label">苦主</span>
+                    <span class="case-row__source-title">{watchCase.sourceTitle}</span>
+                    <span class="case-row__type">{watchCase.sourceType}</span>
+                  </div>
                 </header>
 
                 <div class="case-row__notice">
@@ -154,13 +159,14 @@ Astro.response.headers.set("cache-control", "no-store");
                   <dt>申訴狀態</dt>
                   <dd>{watchCase.appealStatus}</dd>
                 </div>
-                <div>
-                  <dt>站方覆核</dt>
-                  <dd>{watchCase.reviewStatus}</dd>
-                </div>
               </dl>
             </article>
           ))}
+        </div>
+
+        <div class="watch-log__actions">
+          <p>首頁僅顯示近期紀錄，完整公開紀錄可逐頁查核。</p>
+          <a class="btn btn--primary" href={`${baseUrl}records/`}>查看全部公開紀錄</a>
         </div>
       </section>
 
@@ -539,6 +545,22 @@ Astro.response.headers.set("cache-control", "no-store");
     background: var(--board-bg);
   }
 
+  .watch-log__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sp16);
+    margin-top: var(--space-watch-24);
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-watch-20);
+  }
+
+  .watch-log__actions p {
+    margin: 0;
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+
   .case-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(176px, 0.28fr);
@@ -558,17 +580,25 @@ Astro.response.headers.set("cache-control", "no-store");
 
   .case-row__header {
     display: grid;
-    grid-template-columns: minmax(0, 1fr) auto;
-    gap: var(--space-sp16);
-    align-items: start;
+    gap: var(--space-sp10);
   }
 
+  .case-row__priority,
   .case-row__source {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: var(--space-sp8);
     min-width: 0;
   }
 
+  .case-row__priority {
+    gap: var(--space-sp10);
+  }
+
   .case-row__type,
-  .case-row__label {
+  .case-row__label,
+  .case-row__source-label {
     display: block;
     color: var(--ink-muted);
     font-size: 13px;
@@ -576,10 +606,51 @@ Astro.response.headers.set("cache-control", "no-store");
     line-height: 1.4;
   }
 
-  .case-row h3 {
-    margin: var(--space-sp4) 0 0;
-    font-size: 20px;
+  .case-row__source {
+    width: fit-content;
+    max-width: 100%;
+    border: 1px solid var(--line);
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp8);
+    background: var(--surface-muted);
+  }
+
+  .case-row__source-label {
+    color: var(--brand-purple);
+  }
+
+  .case-row__source-title {
+    min-width: 0;
+    max-width: min(38rem, 100%);
+    overflow: hidden;
+    color: var(--ink-muted);
+    font-size: 14px;
+    font-weight: 700;
     line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .case-row__type {
+    color: var(--ink-muted);
+    font-size: 12px;
+    font-weight: 600;
+  }
+
+  .case-row__status {
+    display: inline-flex;
+    align-items: center;
+    min-height: 28px;
+    border-radius: 6px;
+    padding: var(--space-sp4) var(--space-sp10);
+    font-size: 13px;
+    font-weight: 800;
+    line-height: 1.4;
+  }
+
+  .case-row__status {
+    background: var(--surface-purple);
+    color: var(--brand-purple);
   }
 
   .reason {
@@ -849,8 +920,15 @@ Astro.response.headers.set("cache-control", "no-store");
     }
 
     .hero__actions,
-    .hero__actions .btn {
+    .watch-log__actions,
+    .hero__actions .btn,
+    .watch-log__actions .btn {
       width: 100%;
+    }
+
+    .watch-log__actions {
+      align-items: stretch;
+      flex-direction: column;
     }
 
     .hero {

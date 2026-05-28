@@ -41,15 +41,21 @@ type CommunityWatchActionMetricNode = Pick<
   CommunityWatchActionNode,
   "reason" | "actionState" | "appealState"
 >;
+type CommunityWatchActionListNode = Omit<
+  CommunityWatchActionNode,
+  "originalContent" | "contentCleared"
+>;
 
 interface CommunityWatchActionsResponse {
-  communityWatchActions: {
-    edges: CommunityWatchActionsConnection<CommunityWatchActionNode>["edges"];
-  };
+  communityWatchActions: CommunityWatchActionsConnection<CommunityWatchActionNode>;
 }
 
 interface CommunityWatchActionMetricsResponse {
   communityWatchActions: CommunityWatchActionsConnection<CommunityWatchActionMetricNode>;
+}
+
+interface CommunityWatchActionListResponse {
+  communityWatchActions: CommunityWatchActionsConnection<CommunityWatchActionListNode>;
 }
 
 interface CommunityWatchActionResponse {
@@ -66,11 +72,21 @@ export interface CommunityWatchPageData {
   source: "api" | "sample";
 }
 
+export interface CommunityWatchRecordListData {
+  cases: WatchCase[];
+  source: "api" | "sample" | "unavailable";
+  pageInfo: {
+    endCursor: string | null;
+    hasNextPage: boolean;
+  };
+}
+
 type CommunityWatchEnv = Record<string, string | undefined>;
 
 const PUBLIC_NOTICE = "本則貼文已由守望相助隊檢舉";
 const CLEARED_CONTENT_TEXT = "原留言內容已因隱私或個資請求清空。";
-const DEFAULT_FIRST = 50;
+const DEFAULT_RECENT_FIRST = 20;
+const DEFAULT_RECORD_LIST_FIRST = 50;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -95,6 +111,10 @@ const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
           createdAt
         }
       }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
     }
   }
 `;
@@ -107,6 +127,33 @@ const COMMUNITY_WATCH_ACTION_METRICS_QUERY = /* GraphQL */ `
           reason
           actionState
           appealState
+        }
+      }
+      pageInfo {
+        endCursor
+        hasNextPage
+      }
+    }
+  }
+`;
+
+const COMMUNITY_WATCH_ACTION_LIST_QUERY = /* GraphQL */ `
+  query CommunityWatchActionList($input: CommunityWatchActionsInput!) {
+    communityWatchActions(input: $input) {
+      edges {
+        node {
+          uuid
+          commentId
+          sourceType
+          sourceTitle
+          sourceId
+          sourceUrl
+          reason
+          actorDisplayName
+          actionState
+          appealState
+          reviewState
+          createdAt
         }
       }
       pageInfo {
@@ -139,9 +186,11 @@ const COMMUNITY_WATCH_ACTION_QUERY = /* GraphQL */ `
 `;
 
 const getBuildEnv = () =>
-  (globalThis as typeof globalThis & {
-    process?: { env?: Record<string, string | undefined> };
-  }).process?.env ?? {};
+  (
+    globalThis as typeof globalThis & {
+      process?: { env?: Record<string, string | undefined> };
+    }
+  ).process?.env ?? {};
 
 const getRuntimeEnv = (runtimeEnv?: CommunityWatchEnv) => ({
   ...getBuildEnv(),
@@ -154,12 +203,12 @@ const getApiUrl = (runtimeEnv?: CommunityWatchEnv) =>
 const getFirst = (runtimeEnv?: CommunityWatchEnv) => {
   const raw = Number.parseInt(
     getRuntimeEnv(runtimeEnv).COMMUNITY_WATCH_API_FIRST ?? "",
-    10
+    10,
   );
   if (Number.isFinite(raw) && raw > 0) {
     return Math.min(raw, 100);
   }
-  return DEFAULT_FIRST;
+  return DEFAULT_RECENT_FIRST;
 };
 
 const mapReason = (reason: Reason): WatchCase["reason"] =>
@@ -235,11 +284,36 @@ const mapAction = (action: CommunityWatchActionNode): WatchCase => ({
   reviewStatus: mapReviewStatus(action.reviewState),
 });
 
-const buildLiveMetrics = (actions: CommunityWatchActionMetricNode[]): Metric[] => {
+const mapActionSummary = (action: CommunityWatchActionListNode): WatchCase => ({
+  id: action.uuid,
+  commentId: action.commentId,
+  sourceType: mapSourceType(action.sourceType),
+  sourceTitle: action.sourceTitle,
+  sourceId: action.sourceId,
+  sourceUrl: action.sourceUrl,
+  actionState: action.actionState,
+  reason: mapReason(action.reason),
+  publicNotice: PUBLIC_NOTICE,
+  commentPreview: "",
+  watcher: action.actorDisplayName,
+  handledAt: formatHandledAt(action.createdAt),
+  appealStatus: mapAppealStatus(action.appealState),
+  reviewStatus: mapReviewStatus(action.reviewState),
+});
+
+const buildLiveMetrics = (
+  actions: CommunityWatchActionMetricNode[],
+): Metric[] => {
   const activeActions = actions.filter((item) => item.actionState === "active");
-  const pornCount = activeActions.filter((item) => item.reason === "porn_ad").length;
-  const spamCount = activeActions.filter((item) => item.reason === "spam_ad").length;
-  const appealCount = activeActions.filter((item) => item.appealState !== "none").length;
+  const pornCount = activeActions.filter(
+    (item) => item.reason === "porn_ad",
+  ).length;
+  const spamCount = activeActions.filter(
+    (item) => item.reason === "spam_ad",
+  ).length;
+  const appealCount = activeActions.filter(
+    (item) => item.appealState !== "none",
+  ).length;
 
   return [
     { label: "色情廣告", value: String(pornCount), note: "全部公開紀錄" },
@@ -251,7 +325,7 @@ const buildLiveMetrics = (actions: CommunityWatchActionMetricNode[]): Metric[] =
 const buildPage = (
   cases: WatchCase[],
   source: CommunityWatchPageData["source"],
-  metrics = page.metrics
+  metrics = page.metrics,
 ) => ({
   ...page,
   metrics: source === "api" ? metrics : page.metrics,
@@ -268,7 +342,7 @@ const buildPage = (
 const requestGraphQL = async <T>(
   query: string,
   variables: Record<string, unknown>,
-  runtimeEnv?: CommunityWatchEnv
+  runtimeEnv?: CommunityWatchEnv,
 ): Promise<T | null> => {
   const apiUrl = getApiUrl(runtimeEnv);
   if (!apiUrl) {
@@ -294,7 +368,9 @@ const requestGraphQL = async <T>(
 
     return result.data ?? null;
   } catch (error) {
-    console.warn(`Community Watch API unavailable, using sample data: ${error}`);
+    console.warn(
+      `Community Watch API unavailable, using sample data: ${error}`,
+    );
     return null;
   }
 };
@@ -303,7 +379,7 @@ const getLiveCases = async (runtimeEnv?: CommunityWatchEnv) => {
   const data = await requestGraphQL<CommunityWatchActionsResponse>(
     COMMUNITY_WATCH_ACTIONS_QUERY,
     { input: { first: getFirst(runtimeEnv) } },
-    runtimeEnv
+    runtimeEnv,
   );
   if (!data) {
     return null;
@@ -311,6 +387,22 @@ const getLiveCases = async (runtimeEnv?: CommunityWatchEnv) => {
 
   const nodes = data?.communityWatchActions.edges.map(({ node }) => node) ?? [];
   return nodes.map(mapAction);
+};
+
+const getLiveCaseConnection = async (
+  input: { first: number; after?: string },
+  runtimeEnv?: CommunityWatchEnv,
+) => {
+  const data = await requestGraphQL<CommunityWatchActionListResponse>(
+    COMMUNITY_WATCH_ACTION_LIST_QUERY,
+    { input },
+    runtimeEnv,
+  );
+  if (!data) {
+    return null;
+  }
+
+  return data.communityWatchActions;
 };
 
 const getLiveMetrics = async (runtimeEnv?: CommunityWatchEnv) => {
@@ -326,7 +418,7 @@ const getLiveMetrics = async (runtimeEnv?: CommunityWatchEnv) => {
     const data = await requestGraphQL<CommunityWatchActionMetricsResponse>(
       COMMUNITY_WATCH_ACTION_METRICS_QUERY,
       { input },
-      runtimeEnv
+      runtimeEnv,
     );
     if (!data) {
       return null;
@@ -335,7 +427,7 @@ const getLiveMetrics = async (runtimeEnv?: CommunityWatchEnv) => {
     const connection = data.communityWatchActions;
     actions.push(...connection.edges.map(({ node }) => node));
     after = connection.pageInfo?.hasNextPage
-      ? connection.pageInfo.endCursor ?? null
+      ? (connection.pageInfo.endCursor ?? null)
       : null;
   } while (after);
 
@@ -346,21 +438,23 @@ const getLiveCase = async (uuid: string, runtimeEnv?: CommunityWatchEnv) => {
   const data = await requestGraphQL<CommunityWatchActionResponse>(
     COMMUNITY_WATCH_ACTION_QUERY,
     { uuid },
-    runtimeEnv
+    runtimeEnv,
   );
 
   if (!data) {
     return null;
   }
 
-  return data.communityWatchAction ? mapAction(data.communityWatchAction) : undefined;
+  return data.communityWatchAction
+    ? mapAction(data.communityWatchAction)
+    : undefined;
 };
 
 const findSampleCase = (uuid: string) =>
   page.log.cases.find((watchCase) => watchCase.id === uuid);
 
 const loadCommunityWatchPageData = async (
-  runtimeEnv?: CommunityWatchEnv
+  runtimeEnv?: CommunityWatchEnv,
 ): Promise<CommunityWatchPageData> => {
   const liveCases = await getLiveCases(runtimeEnv);
   if (liveCases) {
@@ -373,10 +467,11 @@ const loadCommunityWatchPageData = async (
           buildLiveMetrics(
             liveCases.map((watchCase) => ({
               actionState: watchCase.actionState ?? "active",
-              appealState: watchCase.appealStatus === "未申訴" ? "none" : "received",
+              appealState:
+                watchCase.appealStatus === "未申訴" ? "none" : "received",
               reason: watchCase.reason === "色情廣告" ? "porn_ad" : "spam_ad",
-            }))
-          )
+            })),
+          ),
       ),
       source: "api",
     };
@@ -386,12 +481,12 @@ const loadCommunityWatchPageData = async (
 };
 
 export const getCommunityWatchPageData = async (
-  runtimeEnv?: CommunityWatchEnv
+  runtimeEnv?: CommunityWatchEnv,
 ): Promise<CommunityWatchPageData> => loadCommunityWatchPageData(runtimeEnv);
 
 export const getCommunityWatchActionData = async (
   uuid: string,
-  runtimeEnv?: CommunityWatchEnv
+  runtimeEnv?: CommunityWatchEnv,
 ) => {
   if (!UUID_PATTERN.test(uuid)) {
     return findSampleCase(uuid) ?? null;
@@ -403,4 +498,54 @@ export const getCommunityWatchActionData = async (
   }
 
   return findSampleCase(uuid) ?? null;
+};
+
+export const getCommunityWatchRecordListData = async (
+  {
+    first = DEFAULT_RECORD_LIST_FIRST,
+    after,
+  }: {
+    first?: number;
+    after?: string | null;
+  } = {},
+  runtimeEnv?: CommunityWatchEnv,
+): Promise<CommunityWatchRecordListData> => {
+  const safeFirst = Math.max(1, Math.min(first, 100));
+  const safeAfter = after?.trim();
+  const input: { first: number; after?: string } = { first: safeFirst };
+  if (safeAfter) {
+    input.after = safeAfter;
+  }
+
+  const liveConnection = await getLiveCaseConnection(input, runtimeEnv);
+  if (liveConnection) {
+    return {
+      cases: liveConnection.edges.map(({ node }) => mapActionSummary(node)),
+      source: "api",
+      pageInfo: {
+        endCursor: liveConnection.pageInfo?.endCursor ?? null,
+        hasNextPage: Boolean(liveConnection.pageInfo?.hasNextPage),
+      },
+    };
+  }
+
+  if (getApiUrl(runtimeEnv)) {
+    return {
+      cases: [],
+      source: "unavailable",
+      pageInfo: {
+        endCursor: null,
+        hasNextPage: false,
+      },
+    };
+  }
+
+  return {
+    cases: page.log.cases.slice(0, safeFirst),
+    source: "sample",
+    pageInfo: {
+      endCursor: null,
+      hasNextPage: false,
+    },
+  };
 };
