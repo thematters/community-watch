@@ -24,6 +24,7 @@ interface CommunityWatchActionNode {
   reviewState: ReviewState;
   originalContent: string | null;
   contentCleared: boolean;
+  reportSynced: boolean;
   createdAt: string;
 }
 
@@ -108,6 +109,7 @@ const COMMUNITY_WATCH_ACTIONS_QUERY = /* GraphQL */ `
           reviewState
           originalContent
           contentCleared
+          reportSynced
           createdAt
         }
       }
@@ -153,6 +155,7 @@ const COMMUNITY_WATCH_ACTION_LIST_QUERY = /* GraphQL */ `
           actionState
           appealState
           reviewState
+          reportSynced
           createdAt
         }
       }
@@ -180,6 +183,7 @@ const COMMUNITY_WATCH_ACTION_QUERY = /* GraphQL */ `
       reviewState
       originalContent
       contentCleared
+      reportSynced
       createdAt
     }
   }
@@ -280,6 +284,7 @@ const mapAction = (action: CommunityWatchActionNode): WatchCase => ({
       : toPlainText(action.originalContent),
   watcher: action.actorDisplayName,
   handledAt: formatHandledAt(action.createdAt),
+  reportSynced: action.reportSynced,
   appealStatus: mapAppealStatus(action.appealState),
   reviewStatus: mapReviewStatus(action.reviewState),
 });
@@ -297,6 +302,7 @@ const mapActionSummary = (action: CommunityWatchActionListNode): WatchCase => ({
   commentPreview: "",
   watcher: action.actorDisplayName,
   handledAt: formatHandledAt(action.createdAt),
+  reportSynced: action.reportSynced,
   appealStatus: mapAppealStatus(action.appealState),
   reviewStatus: mapReviewStatus(action.reviewState),
 });
