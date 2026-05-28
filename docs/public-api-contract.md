@@ -116,8 +116,14 @@ Review state:
 ## Site Environment
 
 - `COMMUNITY_WATCH_API_URL`: GraphQL endpoint used by the Cloudflare runtime, for example `https://server.matters.town/graphql`.
-- `COMMUNITY_WATCH_API_FIRST`: optional list size, default `50`, capped at `100`.
+- `COMMUNITY_WATCH_API_FIRST`: optional recent-record list size, default `50`, capped at `100`.
 - If `COMMUNITY_WATCH_API_URL` is unset or unavailable, the Astro site falls back to local sample records in `src/content/page.ts`.
+
+## Homepage Metrics
+
+- Summary metrics are totals across all public Community Watch action pages, not just the recent-record list.
+- The homepage may keep the visible record list limited to `COMMUNITY_WATCH_API_FIRST`, but metrics must paginate through `pageInfo` until all public actions are counted.
+- Metric pagination should request only the fields needed for counting, such as `reason`, `actionState`, and `appealState`, so the homepage does not render every original comment body.
 
 ## Privacy
 
