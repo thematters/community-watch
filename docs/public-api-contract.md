@@ -160,7 +160,7 @@ Review state:
 ## Site Environment
 
 - `COMMUNITY_WATCH_API_URL`: GraphQL endpoint used by the Cloudflare runtime, for example `https://server.matters.town/graphql`.
-- `COMMUNITY_WATCH_API_FIRST`: optional recent-record list size, default `50`, capped at `100`.
+- `COMMUNITY_WATCH_API_FIRST`: optional homepage recent-record list size, default `20`, capped at `100`.
 - If `COMMUNITY_WATCH_API_URL` is unset or unavailable, the Astro site falls back to local sample records in `src/content/page.ts`.
 
 ## Homepage Metrics

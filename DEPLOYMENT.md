@@ -29,10 +29,10 @@ These tasks can be completed before `thematters/matters-server` #4762 is merged 
 
 ## Environment Variables
 
-| Name                        | Required | When                                  | Value                                                                                                  |
-| --------------------------- | -------- | ------------------------------------- | ------------------------------------------------------------------------------------------------------ |
-| `COMMUNITY_WATCH_API_URL`   | No       | After server public query is deployed | `https://server.matters.town/graphql` for production, `https://server.matters.icu/graphql` for staging |
-| `COMMUNITY_WATCH_API_FIRST` | No       | Optional record count tuning          | Defaults to 50                                                                                         |
+| Name                        | Required | When                                   | Value                                                                                                  |
+| --------------------------- | -------- | -------------------------------------- | ------------------------------------------------------------------------------------------------------ |
+| `COMMUNITY_WATCH_API_URL`   | No       | After server public query is deployed  | `https://server.matters.town/graphql` for production, `https://server.matters.icu/graphql` for staging |
+| `COMMUNITY_WATCH_API_FIRST` | No       | Optional homepage recent-record tuning | Defaults to 20                                                                                         |
 
 Do not put admin tokens or private API secrets in this site. The public page must use only public GraphQL queries.
 
@@ -92,7 +92,7 @@ Optional build-time environment:
 
 ```bash
 COMMUNITY_WATCH_API_URL=https://server.matters.town/graphql
-COMMUNITY_WATCH_API_FIRST=50
+COMMUNITY_WATCH_API_FIRST=20
 ```
 
 ## Public Routes

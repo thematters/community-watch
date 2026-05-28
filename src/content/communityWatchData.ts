@@ -85,7 +85,8 @@ type CommunityWatchEnv = Record<string, string | undefined>;
 
 const PUBLIC_NOTICE = "本則貼文已由守望相助隊檢舉";
 const CLEARED_CONTENT_TEXT = "原留言內容已因隱私或個資請求清空。";
-const DEFAULT_FIRST = 50;
+const DEFAULT_RECENT_FIRST = 20;
+const DEFAULT_RECORD_LIST_FIRST = 50;
 const UUID_PATTERN =
   /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
 
@@ -207,7 +208,7 @@ const getFirst = (runtimeEnv?: CommunityWatchEnv) => {
   if (Number.isFinite(raw) && raw > 0) {
     return Math.min(raw, 100);
   }
-  return DEFAULT_FIRST;
+  return DEFAULT_RECENT_FIRST;
 };
 
 const mapReason = (reason: Reason): WatchCase["reason"] =>
@@ -501,7 +502,7 @@ export const getCommunityWatchActionData = async (
 
 export const getCommunityWatchRecordListData = async (
   {
-    first = DEFAULT_FIRST,
+    first = DEFAULT_RECORD_LIST_FIRST,
     after,
   }: {
     first?: number;

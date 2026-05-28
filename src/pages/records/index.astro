@@ -9,6 +9,7 @@ const runtimeEnv = (
 ).runtime?.env;
 const rawAfter = Astro.url.searchParams.get("after");
 const after = rawAfter && rawAfter.length <= 512 ? rawAfter : null;
+const homepageRecentSize = 20;
 const pageSize = 50;
 const { cases, pageInfo, source } = await getCommunityWatchRecordListData(
   { first: pageSize, after },
@@ -39,7 +40,7 @@ Astro.response.headers.set("cache-control", "no-store");
 
 <PageLayout
   title={`完整公開紀錄｜${page.pageTitle}`}
-  description="馬特市守望相助隊完整公開紀錄列表，可分頁查核近期 50 筆以外的處理紀錄。"
+  description="馬特市守望相助隊完整公開紀錄列表，可分頁查核首頁近期紀錄以外的處理紀錄。"
   lang={page.lang}
 >
   <div class="page">
@@ -61,7 +62,7 @@ Astro.response.headers.set("cache-control", "no-store");
         <p class="eyebrow">完整公開紀錄</p>
         <h1 id="records-title">所有守望相助處理紀錄</h1>
         <p>
-          首頁只顯示最新 {pageSize} 筆，完整紀錄在此逐頁公開。列表不展開原留言全文，避免垃圾內容被二次散播；需要申訴、覆核或社群稽核時，可進入單筆紀錄查核。
+          首頁只顯示最新 {homepageRecentSize} 筆，完整紀錄在此逐頁公開。列表不展開原留言全文，避免垃圾內容被二次散播；需要申訴、覆核或社群稽核時，可進入單筆紀錄查核。
         </p>
         {source === "sample" && (
           <p class="records-heading__notice">
