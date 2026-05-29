@@ -104,6 +104,11 @@ Astro.response.headers.set("cache-control", "no-store");
                       <span class={`reason reason--${watchCase.reason === "色情廣告" ? "adult" : "spam"}`}>
                         {watchCase.reason}
                       </span>
+                      {watchCase.reportSynced && (
+                        <span class="record-row__status record-row__status--synced">
+                          已同步報告問題給站方
+                        </span>
+                      )}
                     </div>
                     <div class="record-row__source">
                       <span class="record-row__source-label">苦主</span>
@@ -337,6 +342,11 @@ Astro.response.headers.set("cache-control", "no-store");
   .record-row__status--voided {
     background: var(--surface-muted);
     color: var(--ink-muted);
+  }
+
+  .record-row__status--synced {
+    background: #eef2ff;
+    color: #3730a3;
   }
 
   .reason--adult {
