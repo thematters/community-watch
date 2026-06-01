@@ -30,6 +30,7 @@ Astro.response.headers.set("cache-control", "no-store");
       </a>
       <nav class="page__nav" aria-label="主要導覽">
         <a href="#watch-log">處理紀錄</a>
+        <a href={`${baseUrl}records/`}>完整紀錄</a>
         <a href="#appeal">申訴</a>
         <a href="https://matters.town/billboard">Billboard</a>
       </nav>
@@ -161,6 +162,11 @@ Astro.response.headers.set("cache-control", "no-store");
               </dl>
             </article>
           ))}
+        </div>
+
+        <div class="watch-log__actions">
+          <p>首頁僅顯示近期紀錄，完整公開紀錄可逐頁查核。</p>
+          <a class="btn btn--primary" href={`${baseUrl}records/`}>查看全部公開紀錄</a>
         </div>
       </section>
 
@@ -539,6 +545,22 @@ Astro.response.headers.set("cache-control", "no-store");
     background: var(--board-bg);
   }
 
+  .watch-log__actions {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: var(--space-sp16);
+    margin-top: var(--space-watch-24);
+    border-top: 1px solid var(--line);
+    padding-top: var(--space-watch-20);
+  }
+
+  .watch-log__actions p {
+    margin: 0;
+    color: var(--ink-muted);
+    font-weight: 700;
+  }
+
   .case-row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) minmax(176px, 0.28fr);
@@ -898,8 +920,15 @@ Astro.response.headers.set("cache-control", "no-store");
     }
 
     .hero__actions,
-    .hero__actions .btn {
+    .watch-log__actions,
+    .hero__actions .btn,
+    .watch-log__actions .btn {
       width: 100%;
+    }
+
+    .watch-log__actions {
+      align-items: stretch;
+      flex-direction: column;
     }
 
     .hero {

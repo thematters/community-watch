@@ -64,6 +64,11 @@ Astro.response.headers.set("cache-control", "no-store");
                 <div class="record__status-list" aria-label="主要處理狀態">
                   <span class="status-pill status-pill--reported">已被檢舉</span>
                   <span class={`reason reason--${reasonVariant}`}>{watchCase.reason}</span>
+                  {watchCase.reportSynced && (
+                    <span class="status-pill status-pill--synced">
+                      已同步報告問題給站方
+                    </span>
+                  )}
                   <span class={`status-pill status-pill--${reviewTone}`}>{watchCase.reviewStatus}</span>
                 </div>
                 <p class="record__source-chip" aria-label={`苦主：${watchCase.sourceTitle}`}>
@@ -402,6 +407,11 @@ Astro.response.headers.set("cache-control", "no-store");
   .status-pill--reported {
     background: var(--surface-purple);
     color: var(--brand-purple);
+  }
+
+  .status-pill--synced {
+    background: #eef2ff;
+    color: #3730a3;
   }
 
   .status-pill--positive {

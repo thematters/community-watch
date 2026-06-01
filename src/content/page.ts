@@ -22,6 +22,7 @@ export interface WatchCase {
   commentPreview: string;
   watcher: string;
   handledAt: string;
+  reportSynced?: boolean;
   appealStatus: string;
   reviewStatus: string;
 }
