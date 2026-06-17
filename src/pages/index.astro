@@ -198,6 +198,14 @@ Astro.response.headers.set("cache-control", "no-store");
               </li>
             ))}
           </ol>
+          {
+            page.training.cta && (
+              <a class="info-panel__cta" href={`${baseUrl}${page.training.cta.href.replace(/^\//, "")}`}>
+                {page.training.cta.label}
+                <span aria-hidden="true">→</span>
+              </a>
+            )
+          }
         </article>
       </section>
     </main>
@@ -779,6 +787,24 @@ Astro.response.headers.set("cache-control", "no-store");
     font-size: 20px;
     font-weight: 800;
     text-decoration: none;
+  }
+
+  .info-panel__cta {
+    display: inline-flex;
+    align-items: center;
+    gap: var(--space-sp8);
+    margin-top: var(--space-watch-24);
+    color: var(--brand-purple);
+    font-weight: 800;
+    text-decoration: none;
+  }
+
+  .info-panel__cta span {
+    transition: transform 0.16s ease;
+  }
+
+  .info-panel__cta:hover span {
+    transform: translateX(4px);
   }
 
   .step-list {

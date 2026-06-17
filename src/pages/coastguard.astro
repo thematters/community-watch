@@ -1,0 +1,414 @@
+---
+import PageLayout from "../layouts/PageLayout.astro";
+import { page } from "../content/page";
+
+const baseUrl = import.meta.env.BASE_URL;
+Astro.response.headers.set("cache-control", "no-store");
+
+const tiers = [
+  {
+    name: "檢舉（Tier-1）",
+    trigger: "分數達檢舉門檻",
+    action: "送出檢舉",
+    effect: "三位不同檢舉者湊齊，文章留言會自動收合，交由社群與站方檢視。",
+  },
+  {
+    name: "打掃移除（Tier-2）",
+    trigger: "分數達更高的移除門檻",
+    action: "移除留言並同步公開紀錄",
+    effect: "風險較高，預設關閉；需明確開啟並通過治理核准，移除才會生效。",
+  },
+];
+
+const guardrails = [
+  {
+    title: "預設只看不動手（dry-run）",
+    body: "平時只偵測與記錄，不呼叫任何移除或檢舉，先讓人確認判斷品質。",
+  },
+  {
+    title: "預設待在演練環境",
+    body: "預設跑在 staging，要動到正式環境必須明確指定，不會自己上線。",
+  },
+  {
+    title: "兩道精準度閘門",
+    body: "檢舉與移除各有獨立門檻，移除門檻訂在正常留言分數的天花板之上，把誤殺壓到極低。",
+  },
+  {
+    title: "緊急停止鈕",
+    body: "一個總開關（kill switch）可硬性停機，連偵測都停。",
+  },
+  {
+    title: "被推翻率煞車",
+    body: "若近期被守望相助隊推翻的移除比率過高，代表判斷飄移，機器人會自動拒絕動作。",
+  },
+  {
+    title: "單次出手上限",
+    body: "每輪巡邏的候選數與動作數都設有上限，不會一次掃掉一大片。",
+  },
+];
+---
+
+<PageLayout
+  title="海岸巡守隊 AI 救生員｜community-watch.matters.town"
+  description="馬特市海岸巡守隊 AI 救生員（@coastguard_ai）說明頁。訓練資料來自守望相助隊的集體智慧，協助巡邏與標記垃圾廣告留言；偵測模型與隊員移除標準同源，移除仍由隊員與站方把關。"
+  lang="zh-Hant"
+>
+  <div class="page">
+    <header class="page__header">
+      <a class="page__brand" href={baseUrl}>
+        <img src={`${baseUrl}matters-lettering-black.svg`} alt="Matters" />
+        <span aria-hidden="true"></span>
+        <strong>守望相助隊</strong>
+      </a>
+      <nav class="page__nav" aria-label="主要導覽">
+        <a href={`${baseUrl}`}>處理紀錄</a>
+        <a href={`${baseUrl}rules/`}>隊員規章</a>
+        <a href={`${baseUrl}#appeal`}>申訴</a>
+        <a href="https://matters.town/billboard">Billboard</a>
+      </nav>
+    </header>
+
+    <main class="page__main coastguard-main">
+      <article class="coastguard-document" aria-labelledby="coastguard-title">
+        <p class="eyebrow">AI 協作</p>
+        <h1 id="coastguard-title">海岸巡守隊 AI 救生員</h1>
+        <p class="coastguard-lead">
+          我是馬特市海濱遊樂區的 AI 海岸救生員（<a
+            href="https://matters.town/@coastguard_ai"
+            rel="noopener noreferrer">@coastguard_ai</a
+          >）。沿著留言區巡邏，把濫發廣告與色情廣告這些不該漂上岸的東西撈出來、標記成候選。我的眼力不是憑空來的——是守望相助隊累積的集體智慧教出來的。
+        </p>
+
+        <section>
+          <h2>它是什麼</h2>
+          <p>
+            海岸救生員是一個建立在守望相助隊公開處理紀錄之上的留言偵測機器人。它重用守望相助隊的「留言 spam 偵測模型」當作判斷依據——也就是說，「機器人會動手處理的東西」與「模型學會評分的東西」永遠是同一套標準，不會各走各的。
+          </p>
+          <p>
+            它的定位是<strong>協助巡邏與提示</strong>，不是取代隊員。第一階段，移除留言這件高風險的事仍由守望相助隊員與站方把關。
+          </p>
+        </section>
+
+        <section>
+          <h2>怎麼運作</h2>
+          <ol class="flow-steps">
+            <li>
+              <strong>巡邏</strong>
+              <span>透過公開、唯讀的搜尋路徑掃描留言，不需要特殊權限。</span>
+            </li>
+            <li>
+              <strong>評分</strong>
+              <span>用留言 spam 模型為每則留言打一個 0 到 1 的分數，分數越高越可能是垃圾廣告。</span>
+            </li>
+            <li>
+              <strong>判斷</strong>
+              <span>依分數對照門檻，決定要不要動作、動到哪一層，並受單次出手上限約束。</span>
+            </li>
+            <li>
+              <strong>出手</strong>
+              <span>除非處於只偵測模式，否則送出檢舉或移除，並把每個動作記錄下來。</span>
+            </li>
+          </ol>
+        </section>
+
+        <section>
+          <h2>兩種輕重</h2>
+          <p>它做事分兩層，分數越高、動作越重：</p>
+          <div class="tier-grid">
+            {
+              tiers.map((tier) => (
+                <article class="tier-card">
+                  <h3>{tier.name}</h3>
+                  <dl>
+                    <div>
+                      <dt>觸發</dt>
+                      <dd>{tier.trigger}</dd>
+                    </div>
+                    <div>
+                      <dt>動作</dt>
+                      <dd>{tier.action}</dd>
+                    </div>
+                    <div>
+                      <dt>效果</dt>
+                      <dd>{tier.effect}</dd>
+                    </div>
+                  </dl>
+                </article>
+              ))
+            }
+          </div>
+          <p class="tier-note">
+            門檻不是憑感覺訂的，而是以實際資料校準：移除門檻刻意訂在正常留言分數的天花板之上，換取近乎零的誤殺；檢舉門檻較低，換取更高的覆蓋率。每次模型重訓後都會重新校準。
+          </p>
+        </section>
+
+        <section>
+          <h2>自律與防線</h2>
+          <p>它身上裝了好幾道煞車，而且預設全部踩著——能力之外，自律更重要：</p>
+          <div class="guardrail-grid">
+            {
+              guardrails.map((item) => (
+                <article class="guardrail-card">
+                  <strong>{item.title}</strong>
+                  <span>{item.body}</span>
+                </article>
+              ))
+            }
+          </div>
+        </section>
+
+        <section>
+          <h2>訓練資料來自集體智慧</h2>
+          <p>
+            它的判斷力，來自守望相助隊親手移除過的留言——那些社區夥伴看過、判過、處理過的每一筆，都成了它的教科書。針對「留言」另起一套輕量模型（不走文章模型），在「沒見過的新模板」上也能抓到約 88% 的垃圾廣告，而誤傷正常留言的比率僅約 0.33%。
+          </p>
+          <p>
+            這樣的設計讓偵測與行動同源、可解釋、可追蹤；模型版本、分數與人工覆核結果都會被保留下來，方便日後修正。
+          </p>
+        </section>
+
+        <section>
+          <h2>目前狀態</h2>
+          <p>
+            海岸救生員仍在謹慎導入階段：以巡邏與只偵測（dry-run）為主，自動移除（Tier-2）預設關閉，待治理流程核准後才會逐步開啟。這與
+            <a href={`${baseUrl}rules/`}>守望相助隊規章</a>
+            的 AI 使用邊界一致——第一階段 AI 僅作為候選提示，不直接刪除留言。
+          </p>
+          <p class="coastguard-warning">
+            這是一片遊樂區，不是戰場。我寧可漏掉一兩個壞東西，也不想冤枉任何一個只是來好好寫字的人。若你認為遭到誤判，隨時可以申訴——被推翻，我就會學乖。
+          </p>
+        </section>
+
+        <div class="coastguard-actions">
+          <a class="btn btn--primary" href={baseUrl}>回到公開紀錄</a>
+          <a
+            class="btn btn--ghost"
+            href="https://matters.town/@coastguard_ai"
+            rel="noopener noreferrer">追蹤 @coastguard_ai</a
+          >
+          <a class="btn btn--ghost" href={`${baseUrl}#appeal`}>我要申訴</a>
+        </div>
+      </article>
+    </main>
+
+    <footer class="page__footer">
+      <div class="page__footer-copy">
+        <span>{page.footer.note}</span>
+        <strong>{page.footer.warning}</strong>
+      </div>
+      {
+        page.footer.links && page.footer.links.length > 0 && (
+          <nav aria-label="footer">
+            <ul>
+              {page.footer.links.map((link) => (
+                <li>
+                  <a href={link.href}>{link.label}</a>
+                </li>
+              ))}
+            </ul>
+          </nav>
+        )
+      }
+    </footer>
+  </div>
+</PageLayout>
+
+<style>
+  .coastguard-main {
+    padding-top: var(--space-watch-48);
+  }
+
+  .coastguard-document {
+    width: 100%;
+    max-width: 820px;
+    margin: 0 auto;
+    padding: 0 0 var(--space-watch-48);
+  }
+
+  .coastguard-document h1 {
+    margin: 0 0 var(--space-sp16);
+    font-family: var(--font-reading);
+    font-size: clamp(32px, 5vw, 48px);
+    line-height: 1.25;
+  }
+
+  .coastguard-lead {
+    margin: 0 0 var(--space-watch-48);
+    color: var(--ink-muted);
+    font-size: 18px;
+    line-height: 1.8;
+  }
+
+  .coastguard-lead a,
+  .coastguard-document section a {
+    color: var(--brand-purple);
+    font-weight: 700;
+    text-decoration: none;
+  }
+
+  .coastguard-lead a:hover,
+  .coastguard-document section a:hover {
+    text-decoration: underline;
+  }
+
+  .coastguard-document section {
+    padding: var(--space-watch-24) 0;
+    border-top: 1px solid var(--line);
+  }
+
+  .coastguard-document h2 {
+    margin: 0 0 var(--space-sp12);
+    font-size: 22px;
+    line-height: 1.4;
+  }
+
+  .coastguard-document h3 {
+    margin: 0 0 var(--space-sp12);
+    font-size: 18px;
+    line-height: 1.4;
+  }
+
+  .coastguard-document p {
+    margin: 0 0 var(--space-sp12);
+    color: var(--ink-muted);
+    line-height: 1.8;
+  }
+
+  .coastguard-document strong {
+    color: var(--ink);
+  }
+
+  .flow-steps {
+    margin: var(--space-sp16) 0 0;
+    padding: 0;
+    list-style: none;
+    display: flex;
+    flex-direction: column;
+    gap: var(--space-sp12);
+    counter-reset: steps;
+  }
+
+  .flow-steps li {
+    counter-increment: steps;
+    display: grid;
+    grid-template-columns: 32px minmax(0, 1fr);
+    gap: var(--space-sp12);
+    align-items: start;
+  }
+
+  .flow-steps li::before {
+    content: counter(steps);
+    width: 32px;
+    height: 32px;
+    border-radius: 50%;
+    background: var(--brand-lime);
+    color: var(--color-grey-black);
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    font-weight: 800;
+    line-height: 1;
+  }
+
+  .flow-steps strong,
+  .flow-steps span {
+    grid-column: 2;
+  }
+
+  .flow-steps span {
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  .tier-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sp16);
+    margin-top: var(--space-sp16);
+  }
+
+  .tier-card {
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: var(--space-watch-20);
+    background: var(--board-bg);
+  }
+
+  .tier-card dl {
+    margin: var(--space-sp12) 0 0;
+    display: grid;
+    gap: var(--space-sp10);
+  }
+
+  .tier-card dt {
+    color: var(--brand-purple);
+    font-size: 13px;
+    font-weight: 800;
+  }
+
+  .tier-card dd {
+    margin: var(--space-sp2) 0 0;
+    color: var(--ink-muted);
+    line-height: 1.6;
+  }
+
+  .tier-note {
+    margin-top: var(--space-sp16) !important;
+    border-left: 4px solid var(--brand-lime);
+    padding-left: var(--space-sp12);
+    color: var(--ink) !important;
+    font-weight: 700;
+  }
+
+  .guardrail-grid {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: var(--space-sp16);
+    margin-top: var(--space-sp16);
+  }
+
+  .guardrail-card {
+    display: grid;
+    gap: var(--space-sp6);
+    border: 1px solid var(--line);
+    border-radius: 8px;
+    padding: var(--space-watch-20);
+    background: var(--board-bg);
+  }
+
+  .guardrail-card strong {
+    color: var(--ink);
+    line-height: 1.4;
+  }
+
+  .guardrail-card span {
+    color: var(--ink-muted);
+    line-height: 1.7;
+  }
+
+  .coastguard-warning {
+    border-left: 4px solid var(--brand-purple);
+    padding-left: var(--space-sp12);
+    color: var(--ink) !important;
+    font-weight: 600;
+  }
+
+  .coastguard-actions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: var(--space-sp12);
+    margin-top: var(--space-watch-40);
+  }
+
+  @media (max-width: 760px) {
+    .tier-grid,
+    .guardrail-grid {
+      grid-template-columns: 1fr;
+    }
+
+    .coastguard-actions .btn {
+      width: 100%;
+      justify-content: center;
+    }
+  }
+</style>

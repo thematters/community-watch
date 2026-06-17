@@ -79,6 +79,7 @@ export interface CommunityWatchContent {
     title: string;
     body: string;
     steps: Step[];
+    cta?: CTA;
   };
   footer: {
     note: string;
@@ -200,29 +201,31 @@ export const page: CommunityWatchContent = {
     ],
   },
   training: {
-    eyebrow: "下一步",
-    title: "守望相助 AI 資料規劃",
-    body: "人工處理紀錄未來可整理為訓練與評測資料；第一階段 AI 僅得作為候選提示，不得直接刪除留言。",
+    eyebrow: "AI 協作",
+    title: "海岸巡守隊 AI 救生員",
+    body: "守望相助隊累積的公開處理紀錄，訓練出一位 AI 海岸救生員（@coastguard_ai）。它沿著留言區巡邏，標記疑似垃圾廣告的候選留言；偵測模型與隊員實際移除的標準同源，目前僅協助巡邏與檢舉，移除仍由隊員與站方把關。",
     steps: [
       {
-        title: "整理明確樣本",
-        body: "僅收錄「色情廣告」與「濫發廣告」兩類明確樣本，降低模型誤判正常討論的風險。",
+        title: "從集體智慧學習",
+        body: "訓練資料來自守望相助隊已移除的留言，模型判斷與隊員標準同源，「看到的」與「學到的」不會各走各的。",
       },
       {
-        title: "僅作候選提示",
-        body: "自動檢測工具僅提供候選提示與批次整理，不直接刪除留言。",
+        title: "兩道精準度防線",
+        body: "高分才檢舉、更高分才考慮移除；自動移除（Tier-2）預設關閉，須經治理核准才會開啟。",
       },
       {
-        title: "保留覆核依據",
-        body: "未來若導入模型，仍應記錄模型版本、分數與人工覆核結果，方便修正與追蹤。",
+        title: "全程可稽核",
+        body: "預設只偵測不動手（dry-run），每次出手都留公開紀錄；當移除被推翻的比率過高，會自動煞車停手。",
       },
     ],
+    cta: { label: "了解海岸巡守隊如何運作", href: "coastguard/" },
   },
   footer: {
     note: "© Matters Lab · community-watch.matters.town",
     warning: "公開原文僅供申訴、覆核與社群稽核使用；請勿轉貼垃圾連結、色情廣告或詐騙內容。",
     links: [
       { label: "隊員規章", href: "/rules/" },
+      { label: "海岸巡守隊", href: "/coastguard/" },
       { label: "申訴信箱", href: "mailto:hi@matters.town" },
       { label: "Matters 首頁", href: "https://matters.town" },
       { label: "Billboard", href: "https://matters.town/billboard" },
