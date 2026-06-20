@@ -33,6 +33,18 @@ Astro.response.headers.set("cache-control", "no-store");
           本規章適用於「馬特市守望相助隊」第一階段試行。目的在於讓少數受託市民協助處理明確垃圾留言，並以公開紀錄、站方覆核與申訴管道降低濫權風險。
         </p>
 
+        <section class="rules-summary" aria-labelledby="summary-title">
+          <p class="eyebrow">簡明摘要</p>
+          <h2 id="summary-title">如果你的留言被處理</h2>
+          <ul>
+            <li>第一階段只處理明確「色情廣告」與「濫發廣告」留言。</li>
+            <li>每次處理都會留下公開紀錄，包含理由、處理者顯示名稱、時間、申訴狀態與站方覆核狀態。</li>
+            <li>若你認為留言不是垃圾廣告，可寄信至 <a href="mailto:hi@matters.town">hi@matters.town</a>，並附上留言 ID 或公開紀錄連結。</li>
+            <li>一般申訴原則上 3 個工作天內確認收件，7 個工作天內提供初步回覆，14 個工作天內提供結果或進度說明。</li>
+            <li>完整申訴、救濟與個人資料權利說明可參考 <a href="https://matters.town/appeals">Matters 申訴與救濟中心</a>。</li>
+          </ul>
+        </section>
+
         <section class="rules-tutorial" aria-labelledby="tutorial-title">
           <div class="rules-tutorial__intro">
             <p class="eyebrow">隊員操作教學</p>
@@ -218,6 +230,8 @@ Astro.response.headers.set("cache-control", "no-store");
         <section>
           <h2>申訴與覆核</h2>
           <p>被移除留言的使用者得寄信至 <a href="mailto:hi@matters.town">hi@matters.town</a> 申訴，並附上留言 ID 或公開紀錄連結。</p>
+          <p>來信可補充原留言脈絡、認為該留言不屬於色情廣告或濫發廣告的理由，以及任何能協助判斷的截圖或連結。完整說明可參考 <a href="https://matters.town/appeals">Matters 申訴與救濟中心</a>。</p>
+          <p>一般申訴原則上 3 個工作天內確認收件，7 個工作天內提供初步回覆，14 個工作天內提供處理結果或進度說明。若案件涉及帳號安全、法令限制、他人個資、平台安全或濫用風險，回覆內容可能會受限。</p>
           <ul>
             <li>維持原處理。</li>
             <li>恢復留言。</li>
@@ -250,7 +264,7 @@ Astro.response.headers.set("cache-control", "no-store");
           <h2>資料與隱私</h2>
           <p>守望相助隊不應蒐集不必要個資。稽核資料僅保存必要資訊。</p>
           <p>若 <code>originalContent</code> 包含個資，且收到有效個資或隱私請求，站方得清除 <code>originalContent</code>，並保留非個資稽核資料。</p>
-          <p>目前不執行自動七天清空 <code>originalContent</code>。保留或清除期限，待後續產品與隱私決策確認。</p>
+          <p>暫行策略是只為申訴、覆核、防弊與模型評測保留必要原文。正式保留期限仍待平台層產品與隱私決策確認；確認前，不以自動七天清空作為公開承諾。</p>
         </section>
 
         <section>
@@ -262,6 +276,7 @@ Astro.response.headers.set("cache-control", "no-store");
             <li>保留人工理由、覆核結果與資料來源。</li>
             <li>第一階段 AI 僅得作為候選提示，不得直接刪除留言。</li>
           </ul>
+          <p>平台層自動化與反濫用模型說明，可參考 <a href="https://matters.town/transparency/automation">Matters 自動化與反濫用模型</a>。</p>
         </section>
 
         <section>
